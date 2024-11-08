@@ -267,7 +267,7 @@ export default function ActivitySeven() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/activity-seven/${user.nationalId}`
+          `https://brain-training-server.onrender.com/api/activity-seven/${user.nationalId}`
         );
         const { values, goals, actions } = response.data;
 
@@ -345,7 +345,7 @@ export default function ActivitySeven() {
 
     try {
       setLoading(true);
-      await axios.post("http://localhost:5000/api/activity-seven/values/save", {
+      await axios.post("https://brain-training-server.onrender.com/api/activity-seven/values/save", {
         nationalId: user.nationalId,
         values: [...values, newValueItem],
       });
@@ -370,7 +370,7 @@ export default function ActivitySeven() {
           setLoading(true);
           const valueToRemove = values.find((v) => v.id === valueId);
 
-          await axios.post("http://localhost:5000/api/activity-seven/delete", {
+          await axios.post("https://brain-training-server.onrender.com/api/activity-seven/delete", {
             nationalId: user.nationalId,
             itemId: valueId,
             itemType: "value",
@@ -406,7 +406,7 @@ export default function ActivitySeven() {
 
     try {
       setLoading(true);
-      await axios.post("http://localhost:5000/api/activity-seven/goals/save", {
+      await axios.post("https://brain-training-server.onrender.com/api/activity-seven/goals/save", {
         nationalId: user.nationalId,
         goals: [...goals, newGoalItem],
       });
@@ -433,7 +433,7 @@ export default function ActivitySeven() {
           setLoading(true);
           const goalToRemove = goals.find((g) => g.id === goalId);
 
-          await axios.post("http://localhost:5000/api/activity-seven/delete", {
+          await axios.post("https://brain-training-server.onrender.com/api/activity-seven/delete", {
             nationalId: user.nationalId,
             itemId: goalId,
             itemType: "goal",
@@ -500,7 +500,7 @@ export default function ActivitySeven() {
       );
 
       // บันทึกลงฐานข้อมูล
-      await axios.post("http://localhost:5000/api/activity-seven/goals/save", {
+      await axios.post("https://brain-training-server.onrender.com/api/activity-seven/goals/save", {
         nationalId: user.nationalId,
         goals: updatedGoals,
       });
@@ -527,7 +527,7 @@ export default function ActivitySeven() {
           const planToRemove = plans[goalId].find((p) => p.id === planId);
 
           // บันทึกประวัติการลบ
-          await axios.post("http://localhost:5000/api/activity-seven/delete", {
+          await axios.post("https://brain-training-server.onrender.com/api/activity-seven/delete", {
             nationalId: user.nationalId,
             itemId: planId,
             itemType: "plan",
@@ -554,7 +554,7 @@ export default function ActivitySeven() {
 
           // บันทึกลงฐานข้อมูล
           await axios.post(
-            "http://localhost:5000/api/activity-seven/goals/save",
+            "https://brain-training-server.onrender.com/api/activity-seven/goals/save",
             {
               nationalId: user.nationalId,
               goals: updatedGoals,
@@ -587,7 +587,7 @@ export default function ActivitySeven() {
           : goal
       );
 
-      await axios.post("http://localhost:5000/api/activity-seven/goals/save", {
+      await axios.post("https://brain-training-server.onrender.com/api/activity-seven/goals/save", {
         nationalId: user.nationalId,
         goals: updatedGoals,
       });
@@ -614,7 +614,7 @@ export default function ActivitySeven() {
         return goal;
       });
 
-      await axios.post("http://localhost:5000/api/activity-seven/goals/save", {
+      await axios.post("https://brain-training-server.onrender.com/api/activity-seven/goals/save", {
         nationalId: user.nationalId,
         goals: updatedGoals,
       });
@@ -649,7 +649,7 @@ export default function ActivitySeven() {
           }));
 
           await axios.post(
-            "http://localhost:5000/api/activity-seven/goals/save",
+            "https://brain-training-server.onrender.com/api/activity-seven/goals/save",
             {
               nationalId: user.nationalId,
               goals: updatedGoals,
@@ -658,7 +658,7 @@ export default function ActivitySeven() {
 
           // Fetch summary data
           const summaryResponse = await axios.get(
-            `http://localhost:5000/api/activity-seven/summary/${user.nationalId}`
+            `https://brain-training-server.onrender.com/api/activity-seven/summary/${user.nationalId}`
           );
           setActionHistory(summaryResponse.data.actions);
         }

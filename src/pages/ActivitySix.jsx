@@ -263,7 +263,7 @@ export default function ActivitySix() {
     useEffect(() => {
         const checkExistingPlans = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/life-design/${user.nationalId}`);
+                const response = await axios.get(`https://brain-training-server.onrender.com/api/life-design/${user.nationalId}`);
                 const plans = response.data;
 
                 if (plans && plans.length > 0) {
@@ -306,7 +306,7 @@ export default function ActivitySix() {
     // ฟังก์ชันสำหรับลบแผนเป้าหมาย
     const handleDeletePlan = async (planId) => {
         try {
-            await axios.put(`http://localhost:5000/api/life-design/delete/${planId}`);
+            await axios.put(`https://brain-training-server.onrender.com/api/life-design/delete/${planId}`);
             setExistingPlans(existingPlans.filter(plan => plan._id !== planId));
             message.success('ลบแผนเป้าหมายสำเร็จ');
         } catch (error) {
@@ -325,7 +325,7 @@ export default function ActivitySix() {
                 return;
             }
 
-            const response = await axios.post('http://localhost:5000/api/life-design/create', {
+            const response = await axios.post('https://brain-training-server.onrender.com/api/life-design/create', {
                 nationalId: user.nationalId,
                 values: selectedValues,
                 goals: {

@@ -403,7 +403,7 @@ export default function ActivityFive() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/goals/${user.nationalId}`
+          `https://brain-training-server.onrender.com/api/goals/${user.nationalId}`
         );
         const { values, shortTermGoals, longTermGoals, actions } =
           response.data;
@@ -437,7 +437,7 @@ export default function ActivityFive() {
 
     try {
       setLoading(true);
-      await axios.post("http://localhost:5000/api/goals/save", {
+      await axios.post("https://brain-training-server.onrender.com/api/goals/save", {
         nationalId: user.nationalId,
         values: [...values, newValueItem],
       });
@@ -457,14 +457,14 @@ export default function ActivityFive() {
       setLoading(true);
       const valueToRemove = values.find((v) => v.id === id);
 
-      await axios.post("http://localhost:5000/api/goals/delete", {
+      await axios.post("https://brain-training-server.onrender.com/api/goals/delete", {
         nationalId: user.nationalId,
         itemId: id,
         itemType: "value",
         text: valueToRemove.text,
       });
 
-      await axios.post("http://localhost:5000/api/goals/save", {
+      await axios.post("https://brain-training-server.onrender.com/api/goals/save", {
         nationalId: user.nationalId,
         values: values.filter((v) => v.id !== id),
       });
@@ -497,7 +497,7 @@ export default function ActivityFive() {
           ? [...shortTermGoals, newGoalItem]
           : [...longTermGoals, newGoalItem];
 
-      await axios.post("http://localhost:5000/api/goals/save", {
+      await axios.post("https://brain-training-server.onrender.com/api/goals/save", {
         nationalId: user.nationalId,
         [type === "short" ? "shortTermGoals" : "longTermGoals"]: updatedGoals,
       });
@@ -523,7 +523,7 @@ export default function ActivityFive() {
       const goalsArray = type === "short" ? shortTermGoals : longTermGoals;
       const goalToRemove = goalsArray.find((g) => g.id === id);
 
-      await axios.post("http://localhost:5000/api/goals/delete", {
+      await axios.post("https://brain-training-server.onrender.com/api/goals/delete", {
         nationalId: user.nationalId,
         itemId: id,
         itemType: type === "short" ? "shortTermGoal" : "longTermGoal",
@@ -531,7 +531,7 @@ export default function ActivityFive() {
       });
 
       const updatedGoals = goalsArray.filter((g) => g.id !== id);
-      await axios.post("http://localhost:5000/api/goals/save", {
+      await axios.post("https://brain-training-server.onrender.com/api/goals/save", {
         nationalId: user.nationalId,
         [type === "short" ? "shortTermGoals" : "longTermGoals"]: updatedGoals,
       });
@@ -560,7 +560,7 @@ export default function ActivityFive() {
         completed: !goalToToggle.completed,
       };
 
-      await axios.post("http://localhost:5000/api/goals/complete", {
+      await axios.post("https://brain-training-server.onrender.com/api/goals/complete", {
         nationalId: user.nationalId,
         itemId: id,
         itemType: type === "short" ? "shortTermGoal" : "longTermGoal",
@@ -570,7 +570,7 @@ export default function ActivityFive() {
       const updatedGoals = goalsArray.map((g) =>
         g.id === id ? updatedGoal : g
       );
-      await axios.post("http://localhost:5000/api/goals/save", {
+      await axios.post("https://brain-training-server.onrender.com/api/goals/save", {
         nationalId: user.nationalId,
         [type === "short" ? "shortTermGoals" : "longTermGoals"]: updatedGoals,
       });
@@ -601,7 +601,7 @@ export default function ActivityFive() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:5000/api/goals/summary/${user.nationalId}`
+        `https://brain-training-server.onrender.com/api/goals/summary/${user.nationalId}`
       );
       setActionHistory(response.data.actions);
       setCurrentStep((prev) => prev + 1);

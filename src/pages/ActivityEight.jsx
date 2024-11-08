@@ -267,7 +267,7 @@ export default function ActivityEight() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/activity-eight/${user.nationalId}`
+          `https://brain-training-server.onrender.com/api/activity-eight/${user.nationalId}`
         );
         const { currentGoal, completedGoals, actions, values } = response.data;
 
@@ -330,7 +330,7 @@ export default function ActivityEight() {
         reason: newValue.reason.trim(),
       };
 
-      await axios.post("http://localhost:5000/api/activity-eight/values/save", {
+      await axios.post("https://brain-training-server.onrender.com/api/activity-eight/values/save", {
         nationalId: user.nationalId,
         values: [...values, newValueItem],
       });
@@ -355,7 +355,7 @@ export default function ActivityEight() {
         try {
           setLoading(true);
           await axios.post(
-            "http://localhost:5000/api/activity-eight/values/delete",
+            "https://brain-training-server.onrender.com/api/activity-eight/values/delete",
             {
               nationalId: user.nationalId,
               valueId,
@@ -397,7 +397,7 @@ export default function ActivityEight() {
         reward: "",
       };
 
-      await axios.post("http://localhost:5000/api/activity-eight/goal/save", {
+      await axios.post("https://brain-training-server.onrender.com/api/activity-eight/goal/save", {
         nationalId: user.nationalId,
         goal: newGoalItem,
       });
@@ -427,7 +427,7 @@ export default function ActivityEight() {
         completed: false,
       };
 
-      await axios.post("http://localhost:5000/api/activity-eight/plan/save", {
+      await axios.post("https://brain-training-server.onrender.com/api/activity-eight/plan/save", {
         nationalId: user.nationalId,
         plan: newPlanItem,
       });
@@ -452,7 +452,7 @@ export default function ActivityEight() {
         plan.id === planId ? { ...plan, completed: true } : plan
       );
 
-      await axios.post("http://localhost:5000/api/activity-eight/plan/save", {
+      await axios.post("https://brain-training-server.onrender.com/api/activity-eight/plan/save", {
         nationalId: user.nationalId,
         plan: updatedPlans.find((p) => p.id === planId),
       });
@@ -477,7 +477,7 @@ export default function ActivityEight() {
         completed: true,
       };
 
-      await axios.post("http://localhost:5000/api/activity-eight/goal/save", {
+      await axios.post("https://brain-training-server.onrender.com/api/activity-eight/goal/save", {
         nationalId: user.nationalId,
         goal: updatedGoal,
       });
@@ -504,7 +504,7 @@ export default function ActivityEight() {
         try {
           setLoading(true);
           await axios.post(
-            "http://localhost:5000/api/activity-eight/plan/delete",
+            "https://brain-training-server.onrender.com/api/activity-eight/plan/delete",
             {
               nationalId: user.nationalId,
               planId,
@@ -535,7 +535,7 @@ export default function ActivityEight() {
         reward,
       };
 
-      await axios.post("http://localhost:5000/api/activity-eight/goal/save", {
+      await axios.post("https://brain-training-server.onrender.com/api/activity-eight/goal/save", {
         nationalId: user.nationalId,
         goal: updatedGoal,
       });

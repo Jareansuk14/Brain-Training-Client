@@ -461,7 +461,7 @@ export default function ActivityFour() {
 
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/emotion/history/${user.nationalId}`
+          `https://brain-training-server.onrender.com/api/emotion/history/${user.nationalId}`
         );
         setHistory(response.data);
       } catch (error) {
@@ -480,7 +480,7 @@ export default function ActivityFour() {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/emotion/save-emotion",
+        "https://brain-training-server.onrender.com/api/emotion/save-emotion",
         {
           nationalId: user.nationalId,
           emotion: selectedEmotion.name,
@@ -494,7 +494,7 @@ export default function ActivityFour() {
         message.success("บันทึกอารมณ์สำเร็จ");
         // Fetch updated history
         const historyResponse = await axios.get(
-          `http://localhost:5000/api/emotion/history/${user.nationalId}`
+          `https://brain-training-server.onrender.com/api/emotion/history/${user.nationalId}`
         );
         setHistory(historyResponse.data);
         setThoughts("");
