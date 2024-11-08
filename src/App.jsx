@@ -1,5 +1,5 @@
 // src/App.jsx
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import { Layout, Menu, Button } from "antd";
 import {
   LogoutOutlined,
@@ -198,13 +198,14 @@ const Header = () => {
 
   return (
     <StyledHeader>
-      <LogoContainer>
-        <div className="logo-icon">
-          <ExperimentOutlined />
-        </div>
-        <div className="logo-text">Brain-Training</div>
-      </LogoContainer>
-
+      <Link to="/">
+        <LogoContainer>
+          <div className="logo-icon">
+            <ExperimentOutlined />
+          </div>
+          <div className="logo-text">Brain-Training</div>
+        </LogoContainer>
+      </Link>
       {user && (
         <UserInfo>
           <UserCard>

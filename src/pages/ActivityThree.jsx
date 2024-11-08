@@ -438,10 +438,10 @@ const InstructionCard = styled.div`
 
 // คลิปวิดีโอสำหรับแต่ละระยะเวลา
 const videos = {
-  5: "N59zb_jXVLs",
-  10: "6kVVrE_sCNA",
-  15: "ssss7V1_eyA",
-  30: "XEWK1CZeYbY",
+  5: "oQEllKFFiJM",
+  10: "9-A7zWwTWfQ",
+  15: "yLeYqVtR_xo",
+  30: "7T9Hb1-skNA",
 };
 
 export default function ActivityThree() {
