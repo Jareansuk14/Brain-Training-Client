@@ -246,7 +246,7 @@ export default function Auth() {
     
     try {
         if (!validateNationalId(values.nationalId)) {
-            setError('เลขบัตรประชาชนไม่ถูกต้อง');
+            setError('หมายเลขประจำตัวไม่ถูกต้อง');
             setLoading(false);
             return;
         }
@@ -273,7 +273,7 @@ export default function Auth() {
     
     try {
         if (!validateNationalId(values.nationalId)) {
-            setError('เลขบัตรประชาชนไม่ถูกต้อง');
+            setError('หมายเลขประจำตัวไม่ถูกต้อง');
             setLoading(false);
             return;
         }
@@ -303,13 +303,13 @@ export default function Auth() {
         
         try {
             if (!validateNationalId(value)) {
-                setError('เลขบัตรประชาชนไม่ถูกต้อง');
+                setError('หมายเลขประจำตัวไม่ถูกต้อง');
                 return;
             }
 
             const response = await axios.get(`https://brain-training-server.onrender.com/api/auth/check/${value}`);
             if (activeTab === 'register' && response.data.exists) {
-                setError('เลขบัตรประชาชนนี้มีในระบบแล้ว');
+                setError('หมายเลขประจำตัวนี้มีในระบบแล้ว');
             } else if (activeTab === 'login' && !response.data.exists) {
                 setError('ไม่พบข้อมูลผู้ใช้ในระบบ');
             }
@@ -357,16 +357,16 @@ export default function Auth() {
                 <Form.Item
                   name="nationalId"
                   rules={[
-                    { required: true, message: "กรุณากรอกเลขบัตรประชาชน" },
+                    { required: true, message: "กรุณากรอกหมายเลขประจำตัว" },
                     {
                       pattern: /^\d{13}$/,
-                      message: "กรุณากรอกเลขบัตรประชาชน 13 หลัก",
+                      message: "กรุณากรอกหมายเลขประจำตัว",
                     },
                   ]}
                 >
                   <StyledInput
                     prefix={<IdcardOutlined />}
-                    placeholder="เลขบัตรประชาชน 13 หลัก"
+                    placeholder="หมายเลขประจำตัว"
                     maxLength={13}
                     onChange={(e) => handleNationalIdChange(e, loginForm)}
                     disabled={loading}
@@ -408,16 +408,16 @@ export default function Auth() {
                 <Form.Item
                   name="nationalId"
                   rules={[
-                    { required: true, message: "กรุณากรอกเลขบัตรประชาชน" },
+                    { required: true, message: "กรุณากรอกหมายเลขประจำตัว" },
                     {
                       pattern: /^\d{13}$/,
-                      message: "กรุณากรอกเลขบัตรประชาชน 13 หลัก",
+                      message: "กรุณากรอกหมายเลขประจำตัว",
                     },
                   ]}
                 >
                   <StyledInput
                     prefix={<IdcardOutlined />}
-                    placeholder="เลขบัตรประชาชน 13 หลัก"
+                    placeholder="หมายเลขประจำตัว"
                     maxLength={13}
                     onChange={(e) => handleNationalIdChange(e, registerForm)}
                     disabled={loading}

@@ -126,7 +126,7 @@ export default function Header() {
       <Space direction="vertical" size={16}>
         <MainTitle level={1}>โปรแกรมพัฒนาสมองแบบผสมผสาน</MainTitle>
         <SubTitle level={3}>
-          เสริมสร้าง<strong>ความจำใช้งาน</strong>และลดภาวะบกพร่องเล็กน้อยทาง<strong>การรู้คิด</strong>ในวัยทำงาน
+        นวัตกรรมพัฒนาสมองแบบผสมผสานเพื่อเสริมสร้าง<strong>ความจำใช้งาน</strong>และหน้าที่<strong>ด้านการรู้คิด</strong>ในวัยทำงาน
         </SubTitle>
       </Space>
     </StyledHeader>
