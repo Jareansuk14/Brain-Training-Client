@@ -306,29 +306,62 @@ const ThoughtInput = styled(TextArea)`
 const StyledSteps = styled(Steps)`
   margin-bottom: 40px;
 
-  .ant-steps-item-icon {
-    background: ${COLORS.primary};
-    border: none;
+  // สำหรับ step ปัจจุบัน
+  .ant-steps-item-process {
+    .ant-steps-item-icon {
+      background: ${COLORS.primary}; // สีม่วงเข้ม #7c3aed
+      border-color: ${COLORS.primary};
+    }
 
-    .ant-steps-icon {
-      color: white;
+    .ant-steps-item-title {
+      color: ${COLORS.primary} !important;
+      
+      &::after {
+        background-color: ${COLORS.primary} !important;
+      }
+    }
+  }
+
+  // สำหรับ step ที่เสร็จแล้ว
+  .ant-steps-item-finish {
+    .ant-steps-item-icon {
+      background: white;
+      border-color: ${COLORS.primary};
+      
+      .ant-steps-icon {
+        color: ${COLORS.primary};
+      }
+    }
+
+    .ant-steps-item-title {
+      color: ${COLORS.primary} !important;
+      
+      &::after {
+        background-color: ${COLORS.primary} !important;
+      }
+    }
+  }
+
+  // สำหรับเส้นเชื่อมระหว่าง steps
+  .ant-steps-item-tail::after {
+    background-color: ${COLORS.secondary} !important; // สีม่วงอ่อน #a78bfa
+  }
+
+  // สำหรับ step ที่ยังไม่ถึง
+  .ant-steps-item-wait {
+    .ant-steps-item-icon {
+      background: white;
+      border-color: ${COLORS.secondary};
+      
+      .ant-steps-icon {
+        color: ${COLORS.secondary};
+      }
     }
   }
 
   .ant-steps-item-title {
     font-size: 16px;
     font-weight: 500;
-  }
-
-  .ant-steps-item-description {
-    font-size: 14px;
-    color: ${COLORS.textLight};
-  }
-
-  .ant-steps-item-finish {
-    .ant-steps-item-icon {
-      background: ${COLORS.success};
-    }
   }
 `;
 

@@ -619,7 +619,6 @@ export default function ActivityOneForm() {
         .map(([key]) => key);
 
       if (missingFields.length > 0) {
-        message.error(`กรุณาตอบคำถามให้ครบถ้วน: ${missingFields.join(", ")}`);
         setLoading(false);
         return;
       }
@@ -662,7 +661,7 @@ export default function ActivityOneForm() {
   const steps = [
     {
       title: "ข้อมูลพื้นฐาน",
-      icon: <HeartOutlined />,
+      icon: <HeartOutlined style={{ color: COLORS.primary }} />,
       content: (
         <FormSection>
           <InstructionCard>
@@ -836,7 +835,7 @@ export default function ActivityOneForm() {
     },
     {
       title: "คำถามเชิงลึก",
-      icon: <BookOutlined />,
+      icon: <BookOutlined style={{ color: COLORS.primary }} />,
       content: (
         <FormSection>
           <StyledAlert>

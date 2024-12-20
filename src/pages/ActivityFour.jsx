@@ -126,7 +126,7 @@ const ContentContainer = styled.div`
 const EmotionWheel = styled.div`
   position: relative;
   width: 100%;
-  max-width: 600px;
+  max-width: 720px;    // เพิ่มจาก 600px เป็น 720px
   margin: 0 auto;
   aspect-ratio: 1;
   filter: drop-shadow(0 10px 20px ${COLORS.shadow});
@@ -157,8 +157,8 @@ const EmotionSegment = styled.path`
 `;
 
 const EmotionLabel = styled.text`
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 400;
   fill: #333;
   text-anchor: middle;
   pointer-events: none;
@@ -353,30 +353,60 @@ const InstructionCard = styled.div`
 `;
 
 // Emotions array
-const emotions = [
-  // Negative emotions
-  { name: "โกรธ", color: EMOTION_COLORS["โกรธ"], position: "negative" },
-  {
-    name: "ว้าวุ่นใจ",
-    color: EMOTION_COLORS["ว้าวุ่นใจ"],
-    position: "negative",
+const emotions = {
+  negative: {
+    outer: [
+      { name: "รำคาญ", color: "#6fd2db30" },      // เปลี่ยนจาก 80 เป็น 50
+      { name: "หงุดหงิด", color: "#6697e530" },
+      { name: "กังวลใจ", color: "#9166c230" },
+      { name: "ไม่สบายใจ", color: "#b068c230" },
+      { name: "เบื่อ", color: "#df69ce30" },
+      { name: "เซ็ง", color: "#f4787c30" },
+    ],
+    middle: [                                      // คงเดิม 90%
+      { name: "โมโห", color: "#6fd2db97" },
+      { name: "ตึงเครียด", color: "#6697e597" },
+      { name: "กลัว", color: "#9166c297" },
+      { name: "วิตกกังวล", color: "#b068c297" },
+      { name: "เศร้า", color: "#df69ce97" },
+      { name: "อึดอัด", color: "#f4787c97" },
+    ],
+    inner: [                                      // คงเดิม 100%
+      { name: "โกรธจัด", color: "#6fd2db" },
+      { name: "แค้น", color: "#6697e5" },
+      { name: "หวาดกลัว", color: "#9166c2" },
+      { name: "ตื่นตระหนก", color: "#b068c2" },
+      { name: "ซึมเศร้า", color: "#df69ce" },
+      { name: "ทรมาน", color: "#f4787c" },
+    ],
   },
-  { name: "กลัว", color: EMOTION_COLORS["กลัว"], position: "negative" },
-  {
-    name: "ประหลาดใจ",
-    color: EMOTION_COLORS["ประหลาดใจ"],
-    position: "negative",
+  positive: {
+    outer: [
+      { name: "พอใจ", color: "#ff997d30" },      // เปลี่ยนจาก 80 เป็น 50
+      { name: "สบายใจ", color: "#ffb26630" },
+      { name: "ชอบ", color: "#fac96630" },
+      { name: "สดชื่น", color: "#ffed6b30" },
+      { name: "ผ่อนคลาย", color: "#badd6630" },
+      { name: "รื่นรมย์", color: "#9cdd6630" },
+    ],
+    middle: [                                     // คงเดิม 90%
+      { name: "ดีใจ", color: "#ff997d97" },
+      { name: "มั่นใจ", color: "#ffb26697" },
+      { name: "รัก", color: "#fac96697" },
+      { name: "ตื่นเต้น", color: "#ffed6b97" },
+      { name: "สุข", color: "#badd6697" },
+      { name: "ปลื้ม", color: "#9cdd6697" },
+    ],
+    inner: [                                      // คงเดิม 100%
+      { name: "เปรมปรีดิ์", color: "#ff997d" },
+      { name: "ภาคภูมิใจ", color: "#ffb266" },
+      { name: "หลงรัก", color: "#fac966" },
+      { name: "ปิติ", color: "#ffed6b" },
+      { name: "เบิกบาน", color: "#badd66" },
+      { name: "ปลาบปลื้ม", color: "#9cdd66" },
+    ],
   },
-  { name: "เสียใจ", color: EMOTION_COLORS["เสียใจ"], position: "negative" },
-  { name: "อึดอัด", color: EMOTION_COLORS["อึดอัด"], position: "negative" },
-  // Positive emotions
-  { name: "สนใจ", color: EMOTION_COLORS["สนใจ"], position: "positive" },
-  { name: "มั่นใจ", color: EMOTION_COLORS["มั่นใจ"], position: "positive" },
-  { name: "รัก", color: EMOTION_COLORS["รัก"], position: "positive" },
-  { name: "สบดี", color: EMOTION_COLORS["สบดี"], position: "positive" },
-  { name: "พึงใจ", color: EMOTION_COLORS["พึงใจ"], position: "positive" },
-  { name: "สุข", color: EMOTION_COLORS["สุข"], position: "positive" },
-];
+};
 
 export default function ActivityFour() {
   const { user } = useAuth(); // เพิ่มบรรทัดนี้
@@ -397,60 +427,71 @@ export default function ActivityFour() {
     const segments = [];
     const centerX = 300;
     const centerY = 300;
-    const radius = 250;
-    const innerRadius = 100;
+    // เพิ่มขนาดทุก radius 20%
+    const outerRadius = 290;      // เดิม 250 * 1.2
+    const middleRadius = 230;     // เดิม 200 * 1.2
+    const innerRadius = 170;      // เดิม 150 * 1.2
+    const centerRadius = 100;     // เดิม 100 * 1.2
     const segmentsPerSide = 6;
     const anglePerSegment = Math.PI / segmentsPerSide;
-
-    emotions.forEach((emotion, index) => {
-      let startAngle;
-      if (emotion.position === "negative") {
-        startAngle = Math.PI / 2 + (index % segmentsPerSide) * anglePerSegment;
-      } else {
-        startAngle =
-          -Math.PI / 2 +
-          ((index - segmentsPerSide) % segmentsPerSide) * anglePerSegment;
-      }
-      const endAngle = startAngle + anglePerSegment;
-
-      const x1 = centerX + radius * Math.cos(startAngle);
-      const y1 = centerY + radius * Math.sin(startAngle);
-      const x2 = centerX + radius * Math.cos(endAngle);
-      const y2 = centerY + radius * Math.sin(endAngle);
-      const x1Inner = centerX + innerRadius * Math.cos(startAngle);
-      const y1Inner = centerY + innerRadius * Math.sin(startAngle);
-      const x2Inner = centerX + innerRadius * Math.cos(endAngle);
-      const y2Inner = centerY + innerRadius * Math.sin(endAngle);
-
-      const d = `
+  
+    const createLayer = (emotions, startRadius, endRadius, position) => {
+      emotions.forEach((emotion, index) => {
+        let startAngle;
+        if (position === "negative") {
+          startAngle = Math.PI / 2 + index * anglePerSegment;
+        } else {
+          startAngle = -Math.PI / 2 + index * anglePerSegment;
+        }
+        const endAngle = startAngle + anglePerSegment;
+  
+        const x1 = centerX + startRadius * Math.cos(startAngle);
+        const y1 = centerY + startRadius * Math.sin(startAngle);
+        const x2 = centerX + startRadius * Math.cos(endAngle);
+        const y2 = centerY + startRadius * Math.sin(endAngle);
+        const x1Inner = centerX + endRadius * Math.cos(startAngle);
+        const y1Inner = centerY + endRadius * Math.sin(startAngle);
+        const x2Inner = centerX + endRadius * Math.cos(endAngle);
+        const y2Inner = centerY + endRadius * Math.sin(endAngle);
+  
+        const d = `
           M ${x1Inner} ${y1Inner}
           L ${x1} ${y1}
-          A ${radius} ${radius} 0 0 1 ${x2} ${y2}
+          A ${startRadius} ${startRadius} 0 0 1 ${x2} ${y2}
           L ${x2Inner} ${y2Inner}
-          A ${innerRadius} ${innerRadius} 0 0 0 ${x1Inner} ${y1Inner}
+          A ${endRadius} ${endRadius} 0 0 0 ${x1Inner} ${y1Inner}
           Z
         `;
-
-      const labelAngle = startAngle + anglePerSegment / 2;
-      const labelRadius = (radius + innerRadius) / 2;
-      const labelX = centerX + labelRadius * Math.cos(labelAngle);
-      const labelY = centerY + labelRadius * Math.sin(labelAngle);
-
-      segments.push(
-        <g key={emotion.name}>
-          <EmotionSegment
-            d={d}
-            fill={emotion.color}
-            onClick={() => setSelectedEmotion(emotion)}
-            opacity={selectedEmotion?.name === emotion.name ? 1 : 0.9}
-          />
-          <EmotionLabel x={labelX} y={labelY}>
-            {emotion.name}
-          </EmotionLabel>
-        </g>
-      );
-    });
-
+  
+        const labelAngle = startAngle + anglePerSegment / 2;
+        const labelRadius = (startRadius + endRadius) / 2;
+        const labelX = centerX + labelRadius * Math.cos(labelAngle);
+        const labelY = centerY + labelRadius * Math.sin(labelAngle);
+  
+        segments.push(
+          <g key={emotion.name}>
+            <EmotionSegment
+              d={d}
+              fill={emotion.color}
+              onClick={() => setSelectedEmotion(emotion)}
+              opacity={selectedEmotion?.name === emotion.name ? 1 : 0.9}
+            />
+            <EmotionLabel x={labelX} y={labelY}>
+              {emotion.name}
+            </EmotionLabel>
+          </g>
+        );
+      });
+    };
+  
+    // Create all layers
+    createLayer(emotions.negative.outer, outerRadius, middleRadius, "negative");
+    createLayer(emotions.negative.middle, middleRadius, innerRadius, "negative");
+    createLayer(emotions.negative.inner, innerRadius, centerRadius, "negative");
+    createLayer(emotions.positive.outer, outerRadius, middleRadius, "positive");
+    createLayer(emotions.positive.middle, middleRadius, innerRadius, "positive");
+    createLayer(emotions.positive.inner, innerRadius, centerRadius, "positive");
+  
     return segments;
   };
 
@@ -473,10 +514,9 @@ export default function ActivityFour() {
     fetchHistory();
   }, [user?.nationalId]);
 
-  // แก้ไข handleSubmit
   const handleSubmit = async () => {
-    if (!selectedEmotion || !user?.nationalId) return; // เช็คทั้ง emotion และ user
-
+    if (!selectedEmotion || !user?.nationalId) return;
+  
     setLoading(true);
     try {
       const response = await axios.post(
@@ -489,7 +529,7 @@ export default function ActivityFour() {
           color: selectedEmotion.color,
         }
       );
-
+  
       if (response.data.success) {
         message.success("บันทึกอารมณ์สำเร็จ");
         // Fetch updated history
@@ -513,8 +553,22 @@ export default function ActivityFour() {
       const emotionEntries = history.filter(
         (entry) => entry.emotion === emotionName
       );
-      const emotion = emotions.find((e) => e.name === emotionName);
-
+  
+      // หา emotion จากโครงสร้างใหม่
+      let emotion = null;
+      ['outer', 'middle', 'inner'].some(layer => {
+        const found = emotions.negative[layer].find(e => e.name === emotionName) 
+                     || emotions.positive[layer].find(e => e.name === emotionName);
+        if (found) {
+          emotion = found;
+          return true;
+        }
+        return false;
+      });
+  
+      // ถ้าไม่พบ emotion ให้ข้ามไป
+      if (!emotion) return null;
+  
       return (
         <EmotionTab
           tab={
@@ -544,8 +598,8 @@ export default function ActivityFour() {
           </ScrollableContainer>
         </EmotionTab>
       );
-    });
-
+    }).filter(Boolean); // กรองค่า null ออก
+  
     return tabs;
   };
 

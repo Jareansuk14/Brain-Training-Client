@@ -328,7 +328,7 @@ const Balloon = styled.div`
   border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
   bottom: ${(props) => props.bottom}px;
   left: ${(props) => props.left}%;
-  animation: ${float} 4s ease-out forwards;
+  animation: ${float} 30s ease-out forwards;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -378,6 +378,85 @@ const Balloon = styled.div`
       width: 6px;
       height: 6px;
     }
+  }
+`;
+
+const StyledSteps = styled(Steps)`
+  .ant-steps-item-process .ant-steps-item-icon {
+    background: ${COLORS.primary};
+    border-color: ${COLORS.primary};
+  }
+
+  .ant-steps-item-finish .ant-steps-item-icon {
+    background: white;
+    border-color: ${COLORS.primary};
+  }
+
+  .ant-steps-item-finish .ant-steps-item-icon .ant-steps-icon {
+    color: ${COLORS.primary};
+  }
+
+  .ant-steps-item-finish .ant-steps-item-tail::after {
+    background-color: ${COLORS.primary};
+  }
+
+  .ant-steps-item-title {
+    &::after {
+      background-color: ${COLORS.primary} !important;
+    }
+  }
+
+  .ant-steps-item-finish .ant-steps-item-title {
+    color: ${COLORS.primary};
+  }
+
+  .ant-steps-item-process .ant-steps-item-title {
+    color: ${COLORS.primary};
+  }
+`;
+
+const StyledAlert = styled(Alert)`
+  &.ant-alert-info {
+    background-color: ${COLORS.secondary}15; // เพิ่มความโปร่งใสด้วย hex opacity
+    border: 1px solid ${COLORS.secondary};
+
+    .ant-alert-message {
+      color: ${COLORS.primary};
+    }
+
+    .anticon {
+      color: ${COLORS.primary};
+    }
+  }
+`;
+
+const BreathingButton = styled(Button)`
+  &.ant-btn-primary {
+    background: ${COLORS.primary};
+    border-color: ${COLORS.primary};
+
+    &:hover,
+    &:focus {
+      background: ${COLORS.secondary};
+      border-color: ${COLORS.secondary};
+    }
+  }
+
+  &.ant-btn-default {
+    color: ${COLORS.primary};
+    border-color: ${COLORS.primary};
+
+    &:hover,
+    &:focus {
+      color: ${COLORS.secondary};
+      border-color: ${COLORS.secondary};
+    }
+  }
+
+  &:disabled {
+    background: ${COLORS.secondary}40;
+    border-color: ${COLORS.secondary};
+    color: white;
   }
 `;
 
@@ -469,7 +548,7 @@ export default function ActivityTwo() {
               title: "ปล่อยวางความคิดสำเร็จ",
               content: "คุณได้ปล่อยวางความคิดทั้งหมดแล้ว รู้สึกเบาสบายขึ้นไหม?",
             });
-          }, 2000);
+          }, 15000);
         }
       }, index * 1000);
     });
@@ -502,7 +581,12 @@ export default function ActivityTwo() {
       <ContentContainer>
         <Title
           level={2}
-          style={{ textAlign: "center", color: "white", marginBottom: 32,  paddingTop: 60}}
+          style={{
+            textAlign: "center",
+            color: "white",
+            marginBottom: 32,
+            paddingTop: 60,
+          }}
         >
           ปล่อยความคิด ให้ปลิวไปในอากาศ
         </Title>
@@ -610,7 +694,7 @@ export default function ActivityTwo() {
         <Space direction="vertical" size="large" style={{ width: "100%" }}>
           <StyledCard>
             <Space direction="vertical">
-              <Alert
+              <StyledAlert
                 message="ระยะเวลาในการทำกิจกรรม 50 นาที"
                 type="info"
                 showIcon
@@ -629,7 +713,7 @@ export default function ActivityTwo() {
               style={{ width: "100%" }}
             >
               <Text>นั่งในท่าที่สบาย และทำการหายใจลึกๆ 3-5 ครั้ง</Text>
-              <Button
+              <BreathingButton
                 type={isBreathing ? "default" : "primary"}
                 icon={<ClockCircleOutlined />}
                 onClick={() => {
@@ -653,7 +737,7 @@ export default function ActivityTwo() {
                 {isBreathing
                   ? `หายใจครั้งที่ ${breathCount + 1}`
                   : "เริ่มการหายใจ"}
-              </Button>
+              </BreathingButton>
               {isBreathing && (
                 <Text>
                   {breathCount % 2 === 0 ? "หายใจเข้า..." : "หายใจออก..."}
@@ -684,7 +768,7 @@ export default function ActivityTwo() {
                 level={3}
                 style={{
                   margin: 0,
-                  background: "linear-gradient(45deg, #4ECDC4, #556270)",
+                  background: "linear-gradient(45deg, #a78bfa, #7c3aed)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
@@ -704,7 +788,7 @@ export default function ActivityTwo() {
           <Space direction="vertical" size="large" style={{ width: "100%" }}>
             <div
               style={{
-                background: "linear-gradient(135deg, #4ECDC4 0%, #556270 100%)",
+                background: "linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)",
                 borderRadius: "16px",
                 padding: "30px",
                 textAlign: "center",
@@ -811,10 +895,11 @@ export default function ActivityTwo() {
         กิจกรรม "ปล่อยความคิด ให้ปลิวไปในอากาศ"
       </Title>
 
-      <Steps
+      <StyledSteps
         current={currentStep}
         items={steps.map((item) => ({ key: item.title, title: item.title }))}
         style={{ marginBottom: 32 }}
+        className="custom-steps"
       />
 
       <StyledCard>
