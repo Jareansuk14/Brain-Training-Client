@@ -1,783 +1,709 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Space, Typography, Button, Steps, Alert, Checkbox, Input, List, Tag, message, Modal } from 'antd';
-import { HeartOutlined, AimOutlined, CheckOutlined, PlusOutlined, DeleteOutlined, SaveOutlined, LoadingOutlined } from '@ant-design/icons';
-import styled from '@emotion/styled';
-import { keyframes } from '@emotion/react';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+// ActivitySix.jsx
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Card,
+  Space,
+  Typography,
+  Button,
+  Steps,
+  Input,
+  message,
+  Tabs,
+} from "antd";
+import {
+  CheckOutlined,
+  ArrowLeftOutlined,
+  ClockCircleOutlined,
+  CalendarOutlined,
+  LoadingOutlined,
+} from "@ant-design/icons";
+import styled from "@emotion/styled";
+import { keyframes } from "@emotion/react";
+import { useAuth } from "../context/AuthContext";
+import axios from "axios";
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-// Updated minimal color palette
+// Color Constants
 const COLORS = {
-    primary: '#7c3aed',    // Deep purple
-    secondary: '#a78bfa',  // Light purple
-    background: '#7c3aed10', // Almost white
-    surface: '#ffffff',    // Pure white
-    text: '#1f2937',      // Dark gray
-    textLight: '#6b7280', // Medium gray
-    border: '#e5e7eb',    // Light gray
-    success: '#10b981',   // Emerald
-    warning: '#ef4444',   // Red
-    highlight: '#f3f4f6', // Very light gray
+  primary: "#7c3aed",
+  secondary: "#a78bfa",
+  background: "#7c3aed10",
+  dark: "#1f2937",
+  light: "#f8fafc",
+  shadow: "rgba(17, 12, 46, 0.1)",
 };
 
-const PageTitle = styled(Title)`
-  &.ant-typography {
-    text-align: center;
-    margin-bottom: 40px;
-    color: ${COLORS.text};
-    font-size: 32px;
-    font-weight: 700;
-    position: relative;
-    display: inline-block;
-    left: 50%;
-    transform: translateX(-50%);
+// Animations
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
 
-    &::after {
-      content: "";
-      position: absolute;
-      bottom: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 60px;
-      height: 4px;
-      background: linear-gradient(
-        90deg,
-        ${COLORS.primary},
-        ${COLORS.secondary}
-      );
-      border-radius: 2px;
+// Styled Components
+const PageContainer = styled.div`
+  min-height: 100vh;
+  background: ${COLORS.background};
+  padding: 40px 24px;
+`;
+
+const ContentContainer = styled.div`
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  animation: ${fadeIn} 0.6s ease-out;
+`;
+
+const StyledCard = styled(Card)`
+  background: ${COLORS.light};
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 4px 24px ${COLORS.shadow};
+  margin-bottom: 24px;
+
+  .ant-card-head {
+    border-bottom: 1px solid ${COLORS.background};
+  }
+
+  .ant-card-body {
+    padding: 24px;
+  }
+`;
+
+// เพิ่ม styled component ใหม่
+const GoalTypeContainer = styled.div`
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+`;
+
+// ปรับ GoalTypeButton
+const GoalTypeButton = styled(Button)`
+  flex: 1;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 500;
+  position: relative;
+
+  &.type-short {
+    background: ${props => props.active ? COLORS.primary : 'white'};
+    border-color: ${COLORS.primary};
+    color: ${props => props.active ? 'white' : COLORS.primary};
+
+    &:hover {
+      background: ${props => props.active ? COLORS.secondary : COLORS.background};
+      border-color: ${COLORS.secondary};
+    }
+  }
+
+  &.type-long {
+    background: ${props => props.active ? COLORS.primary : 'white'};
+    border-color: ${COLORS.primary};
+    color: ${props => props.active ? 'white' : COLORS.primary};
+
+    &:hover {
+      background: ${props => props.active ? COLORS.secondary : COLORS.background};
+      border-color: ${COLORS.secondary};
     }
   }
 `;
 
-// Smooth fade-in animation
-const fadeIn = keyframes`
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+const SlideContainer = styled.div`
+  overflow: hidden;
+  margin-top: 24px;
 `;
 
-// Updated styled components with minimal design
-const PageContainer = styled.div`
-    min-height: 100vh;
-    padding: 32px;
-    background: ${COLORS.background};
-
-    @media (max-width: 768px) {
-        padding: 16px;
-    }
+const SlideContent = styled.div`
+  transform: translateX(${props => props.slide === 'short' ? '0' : '-100%'});
+  transition: transform 0.3s ease-in-out;
+  display: flex;
+  width: 200%;
 `;
 
-const ContentContainer = styled.div`
-    max-width: 800px;
-    margin: 0 auto;
-    background: ${COLORS.surface};
-    border-radius: 24px;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
-    padding: 40px;
-
-    @media (max-width: 768px) {
-        padding: 24px;
-        border-radius: 16px;
-    }
+const SlidePage = styled.div`
+  flex: 0 0 50%;
+  padding-right: 16px;
 `;
 
-const StyledCard = styled(Card)`
-    margin-bottom: 32px;
-    border-radius: 16px;
-    border: 1px solid ${COLORS.border};
-    box-shadow: none;
-    animation: ${fadeIn} 0.5s ease-out;
-
-    .ant-card-head {
-        border-bottom: 1px solid ${COLORS.border};
-        padding: 16px 24px;
-        min-height: auto;
-    }
-
-    .ant-card-head-title {
-        font-size: 18px;
-        font-weight: 500;
-    }
-
-    .ant-card-body {
-        padding: 24px;
-    }
-`;
-
-const ValueCard = styled(Card)`
-    margin-bottom: 16px;
-    border-radius: 12px;
-    border: 1px solid ${COLORS.border};
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: ${props => props.selected ? COLORS.highlight : COLORS.surface};
-    
-    ${props => props.selected && `
-        border-color: ${COLORS.primary};
-        border-width: 2px;
-    `}
-    
-    &:hover {
-        border-color: ${COLORS.primary};
-    }
-
-    .ant-card-body {
-        padding: 20px;
-    }
-`;
-
-const ActionButton = styled(Button)`
-    height: 44px;
-    padding: 0 24px;
-    border-radius: 12px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    
-    &.primary {
-        background: ${COLORS.primary};
-        border: none;
-        color: white;
-        
-        &:hover {
-            background: ${COLORS.secondary};
-            transform: translateY(-1px);
-        }
-
-        &:disabled {
-            background: ${COLORS.textLight};
-            opacity: 0.5;
-        }
-    }
-
-    &.ghost {
-        color: ${COLORS.text};
-        border: 1px solid ${COLORS.border};
-        background: transparent;
-        
-        &:hover {
-            color: ${COLORS.primary};
-            border-color: ${COLORS.primary};
-            background: transparent;
-        }
-    }
+const ExampleBox = styled.div`
+  background: ${COLORS.background};
+  border: 1px solid ${COLORS.secondary}20;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  font-style: italic;
+  color: ${COLORS.dark};
 `;
 
 const StyledTextArea = styled(TextArea)`
-    border-radius: 12px;
-    border: 1px solid ${COLORS.border};
-    padding: 16px;
-    transition: all 0.2s ease;
-    font-size: 16px;
-    resize: none;
-    
-    &:hover, &:focus {
-        border-color: ${COLORS.primary};
-        box-shadow: none;
+  border-radius: 8px;
+  border: 1px solid ${COLORS.secondary};
+  padding: 12px;
+  min-height: 120px;
+  margin: 16px 0;
+
+  &:focus {
+    border-color: ${COLORS.primary};
+    box-shadow: 0 0 0 2px ${COLORS.primary}20;
+  }
+`;
+
+const NavigationButtons = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+`;
+
+const ActionButton = styled(Button)`
+  min-width: 120px;
+  height: 40px;
+  border-radius: 8px;
+  font-weight: 500;
+
+  &.primary {
+    background: ${COLORS.primary};
+    border-color: ${COLORS.primary};
+    color: white;
+
+    &:hover {
+      background: ${COLORS.secondary};
+      border-color: ${COLORS.secondary};
     }
+  }
 `;
 
 const StyledSteps = styled(Steps)`
-    margin-bottom: 48px;
-
+  .ant-steps-item-process {
     .ant-steps-item-icon {
-        width: 40px;
-        height: 40px;
-        line-height: 40px;
-        border: none;
-        
-        .ant-steps-icon {
-            font-size: 18px;
-        }
+      background: ${COLORS.primary};
+      border-color: ${COLORS.primary};
     }
 
     .ant-steps-item-title {
-        font-size: 16px;
-        font-weight: 500;
+      color: ${COLORS.primary} !important;
+      font-size: 16px !important;
+      font-weight: 500 !important;
+
+      &::after {
+        background-color: ${COLORS.primary} !important;
+      }
     }
+  }
+
+  .ant-steps-item-finish {
+    .ant-steps-item-icon {
+      background: white;
+      border-color: ${COLORS.primary};
+
+      .ant-steps-icon {
+        color: ${COLORS.primary};
+      }
+    }
+  }
+
+  .ant-steps-item-title {
+    font-size: 16px !important;
+    font-weight: 500 !important;
+  }
 `;
 
-
-// ข้อมูลคุณค่า
-const VALUES_DATA = [
+// Step Configuration
+const STEPS = [
     {
-        id: 1,
-        title: 'การเรียนรู้และพัฒนาตนเอง',
-        description: 'มุ่งมั่นในการเรียนรู้สิ่งใหม่และพัฒนาทักษะอย่างต่อเนื่อง เพื่อการเติบโตที่ยั่งยืน'
+      title: <span style={{ fontSize: '16px', fontWeight: '500' }}>ด้านครอบครัว</span>,
+      category: "family",
+      examples: [
+        "จดจำวันเกิดและวันสำคัญของสมาชิกในครอบครัวได้ทุกคน",
+        "พาครอบครัวไปท่องเที่ยวในสถานที่ที่ทุกคนต้องการไป",
+        "จัดเวลาทานข้าวร่วมกันกับครอบครัวอย่างน้อยสัปดาห์ละ 3 วัน"
+      ]
     },
     {
-        id: 2,
-        title: 'สุขภาพและความเป็นอยู่ที่ดี',
-        description: 'ให้ความสำคัญกับการดูแลสุขภาพกายและใจ สร้างสมดุลในการใช้ชีวิต'
+      title: <span style={{ fontSize: '16px', fontWeight: '500' }}>ด้านการงาน/การศึกษา</span>,
+      category: "work",
+      examples: [
+        "จดจำขั้นตอนการทำงานสำคัญได้อย่างแม่นยำ",
+        "เรียนรู้ทักษะใหม่ที่จำเป็นต่อการทำงาน",
+        "พัฒนาความสามารถในการจดจำข้อมูลสำคัญของลูกค้า"
+      ]
     },
     {
-        id: 3,
-        title: 'ความสัมพันธ์และการเชื่อมต่อ',
-        description: 'สร้างและรักษาความสัมพันธ์ที่มีความหมาย เสริมสร้างการเชื่อมต่อกับผู้อื่น'
+      title: <span style={{ fontSize: '16px', fontWeight: '500' }}>ด้านสังคม</span>,
+      category: "social",
+      examples: [
+        "จดจำชื่อและรายละเอียดสำคัญของเพื่อนใหม่ที่พบ",
+        "เข้าร่วมกิจกรรมกลุ่มที่สนใจอย่างน้อยเดือนละครั้ง",
+        "รักษาการติดต่อกับเพื่อนเก่าอย่างสม่ำเสมอ"
+      ]
     },
     {
-        id: 4,
-        title: 'ความสำเร็จและการบรรลุเป้าหมาย',
-        description: 'มุ่งมั่นสู่ความสำเร็จและการบรรลุเป้าหมายที่ตั้งไว้อย่างมีประสิทธิภาพ'
+      title: <span style={{ fontSize: '16px', fontWeight: '500' }}>ด้านการพักผ่อน</span>,
+      category: "leisure",
+      examples: [
+        "ทำกิจกรรมที่ช่วยฝึกความจำในยามว่าง เช่น เล่นเกมฝึกสมอง",
+        "จัดตารางเวลาพักผ่อนที่เหมาะสม",
+        "หากิจกรรมยามว่างใหม่ๆ ที่ช่วยพัฒนาความจำ"
+      ]
     },
     {
-        id: 5,
-        title: 'ความคิดสร้างสรรค์และการแสดงออก',
-        description: 'ส่งเสริมการแสดงออกทางความคิดสร้างสรรค์และจินตนาการอย่างอิสระ'
+      title: <span style={{ fontSize: '16px', fontWeight: '500' }}>ด้านสุขภาพ</span>,
+      category: "health",
+      examples: [
+        "จดจำตารางการทานยาได้อย่างแม่นยำ",
+        "จดจำและปฏิบัติตามคำแนะนำด้านสุขภาพจากแพทย์",
+        "วางแผนและจดจำตารางการออกกำลังกายประจำสัปดาห์"
+      ]
     },
     {
-        id: 6,
-        title: 'ความรับผิดชอบและจริยธรรม',
-        description: 'ยึดมั่นในความถูกต้อง มีความรับผิดชอบต่อตนเองและสังคม'
+      title: <span style={{ fontSize: '16px', fontWeight: '500' }}>ด้านจิตวิญญาณ</span>,
+      category: "spiritual",
+      examples: [
+        "จดจำบทสวดมนต์หรือข้อคิดที่สร้างกำลังใจ",
+        "ฝึกสมาธิเพื่อพัฒนาความจำอย่างสม่ำเสมอ",
+        "จดบันทึกและทบทวนประสบการณ์ที่สร้างแรงบันดาลใจ"
+      ]
     },
     {
-        id: 7,
-        title: 'ความเป็นผู้นำและการทำงานเป็นทีม',
-        description: 'พัฒนาทักษะการเป็นผู้นำและการทำงานร่วมกับผู้อื่น'
-    },
-    {
-        id: 8,
-        title: 'การจัดการอารมณ์และความเครียด',
-        description: 'พัฒนาทักษะการจัดการอารมณ์และความเครียดอย่างมีประสิทธิภาพ'
+      title: <span style={{ fontSize: '16px', fontWeight: '500' }}>สรุป</span>,
+      category: "summary"
     }
-];
+  ];
+  
+  // Goal Types Configuration
+  const GOAL_TYPES = {
+    short: {
+      title: "เป้าหมายระยะสั้น (1-3 เดือน)",
+      icon: <ClockCircleOutlined />,
+      className: "type-short"
+    },
+    long: {
+      title: "เป้าหมายระยะยาว (6-12 เดือน)",
+      icon: <CalendarOutlined />,
+      className: "type-long"
+    }
+  };
+  
+  // Initial States
+  const INITIAL_GOAL_STATE = {
+    type: null, // 'short' หรือ 'long'
+    text: '',
+    category: ''
+  };
+  
+  const INITIAL_GOALS_STATE = {
+    family: { short: [], long: [] },
+    work: { short: [], long: [] },
+    social: { short: [], long: [] },
+    leisure: { short: [], long: [] },
+    health: { short: [], long: [] },
+    spiritual: { short: [], long: [] }
+  };
 
-export default function ActivitySix() {
-    const navigate = useNavigate();
+  export default function ActivitySix() {
     const { user } = useAuth();
+    const navigate = useNavigate();
+    
+    // States
     const [currentStep, setCurrentStep] = useState(0);
-    const [selectedValues, setSelectedValues] = useState([]);
-    const [goals, setGoals] = useState({
-        workingMemory: '',
-        cognition: '',
-        lifeBalance: ''
-    });
+    const [goals, setGoals] = useState(INITIAL_GOALS_STATE);
+    const [currentGoal, setCurrentGoal] = useState(INITIAL_GOAL_STATE);
     const [loading, setLoading] = useState(false);
-    const [existingPlans, setExistingPlans] = useState([]);
-    const [showSummaryFirst, setShowSummaryFirst] = useState(false);
-
-    // ตรวจสอบแผนที่มีอยู่เมื่อโหลดหน้า
+    const [isEditing, setIsEditing] = useState(false);
+  
+    // Fetch existing goals when component mounts
     useEffect(() => {
-        const checkExistingPlans = async () => {
-            try {
-                const response = await axios.get(`https://brain-training-server.onrender.com/api/life-design/${user.nationalId}`);
-                const plans = response.data;
-
-                if (plans && plans.length > 0) {
-                    const validPlans = plans.map(plan => ({
-                        ...plan,
-                        values: Array.isArray(plan.values) ? plan.values : []
-                    }));
-                    setExistingPlans(validPlans);
-                    setShowSummaryFirst(true);
-                    setCurrentStep(2);
-                }
-            } catch (error) {
-                console.error('Error fetching existing plans:', error);
-                message.error('ไม่สามารถโหลดข้อมูลแผนเป้าหมายได้');
-            }
-        };
-
-        if (user?.nationalId) {
-            checkExistingPlans();
+      const fetchGoals = async () => {
+        if (!user?.nationalId) {
+          console.warn('No user ID available');
+          return;
         }
-    }, [user?.nationalId]);
-
-    // ฟังก์ชันสำหรับเลือก Values
-    const handleValueSelect = (valueId) => {
-        if (selectedValues.includes(valueId)) {
-            setSelectedValues(selectedValues.filter(id => id !== valueId));
-        } else {
-            setSelectedValues([...selectedValues, valueId]);
-        }
-    };
-
-    // ฟังก์ชันสำหรับบันทึกเป้าหมาย
-    const handleGoalChange = (field, value) => {
-        setGoals(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
-
-    // ฟังก์ชันสำหรับลบแผนเป้าหมาย
-    const handleDeletePlan = async (planId) => {
+  
         try {
-            await axios.put(`https://brain-training-server.onrender.com/api/life-design/delete/${planId}`);
-            setExistingPlans(existingPlans.filter(plan => plan._id !== planId));
-            message.success('ลบแผนเป้าหมายสำเร็จ');
-        } catch (error) {
-            console.error('Error deleting plan:', error);
-            message.error('ไม่สามารถลบแผนเป้าหมายได้');
-        }
-    };
-
-    // ฟังก์ชันสำหรับบันทึกแผนเป้าหมายใหม่
-    const handleSavePlan = async () => {
-        setLoading(true);
-        try {
-            if (!selectedValues.length || !goals.workingMemory || !goals.cognition || !goals.lifeBalance) {
-                message.error('กรุณากรอกข้อมูลให้ครบถ้วน');
-                setLoading(false);
-                return;
-            }
-
-            const response = await axios.post('https://brain-training-server.onrender.com/api/life-design/create', {
-                nationalId: user.nationalId,
-                values: selectedValues,
-                goals: {
-                    workingMemory: goals.workingMemory.trim(),
-                    cognition: goals.cognition.trim(),
-                    lifeBalance: goals.lifeBalance.trim()
-                }
+          setLoading(true);
+          const response = await axios.get(
+            `https://brain-training-server.onrender.com/api/life-design/${user.nationalId}`
+          );
+  
+          if (response.data?.categories) {
+            const formattedGoals = INITIAL_GOALS_STATE;
+            response.data.categories.forEach(category => {
+              formattedGoals[category.name] = {
+                short: category.shortTermGoals || [],
+                long: category.longTermGoals || []
+              };
             });
-
-            if (response.data.success) {
-                message.success('บันทึกแผนเป้าหมายสำเร็จ');
-                // ตรวจสอบว่า response.data.plan มีข้อมูลครบถ้วน
-                if (response.data.plan) {
-                    setExistingPlans(prev => [...prev, response.data.plan]);
-                }
-                resetForm();
-                setShowSummaryFirst(true);
-            }
+            setGoals(formattedGoals);
+          }
         } catch (error) {
-            console.error('Error saving plan:', error);
-            message.error(
-                error.response?.data?.error ||
-                'ไม่สามารถบันทึกแผนเป้าหมายได้ กรุณาลองใหม่อีกครั้ง'
-            );
+          console.error('Error fetching goals:', error);
+          message.error('เกิดข้อผิดพลาดในการโหลดข้อมูล');
         } finally {
-            setLoading(false);
+          setLoading(false);
         }
-    };
-
-    // ฟังก์ชันรีเซ็ตฟอร์ม
-    const resetForm = () => {
-        setSelectedValues([]);
-        setGoals({
-            workingMemory: '',
-            cognition: '',
-            lifeBalance: ''
+      };
+  
+      fetchGoals();
+    }, [user?.nationalId]);
+  
+    // Save goal
+    const handleSaveGoal = async () => {
+      if (!user?.nationalId || !currentGoal.type || !currentGoal.text.trim()) {
+        message.warning('กรุณากรอกข้อมูลให้ครบถ้วน');
+        return;
+      }
+  
+      try {
+        setLoading(true);
+        const currentStepData = STEPS[currentStep];
+        const updatedGoals = currentGoal.type === 'short' 
+          ? [...goals[currentStepData.category].short, { text: currentGoal.text }]
+          : [...goals[currentStepData.category].long, { text: currentGoal.text }];
+  
+        await axios.post('https://brain-training-server.onrender.com/api/life-design/save', {
+          nationalId: user.nationalId,
+          category: currentStepData.category,
+          type: currentGoal.type,
+          goals: updatedGoals
         });
-        setCurrentStep(0);
+  
+        setGoals(prev => ({
+          ...prev,
+          [currentStepData.category]: {
+            ...prev[currentStepData.category],
+            [currentGoal.type]: updatedGoals
+          }
+        }));
+  
+        setCurrentGoal(INITIAL_GOAL_STATE);
+        message.success('บันทึกเป้าหมายสำเร็จ');
+      } catch (error) {
+        console.error('Error saving goal:', error);
+        message.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    // Toggle goal completion
+    const handleToggleGoal = async (category, type, goalId) => {
+      try {
+        setLoading(true);
+        await axios.post('https://brain-training-server.onrender.com/api/life-design/toggle-goal', {
+          nationalId: user.nationalId,
+          category,
+          type,
+          goalId
+        });
+  
+        setGoals(prev => ({
+          ...prev,
+          [category]: {
+            ...prev[category],
+            [type]: prev[category][type].map(goal => 
+              goal._id === goalId ? { ...goal, completed: !goal.completed } : goal
+            )
+          }
+        }));
+  
+        message.success('อัพเดทสถานะเป้าหมายสำเร็จ');
+      } catch (error) {
+        console.error('Error toggling goal:', error);
+        message.error('เกิดข้อผิดพลาดในการอัพเดทสถานะ');
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    // Navigation handlers
+    const handleNext = async () => {
+      if (currentGoal.text.trim()) {
+        await handleSaveGoal();
+      }
+      setCurrentStep(prev => prev + 1);
+    };
+  
+    const handlePrevious = () => {
+      setCurrentStep(prev => prev - 1);
+      setCurrentGoal(INITIAL_GOAL_STATE);
+    };
+  
+    const handleGoalTypeSelect = (type) => {
+      setCurrentGoal(prev => ({
+        ...prev,
+        type,
+        category: STEPS[currentStep].category
+      }));
+    };
+  
+    const handleFinish = async () => {
+      try {
+        setLoading(true);
+        message.success('จบกิจกรรมเรียบร้อย');
+        navigate('/');
+      } catch (error) {
+        console.error('Error finishing activity:', error);
+        message.error('เกิดข้อผิดพลาดในการจบกิจกรรม');
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    const handleEdit = () => {
+      setCurrentStep(0);
+      setIsEditing(true);
     };
 
-    // ฟังก์ชันเริ่มแผนใหม่
-    const handleStartNewPlan = () => {
-        resetForm();
-        setShowSummaryFirst(false);
-        setCurrentStep(0);
-    };
-
-    // เงื่อนไขการไปขั้นตอนถัดไป
-    const canProceedToGoals = selectedValues.length > 0;
-    const canProceedToAction = goals.workingMemory && goals.cognition && goals.lifeBalance;
-
-    return (
-        <PageContainer>
-            <ContentContainer>
-            <PageTitle level={2}>ออกแบบชีวิต สร้างเป้าหมายที่สมดุล</PageTitle>
-
-                {showSummaryFirst ? (
-                    // แสดงสรุปแผนที่มีอยู่
-                    <>
-                        <StyledCard title="แผนเป้าหมายของคุณ">
-                            {existingPlans.map((plan) => (
-                                <StyledCard
-                                    key={plan._id}
-                                    type="inner"
-                                    style={{ marginBottom: 16 }}
-                                    extra={
-                                        <Button
-                                            type="text"
-                                            danger
-                                            icon={<DeleteOutlined />}
-                                            onClick={() => handleDeletePlan(plan._id)}
-                                        >
-                                            ลบแผน
-                                        </Button>
-                                    }
-                                >
-                                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                                        <div>
-                                            <Text strong>คุณค่าที่เลือก:</Text>
-                                            <div style={{ marginTop: 8 }}>
-                                                {plan.values.map((valueId) => (
-                                                    <Tag
-                                                        key={valueId}
-                                                        color={COLORS.primary}
-                                                        style={{ margin: '4px', padding: '4px 8px' }}
-                                                    >
-                                                        {VALUES_DATA.find(v => v.id === valueId)?.title}
-                                                    </Tag>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <Text strong>เป้าหมาย:</Text>
-                                            <List
-                                                style={{ marginTop: 8 }}
-                                                itemLayout="vertical"
-                                                dataSource={[
-                                                    {
-                                                        label: 'ความจำใช้งาน',
-                                                        content: plan.goals.workingMemory
-                                                    },
-                                                    {
-                                                        label: 'กระบวนการรู้คิด',
-                                                        content: plan.goals.cognition
-                                                    },
-                                                    {
-                                                        label: 'ความสมดุลในชีวิต',
-                                                        content: plan.goals.lifeBalance
-                                                    }
-                                                ]}
-                                                renderItem={item => (
-                                                    <List.Item>
-                                                        <Space direction="vertical" size={4} style={{ width: '100%' }}>
-                                                            <Text type="secondary">{item.label}:</Text>
-                                                            <Text>{item.content}</Text>
-                                                        </Space>
-                                                    </List.Item>
-                                                )}
-                                            />
-                                        </div>
-                                    </Space>
-                                </StyledCard>
-                            ))}
-
-                            <div style={{ textAlign: 'center', marginTop: 24 }}>
-                                <ActionButton
-                                    className="primary"
-                                    onClick={handleStartNewPlan}
-                                    icon={<PlusOutlined />}
-                                    size="large"
-                                >
-                                    สร้างแผนใหม่
-                                </ActionButton>
-                            </div>
-                        </StyledCard>
-                    </>
-                ) : (
-                    // แสดงฟอร์มสร้างแผนใหม่
-                    <>
-                        <StyledSteps
-                            current={currentStep}
-                            items={[
-                                { title: 'ค้นหาคุณค่า', icon: <HeartOutlined /> },
-                                { title: 'กำหนดเป้าหมาย', icon: <AimOutlined /> },
-                                { title: 'สรุปแผนเป้าหมาย', icon: <CheckOutlined /> }
-                            ]}
-                        />
-
-                        {/* Step 1: ค้นหาคุณค่า */}
-                        {currentStep === 0 && (
-                            <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                                <StyledCard>
-                                    <Alert
-                                        message="ระยะเวลาในการทำกิจกรรม 50 นาที"
-                                        type="info"
-                                        showIcon
-                                        style={{
-                                            marginBottom: 24,
-                                            borderRadius: 12,
-                                            border: 'none',
-                                            background: `${COLORS.primary}10`
-                                        }}
-                                    />
-                                    <Paragraph style={{
-                                        fontSize: '16px',
-                                        marginBottom: 32,
-                                        color: '#000',
-                                        lineHeight: '1.8',
-                                        fontWeight: '600'
-                                    }}>
-                                        เลือกคุณค่าที่สำคัญในชีวิตของคุณ เพื่อเป็นเข็มทิศนำทางในการกำหนดเป้าหมายและแผนปฏิบัติการ
-                                    </Paragraph>
-
-                                    {VALUES_DATA.map(value => (
-                                        <ValueCard
-                                            key={value.id}
-                                            selected={selectedValues.includes(value.id)}
-                                            onClick={() => handleValueSelect(value.id)}
-                                        >
-                                            <Space align="start">
-                                                <Checkbox
-                                                    checked={selectedValues.includes(value.id)}
-                                                    style={{ marginTop: 4 }}
-                                                />
-                                                <div>
-                                                    <Text strong style={{
-                                                        fontSize: '16px',
-                                                        display: 'block',
-                                                        marginBottom: 8,
-                                                        color: COLORS.text
-                                                    }}>
-                                                        {value.title}
-                                                    </Text>
-                                                    <Text type="secondary" style={{
-                                                        fontSize: '14px',
-                                                        lineHeight: '1.6'
-                                                    }}>
-                                                        {value.description}
-                                                    </Text>
-                                                </div>
-                                            </Space>
-                                        </ValueCard>
-                                    ))}
-                                </StyledCard>
-
-                                <div style={{ textAlign: 'right' }}>
-                                    <ActionButton
-                                        className="primary"
-                                        disabled={!canProceedToGoals}
-                                        onClick={() => setCurrentStep(1)}
-                                        size="large"
-                                    >
-                                        ถัดไป
-                                    </ActionButton>
-                                </div>
-                            </Space>
-                        )}
-
-                        {/* Step 2: กำหนดเป้าหมาย */}
-                        {currentStep === 1 && (
-                            <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                                <StyledCard title="ความจำใช้งาน (Working Memory)">
-                                    <Paragraph style={{
-                                        marginBottom: 16,
-                                        color: COLORS.textLight,
-                                        lineHeight: '1.8'
-                                    }}>
-                                        กำหนดเป้าหมายในการพัฒนาความจำใช้งาน เช่น การจดจำข้อมูลระยะสั้น การจัดการข้อมูลหลายอย่างพร้อมกัน
-                                    </Paragraph>
-                                    <StyledTextArea
-                                        rows={4}
-                                        placeholder="เป้าหมายการพัฒนาความจำใช้งานของคุณ..."
-                                        value={goals.workingMemory}
-                                        onChange={(e) => handleGoalChange('workingMemory', e.target.value)}
-                                    />
-                                </StyledCard>
-
-                                <StyledCard title="กระบวนการรู้คิด (Cognitive Function)">
-                                    <Paragraph style={{
-                                        marginBottom: 16,
-                                        color: COLORS.textLight,
-                                        lineHeight: '1.8'
-                                    }}>
-                                        กำหนดเป้าหมายในการพัฒนากระบวนการคิด การวิเคราะห์ และการแก้ปัญหา
-                                    </Paragraph>
-                                    <StyledTextArea
-                                        rows={4}
-                                        placeholder="เป้าหมายการพัฒนากระบวนการรู้คิดของคุณ..."
-                                        value={goals.cognition}
-                                        onChange={(e) => handleGoalChange('cognition', e.target.value)}
-                                    />
-                                </StyledCard>
-
-                                <StyledCard title="ความสมดุลในชีวิต (Life Balance)">
-                                    <Paragraph style={{
-                                        marginBottom: 16,
-                                        color: COLORS.textLight,
-                                        lineHeight: '1.8'
-                                    }}>
-                                        กำหนดเป้าหมายในการสร้างสมดุลระหว่างการทำงาน การพักผ่อน และการใช้ชีวิต
-                                    </Paragraph>
-                                    <StyledTextArea
-                                        rows={4}
-                                        placeholder="เป้าหมายการสร้างสมดุลในชีวิตของคุณ..."
-                                        value={goals.lifeBalance}
-                                        onChange={(e) => handleGoalChange('lifeBalance', e.target.value)}
-                                    />
-                                </StyledCard>
-
-                                <div style={{ textAlign: 'right', marginTop: 32 }}>
-                                    <Space size={16}>
-                                        <ActionButton
-                                            className="ghost"
-                                            onClick={() => setCurrentStep(0)}
-                                            size="large"
-                                        >
-                                            ย้อนกลับ
-                                        </ActionButton>
-                                        <ActionButton
-                                            className="primary"
-                                            disabled={!canProceedToAction}
-                                            onClick={() => setCurrentStep(2)}
-                                            size="large"
-                                        >
-                                            ถัดไป
-                                        </ActionButton>
-                                    </Space>
-                                </div>
-                            </Space>
-                        )}
-
-                        {/* Step 3: สรุปแผนเป้าหมาย */}
-                        {currentStep === 2 && (
-                            <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                                <StyledCard title="สรุปเป้าหมายที่เลือก">
-                                    <List
-                                        itemLayout="vertical"
-                                        dataSource={[
-                                            {
-                                                title: 'คุณค่าที่เลือก',
-                                                content: (
-                                                    <div style={{ marginTop: 8 }}>
-                                                        {selectedValues.map((valueId) => (
-                                                            <Tag
-                                                                key={valueId}
-                                                                color={COLORS.primary}
-                                                                style={{ margin: '4px', padding: '4px 8px' }}
-                                                            >
-                                                                {VALUES_DATA.find(v => v.id === valueId)?.title}
-                                                            </Tag>
-                                                        ))}
-                                                    </div>
-                                                )
-                                            },
-                                            {
-                                                title: 'เป้าหมายด้านความจำใช้งาน',
-                                                content: goals.workingMemory
-                                            },
-                                            {
-                                                title: 'เป้าหมายด้านกระบวนการรู้คิด',
-                                                content: goals.cognition
-                                            },
-                                            {
-                                                title: 'เป้าหมายด้านความสมดุลในชีวิต',
-                                                content: goals.lifeBalance
-                                            }
-                                        ]}
-                                        renderItem={item => (
-                                            <List.Item style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-                                                <Space direction="vertical" style={{ width: '100%' }}>
-                                                    <Text strong style={{
-                                                        fontSize: '16px',
-                                                        color: COLORS.primary
-                                                    }}>
-                                                        {item.title}
-                                                    </Text>
-                                                    {typeof item.content === 'string' ? (
-                                                        <Text style={{
-                                                            fontSize: '14px',
-                                                            color: COLORS.text,
-                                                            lineHeight: '1.6'
-                                                        }}>
-                                                            {item.content}
-                                                        </Text>
-                                                    ) : (
-                                                        item.content
-                                                    )}
-                                                </Space>
-                                            </List.Item>
-                                        )}
-                                    />
-
-                                    <div style={{ textAlign: 'right', marginTop: 32 }}>
-                                        <Space size={16}>
-                                            <ActionButton
-                                                className="ghost"
-                                                onClick={() => setCurrentStep(1)}
-                                                size="large"
-                                            >
-                                                ย้อนกลับ
-                                            </ActionButton>
-                                            <ActionButton
-                                                className="primary"
-                                                onClick={handleSavePlan}
-                                                loading={loading}
-                                                size="large"
-                                            >
-                                                บันทึกแผนเป้าหมาย
-                                            </ActionButton>
-                                        </Space>
-                                    </div>
-                                </StyledCard>
-                            </Space>
-                        )}
-
-                        {/* Progress indicator */}
-                        <Alert
-                            style={{
-                                marginTop: 48,
-                                borderRadius: 12,
-                                border: 'none',
-                                background: `${COLORS.primary}10`
-                            }}
-                            message={
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text strong style={{ color: COLORS.primary }}>
-                                        ความคืบหน้า: {currentStep === 0 ? '33%' : currentStep === 1 ? '66%' : '100%'}
-                                    </Text>
-                                    <Text type="secondary">
-                                        {currentStep === 0 ? 'กำลังเลือกคุณค่า' :
-                                            currentStep === 1 ? 'กำลังกำหนดเป้าหมาย' :
-                                                'กำลังสรุปแผนเป้าหมาย'}
-                                    </Text>
-                                </div>
-                            }
-                            type="info"
-                            showIcon
-                        />
-
-                        {/* Helper Messages */}
-                        {currentStep === 0 && !canProceedToGoals && (
-                            <Alert
-                                style={{
-                                    marginTop: 16,
-                                    borderRadius: 12,
-                                    border: 'none',
-                                    background: `${COLORS.warning}10`
-                                }}
-                                message="กรุณาเลือกอย่างน้อย 1 คุณค่าที่สำคัญสำหรับคุณ"
-                                type="warning"
-                                showIcon
-                            />
-                        )}
-
-                        {currentStep === 1 && !canProceedToAction && (
-                            <Alert
-                                style={{
-                                    marginTop: 16,
-                                    borderRadius: 12,
-                                    border: 'none',
-                                    background: `${COLORS.warning}10`
-                                }}
-                                message="กรุณากรอกเป้าหมายให้ครบทุกด้าน"
-                                type="warning"
-                                showIcon
-                            />
-                        )}
-                    </>
-                )}
-            </ContentContainer>
-
-            {/* Loading overlay */}
-            {loading && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'rgba(255, 255, 255, 0.8)',
+// Component rendering functions
+const renderGoalTypeSelection = () => (
+    <div>
+      {/* ส่วนปุ่มเลือกประเภทเป้าหมาย */}
+      <GoalTypeContainer>
+        {Object.entries(GOAL_TYPES).map(([type, config]) => (
+          <GoalTypeButton
+            key={type}
+            icon={config.icon}
+            className={config.className}
+            active={currentGoal.type === type}
+            onClick={() => handleGoalTypeSelect(type)}
+          >
+            {config.title}
+          </GoalTypeButton>
+        ))}
+      </GoalTypeContainer>
+  
+      {/* ส่วนตัวอย่างและการกรอกข้อมูล */}
+      {currentGoal.type === 'short' && (
+        <div>
+          <ExampleBox>
+            <Title level={5}>ตัวอย่างเป้าหมายระยะสั้น:</Title>
+            <ul style={{ marginBottom: 0 }}>
+              {STEPS[currentStep].examples.slice(0, 2).map((example, index) => (
+                <li key={index}>{example}</li>
+              ))}
+            </ul>
+          </ExampleBox>
+          <div style={{ marginTop: '20px' }}>
+            <Text strong>เป้าหมายระยะสั้นของคุณ:</Text>
+            <StyledTextArea
+              value={currentGoal.text}
+              onChange={e => setCurrentGoal(prev => ({ ...prev, text: e.target.value }))}
+              placeholder="พิมพ์เป้าหมายระยะสั้นของคุณที่นี่..."
+              disabled={loading}
+            />
+          </div>
+        </div>
+      )}
+  
+      {currentGoal.type === 'long' && (
+        <div>
+          <ExampleBox>
+            <Title level={5}>ตัวอย่างเป้าหมายระยะยาว:</Title>
+            <ul style={{ marginBottom: 0 }}>
+              {STEPS[currentStep].examples.slice(-2).map((example, index) => (
+                <li key={index}>{example}</li>
+              ))}
+            </ul>
+          </ExampleBox>
+          <div style={{ marginTop: '20px' }}>
+            <Text strong>เป้าหมายระยะยาวของคุณ:</Text>
+            <StyledTextArea
+              value={currentGoal.text}
+              onChange={e => setCurrentGoal(prev => ({ ...prev, text: e.target.value }))}
+              placeholder="พิมพ์เป้าหมายระยะยาวของคุณที่นี่..."
+              disabled={loading}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+   
+   const renderSummary = () => (
+    <StyledCard
+      title={
+        <div style={{
+          textAlign: 'center',
+          borderBottom: `2px solid ${COLORS.primary}`,
+          paddingBottom: 16,
+          marginBottom: 24
+        }}>
+          <Title level={3} style={{
+            background: `linear-gradient(45deg, ${COLORS.primary}, ${COLORS.secondary})`,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            marginBottom: 0
+          }}>
+            สรุปเป้าหมายทั้งหมด
+          </Title>
+        </div>
+      }
+    >
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        {STEPS.slice(0, -1).map((step, index) => (
+          <div key={step.category} style={{
+            background: COLORS.background,
+            padding: '24px',
+            borderRadius: '16px',
+            marginBottom: '16px',
+            border: `1px solid ${COLORS.secondary}20`
+          }}>
+            <Title level={4} style={{
+              color: COLORS.primary,
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              borderBottom: `1px solid ${COLORS.secondary}40`,
+              paddingBottom: '12px'
+            }}>
+              <div style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                background: COLORS.primary,
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }}>
+                {index + 1}
+              </div>
+              {step.title}
+            </Title>
+   
+            <Tabs defaultActiveKey="short">
+              <Tabs.TabPane
+                tab={<span>{GOAL_TYPES.short.icon} {GOAL_TYPES.short.title}</span>}
+                key="short"
+              >
+                {goals[step.category].short.map((goal, idx) => (
+                  <div key={idx} style={{
+                    background: 'white',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    marginBottom: '8px',
                     display: 'flex',
-                    justifyContent: 'center',
                     alignItems: 'center',
-                    zIndex: 1000
-                }}>
-                    <Space direction="vertical" align="center">
-                        <LoadingOutlined style={{ fontSize: 24, color: COLORS.primary }} />
-                        <Text>กำลังดำเนินการ...</Text>
-                    </Space>
-                </div>
-            )}
-        </PageContainer>
-    );
+                    gap: '8px'
+                  }}>
+                    <Text>{goal.text}</Text>
+                  </div>
+                ))}
+              </Tabs.TabPane>
+              <Tabs.TabPane
+                tab={<span>{GOAL_TYPES.long.icon} {GOAL_TYPES.long.title}</span>}
+                key="long"
+              >
+                {goals[step.category].long.map((goal, idx) => (
+                  <div key={idx} style={{
+                    background: 'white',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    marginBottom: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <Text>{goal.text}</Text>
+                  </div>
+                ))}
+              </Tabs.TabPane>
+            </Tabs>
+          </div>
+        ))}
+   
+        <NavigationButtons style={{
+          marginTop: '32px',
+          padding: '24px',
+          borderTop: `1px solid ${COLORS.secondary}20`
+        }}>
+          <ActionButton
+            icon={<ArrowLeftOutlined />}
+            onClick={handleEdit}
+            style={{ boxShadow: `0 2px 8px ${COLORS.shadow}` }}
+          >
+            แก้ไขคำตอบ
+          </ActionButton>
+          <ActionButton
+            className="primary"
+            icon={<CheckOutlined />}
+            onClick={handleFinish}
+            style={{ boxShadow: `0 2px 8px ${COLORS.primary}40` }}
+          >
+            จบกิจกรรม
+          </ActionButton>
+        </NavigationButtons>
+      </Space>
+    </StyledCard>
+   );
+   
+   // Main render
+   return (
+    <PageContainer>
+      <ContentContainer>
+        <Title level={2} style={{ textAlign: 'center', marginBottom: 32 }}>
+          กิจกรรมที่ 6: ออกแบบชีวิตด้วยความทรงจำ
+        </Title>
+   
+        <StyledSteps
+          current={currentStep}
+          items={STEPS.map(step => ({
+            title: step.title
+          }))}
+          style={{ marginBottom: 32 }}
+        />
+   
+        {currentStep < STEPS.length - 1 ? (
+          <StyledCard title={STEPS[currentStep].title}>
+            {renderGoalTypeSelection()}
+   
+            <NavigationButtons>
+              {currentStep > 0 && (
+                <ActionButton icon={<ArrowLeftOutlined />} onClick={handlePrevious}>
+                  ย้อนกลับ
+                </ActionButton>
+              )}
+              <ActionButton 
+                className="primary" 
+                onClick={handleNext}
+                disabled={!currentGoal.type || !currentGoal.text.trim()}
+              >
+                {currentStep === STEPS.length - 2 ? 'ดูสรุป' : 'ถัดไป'}
+              </ActionButton>
+            </NavigationButtons>
+          </StyledCard>
+        ) : (
+          renderSummary()
+        )}
+   
+        {loading && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(255, 255, 255, 0.8)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000
+          }}>
+            <Space direction="vertical" align="center">
+              <LoadingOutlined style={{ fontSize: 24, color: COLORS.primary }} />
+              <Text>กำลังดำเนินการ...</Text>
+            </Space>
+          </div>
+        )}
+      </ContentContainer>
+    </PageContainer>
+   );
 }
