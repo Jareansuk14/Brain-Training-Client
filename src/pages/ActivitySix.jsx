@@ -16,6 +16,7 @@ import {
   ClockCircleOutlined,
   CalendarOutlined,
   LoadingOutlined,
+  BulbOutlined,
 } from "@ant-design/icons";
 import styled from "@emotion/styled";
 import { keyframes } from "@emotion/react";
@@ -163,18 +164,65 @@ const StyledTextArea = styled(TextArea)`
 
 const ExampleBox = styled.div`
   background: ${COLORS.background};
-  border: 1px solid ${COLORS.secondary}20;
-  border-radius: 8px;
-  padding: 12px;
-  margin: 12px 0;
-  font-style: italic;
+  border: 1px solid ${COLORS.secondary}30;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
   color: ${COLORS.dark};
   font-size: 14px;
+  box-shadow: 0 2px 8px ${COLORS.shadow};
+
+  .example-title {
+    color: ${COLORS.primary};
+    font-weight: 600;
+    margin-bottom: 12px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .example-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .example-item {
+    background: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid ${COLORS.secondary}15;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px ${COLORS.shadow};
+    }
+
+    &::before {
+      content: "•";
+      color: ${COLORS.primary};
+      font-size: 20px;
+    }
+  }
 
   @media (min-width: ${BREAKPOINTS.tablet}) {
-    padding: 16px;
-    margin: 16px 0;
-    font-size: 16px;
+    padding: 20px;
+    margin: 20px 0;
+    font-size: 15px;
+
+    .example-title {
+      font-size: 17px;
+    }
   }
 `;
 
@@ -215,51 +263,82 @@ const ActionButton = styled(Button)`
 `;
 
 const StyledSteps = styled(Steps)`
-  .ant-steps-item {
-    font-size: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
+
+  .ant-steps {
+    width: 100%;
+    display: flex;
+    justify-content: center;
   }
 
-  @media (min-width: ${BREAKPOINTS.mobile}) {
-    .ant-steps-item {
-      font-size: 12px;
-    }
+  .ant-steps-item {
+    display: none !important;
   }
 
   .ant-steps-item-process {
-    .ant-steps-item-icon {
-      background: ${COLORS.primary};
-      border-color: ${COLORS.primary};
-    }
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    flex: none;
+    margin: 0 auto;
+    padding: 0;
+    min-width: auto;
+    position: relative;
+    width: 100%;
 
-    .ant-steps-item-title {
-      color: ${COLORS.primary} !important;
-      font-size: 12px !important;
-      font-weight: 500 !important;
+    .ant-steps-item-container {
+      padding: 0;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
 
-      &::after {
-        background-color: ${COLORS.primary} !important;
+      .ant-steps-item-tail,
+      .ant-steps-item-icon {
+        display: none;
+      }
+
+      .ant-steps-item-content {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: auto;
+        margin: 0 auto;
+        text-align: center;
+
+        .ant-steps-item-title {
+          color: ${COLORS.primary};
+          font-weight: 600;
+          font-size: 1.5rem;
+          text-align: center;
+          padding: 0 !important;
+          margin: 0 auto;
+          width: 100%;
+          
+          &::after {
+            display: none;
+          }
+        }
       }
     }
   }
 
-  .ant-steps-item-finish {
-    .ant-steps-item-icon {
-      background: white;
-      border-color: ${COLORS.primary};
-
-      .ant-steps-icon {
-        color: ${COLORS.primary};
-      }
-    }
+  .ant-steps-item-tail {
+    display: none !important;
   }
 
-  .ant-steps-item-title {
-    font-size: 10px !important;
-    font-weight: 500 !important;
-
-    @media (min-width: ${BREAKPOINTS.mobile}) {
-      font-size: 12px !important;
-    }
+  .ant-steps-item-wait,
+  .ant-steps-item-finish,
+  .ant-steps-item-title::after {
+    display: none !important;
   }
 `;
 
@@ -276,7 +355,7 @@ const SummaryCard = styled(StyledCard)`
 // Step Configuration
 const STEPS = [
   {
-    title: <span style={{ fontSize: "10px" }}>ด้านครอบครัว</span>,
+    title: "ด้านครอบครัว",
     category: "family",
     examples: [
       "จดจำวันเกิดและวันสำคัญของสมาชิกในครอบครัวได้ทุกคน",
@@ -285,7 +364,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: "10px" }}>ด้านการงาน</span>,
+    title: "ด้านการงาน",
     category: "work",
     examples: [
       "จดจำขั้นตอนการทำงานสำคัญได้อย่างแม่นยำ",
@@ -294,7 +373,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: "10px" }}>ด้านสังคม</span>,
+    title: "ด้านสังคม",
     category: "social",
     examples: [
       "จดจำชื่อและรายละเอียดสำคัญของเพื่อนใหม่ที่พบ",
@@ -303,7 +382,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: "10px" }}>ด้านการพักผ่อน</span>,
+    title: "ด้านการพักผ่อน",
     category: "leisure",
     examples: [
       "ทำกิจกรรมที่ช่วยฝึกความจำในยามว่าง เช่น เล่นเกมฝึกสมอง",
@@ -312,7 +391,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: "10px" }}>ด้านสุขภาพ</span>,
+    title: "ด้านสุขภาพ",
     category: "health",
     examples: [
       "จดจำตารางการทานยาได้อย่างแม่นยำ",
@@ -321,7 +400,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: "10px" }}>ด้านจิตวิญญาณ</span>,
+    title: "ด้านจิตวิญญาณ",
     category: "spiritual",
     examples: [
       "จดจำบทสวดมนต์หรือข้อคิดที่สร้างกำลังใจ",
@@ -330,11 +409,10 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: "10px" }}>สรุป</span>,
+    title: "สรุป",
     category: "summary",
   },
 ];
-
 // Goal Types Configuration
 const GOAL_TYPES = {
   short: {
@@ -619,10 +697,22 @@ export default function ActivitySix() {
       {selectedType === "short" && (
         <div>
           <ExampleBox>
-            <Title level={5}>ตัวอย่างเป้าหมายระยะสั้น:</Title>
-            <ul style={{ marginBottom: 0 }}>
+            {selectedType === "short" ? (
+              <div className="example-title">
+                <BulbOutlined style={{ color: COLORS.primary }} />
+                ตัวอย่างเป้าหมายระยะสั้น
+              </div>
+            ) : (
+              <div className="example-title">
+                <BulbOutlined style={{ color: COLORS.primary }} />
+                ตัวอย่างเป้าหมายระยะยาว
+              </div>
+            )}
+            <ul className="example-list">
               {STEPS[currentStep].examples.slice(0, 2).map((example, index) => (
-                <li key={index}>{example}</li>
+                <li key={index} className="example-item">
+                  {example}
+                </li>
               ))}
             </ul>
           </ExampleBox>
@@ -641,10 +731,22 @@ export default function ActivitySix() {
       {selectedType === "long" && (
         <div>
           <ExampleBox>
-            <Title level={5}>ตัวอย่างเป้าหมายระยะยาว:</Title>
-            <ul style={{ marginBottom: 0 }}>
+            {selectedType === "short" ? (
+              <div className="example-title">
+                <BulbOutlined style={{ color: COLORS.primary }} />
+                ตัวอย่างเป้าหมายระยะสั้น
+              </div>
+            ) : (
+              <div className="example-title">
+                <BulbOutlined style={{ color: COLORS.primary }} />
+                ตัวอย่างเป้าหมายระยะยาว
+              </div>
+            )}
+            <ul className="example-list">
               {STEPS[currentStep].examples.slice(-2).map((example, index) => (
-                <li key={index}>{example}</li>
+                <li key={index} className="example-item">
+                  {example}
+                </li>
               ))}
             </ul>
           </ExampleBox>
