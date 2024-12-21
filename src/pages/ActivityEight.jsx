@@ -44,7 +44,7 @@ const BREAKPOINTS = {
 // Step Configuration
 const STEPS = [
   {
-    title: <span style={{ fontSize: "10px" }}>ด้านครอบครัว</span>,
+    title: "ด้านครอบครัว",
     category: "family",
     questions: [
       {
@@ -69,7 +69,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: "10px" }}>ด้านการงาน</span>,
+    title: "ด้านการงาน",
     category: "work",
     questions: [
       {
@@ -93,7 +93,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: "10px" }}>ด้านสังคม</span>,
+    title: "ด้านสังคม",
     category: "social",
     questions: [
       {
@@ -117,7 +117,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: "10px" }}>ด้านการพักผ่อน</span>,
+    title: "ด้านการพักผ่อน",
     category: "leisure",
     questions: [
       {
@@ -140,7 +140,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: "10px" }}>ด้านสุขภาพ</span>,
+    title: "ด้านสุขภาพ",
     category: "health",
     questions: [
       {
@@ -162,7 +162,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: "10px" }}>ด้านจิตวิญญาณ</span>,
+    title: "ด้านจิตวิญญาณ",
     category: "spiritual",
     questions: [
       {
@@ -185,7 +185,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: "10px" }}>สรุป</span>,
+    title: "สรุป",
     category: "summary",
   },
 ];
@@ -314,42 +314,82 @@ const ActionButton = styled(Button)`
 `;
 
 const StyledSteps = styled(Steps)`
-  .ant-steps-item {
-    font-size: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
+
+  .ant-steps {
+    width: 100%;
+    display: flex;
+    justify-content: center;
   }
 
-  @media (min-width: ${BREAKPOINTS.mobile}) {
-    .ant-steps-item {
-      font-size: 12px;
-    }
+  .ant-steps-item {
+    display: none !important;
   }
 
   .ant-steps-item-process {
-    .ant-steps-item-icon {
-      background: ${COLORS.primary};
-      border-color: ${COLORS.primary};
-    }
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    flex: none;
+    margin: 0 auto;
+    padding: 0;
+    min-width: auto;
+    position: relative;
+    width: 100%;
 
-    .ant-steps-item-title {
-      color: ${COLORS.primary} !important;
-      font-size: 12px !important;
-      font-weight: 500 !important;
+    .ant-steps-item-container {
+      padding: 0;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
 
-      &::after {
-        background-color: ${COLORS.primary} !important;
+      .ant-steps-item-tail,
+      .ant-steps-item-icon {
+        display: none;
+      }
+
+      .ant-steps-item-content {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: auto;
+        margin: 0 auto;
+        text-align: center;
+
+        .ant-steps-item-title {
+          color: ${COLORS.primary};
+          font-weight: 600;
+          font-size: 1.5rem;
+          text-align: center;
+          padding: 0 !important;
+          margin: 0 auto;
+          width: 100%;
+
+          &::after {
+            display: none;
+          }
+        }
       }
     }
   }
 
-  .ant-steps-item-finish {
-    .ant-steps-item-icon {
-      background: white;
-      border-color: ${COLORS.primary};
+  .ant-steps-item-tail {
+    display: none !important;
+  }
 
-      .ant-steps-icon {
-        color: ${COLORS.primary};
-      }
-    }
+  .ant-steps-item-wait,
+  .ant-steps-item-finish,
+  .ant-steps-item-title::after {
+    display: none !important;
   }
 `;
 
