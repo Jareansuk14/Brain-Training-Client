@@ -167,7 +167,7 @@ const StyledSteps = styled(Steps)`
 // Steps Configuration
 const STEPS = [
   {
-    title: <span style={{ fontSize: '10px' }}>ด้านครอบครัว</span>,
+    title: <span style={{ fontSize: "10px" }}>ด้านครอบครัว</span>,
     category: "family",
     questions: [
       {
@@ -181,7 +181,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: '10px' }}>ด้านการงาน</span>,
+    title: <span style={{ fontSize: "10px" }}>ด้านการงาน</span>,
     category: "work",
     questions: [
       {
@@ -195,7 +195,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: '10px' }}>ด้านสังคม</span>,
+    title: <span style={{ fontSize: "10px" }}>ด้านสังคม</span>,
     category: "social",
     questions: [
       {
@@ -209,7 +209,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: '10px' }}>ด้านการพักผ่อน</span>,
+    title: <span style={{ fontSize: "10px" }}>ด้านการพักผ่อน</span>,
     category: "leisure",
     questions: [
       {
@@ -223,7 +223,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: '10px' }}>ด้านสุขภาพ</span>,
+    title: <span style={{ fontSize: "10px" }}>ด้านสุขภาพ</span>,
     category: "health",
     questions: [
       {
@@ -237,7 +237,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: '10px' }}>ด้านจิตวิญญาณ</span>,
+    title: <span style={{ fontSize: "10px" }}>ด้านจิตวิญญาณ</span>,
     category: "spiritual",
     questions: [
       {
@@ -251,7 +251,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: '10px' }}>สรุป</span>,
+    title: <span style={{ fontSize: "10px" }}>สรุป</span>,
     category: "summary",
   },
 ];
@@ -305,6 +305,53 @@ export default function ActivityFive() {
       setIsEditing(false);
     }
   }, [currentStep, isEditing]);
+
+  // เพิ่ม useEffect ใหม่สำหรับตรวจสอบข้อมูลเก่า
+  useEffect(() => {
+    const checkExistingAnswers = async () => {
+      if (!user?.nationalId) return;
+
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          `https://brain-training-server.onrender.com/api/goals/${user.nationalId}`
+        );
+
+        // ตรวจสอบว่ามีข้อมูลคำตอบครบทุกด้านหรือไม่
+        if (response.data.answers) {
+          const categories = [
+            "family",
+            "work",
+            "social",
+            "leisure",
+            "health",
+            "spiritual",
+          ];
+          const hasAllCategories = categories.every((category) =>
+            response.data.answers.some((answer) => answer.category === category)
+          );
+
+          // ถ้ามีข้อมูลครบทุกด้าน ให้ไปที่หน้าสรุป
+          if (hasAllCategories) {
+            const formattedAnswers = {};
+            response.data.answers.forEach((category) => {
+              category.questions.forEach((q) => {
+                formattedAnswers[q.questionId] = q.answer;
+              });
+            });
+            setAnswers(formattedAnswers);
+            setCurrentStep(STEPS.length - 1); // ไปที่หน้าสรุป
+          }
+        }
+      } catch (error) {
+        console.error("Error checking existing answers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkExistingAnswers();
+  }, [user?.nationalId]); // เรียกใช้เมื่อ user.nationalId มีการเปลี่ยนแปลง
 
   // บันทึกคำตอบ
   const handleSaveAnswers = async () => {

@@ -276,9 +276,7 @@ const SummaryCard = styled(StyledCard)`
 // Step Configuration
 const STEPS = [
   {
-    title: (
-      <span style={{ fontSize: "10px", fontWeight: "500" }}>ด้านครอบครัว</span>
-    ),
+    title: <span style={{ fontSize: "10px" }}>ด้านครอบครัว</span>,
     category: "family",
     examples: [
       "จดจำวันเกิดและวันสำคัญของสมาชิกในครอบครัวได้ทุกคน",
@@ -287,11 +285,7 @@ const STEPS = [
     ],
   },
   {
-    title: (
-      <span style={{ fontSize: "10px", fontWeight: "500" }}>
-        ด้านการงาน/การศึกษา
-      </span>
-    ),
+    title: <span style={{ fontSize: "10px" }}>ด้านการงาน</span>,
     category: "work",
     examples: [
       "จดจำขั้นตอนการทำงานสำคัญได้อย่างแม่นยำ",
@@ -300,9 +294,7 @@ const STEPS = [
     ],
   },
   {
-    title: (
-      <span style={{ fontSize: "10px", fontWeight: "500" }}>ด้านสังคม</span>
-    ),
+    title: <span style={{ fontSize: "10px" }}>ด้านสังคม</span>,
     category: "social",
     examples: [
       "จดจำชื่อและรายละเอียดสำคัญของเพื่อนใหม่ที่พบ",
@@ -311,11 +303,7 @@ const STEPS = [
     ],
   },
   {
-    title: (
-      <span style={{ fontSize: "10px", fontWeight: "500" }}>
-        ด้านการพักผ่อน
-      </span>
-    ),
+    title: <span style={{ fontSize: "10px" }}>ด้านการพักผ่อน</span>,
     category: "leisure",
     examples: [
       "ทำกิจกรรมที่ช่วยฝึกความจำในยามว่าง เช่น เล่นเกมฝึกสมอง",
@@ -324,9 +312,7 @@ const STEPS = [
     ],
   },
   {
-    title: (
-      <span style={{ fontSize: "10px", fontWeight: "500" }}>ด้านสุขภาพ</span>
-    ),
+    title: <span style={{ fontSize: "10px" }}>ด้านสุขภาพ</span>,
     category: "health",
     examples: [
       "จดจำตารางการทานยาได้อย่างแม่นยำ",
@@ -335,9 +321,7 @@ const STEPS = [
     ],
   },
   {
-    title: (
-      <span style={{ fontSize: "10px", fontWeight: "500" }}>ด้านจิตวิญญาณ</span>
-    ),
+    title: <span style={{ fontSize: "10px" }}>ด้านจิตวิญญาณ</span>,
     category: "spiritual",
     examples: [
       "จดจำบทสวดมนต์หรือข้อคิดที่สร้างกำลังใจ",
@@ -346,7 +330,7 @@ const STEPS = [
     ],
   },
   {
-    title: <span style={{ fontSize: "10px", fontWeight: "500" }}>สรุป</span>,
+    title: <span style={{ fontSize: "10px" }}>สรุป</span>,
     category: "summary",
   },
 ];
@@ -418,8 +402,29 @@ export default function ActivitySix() {
               long: category.longTermGoals || [],
             };
           });
-          console.log("Formatted goals:", formattedGoals); // เพิ่ม log
           setGoals(formattedGoals);
+
+          // เพิ่มการตรวจสอบว่ามีข้อมูลครบทุกด้านหรือไม่
+          const hasAllCategories = [
+            "family",
+            "work",
+            "social",
+            "leisure",
+            "health",
+            "spiritual",
+          ].every((category) => {
+            const categoryData = formattedGoals[category];
+            return (
+              categoryData &&
+              categoryData.short.length > 0 &&
+              categoryData.long.length > 0
+            );
+          });
+
+          // ถ้ามีข้อมูลครบทุกด้าน ให้ไปที่หน้าสรุป
+          if (hasAllCategories) {
+            setCurrentStep(STEPS.length - 1);
+          }
         }
       } catch (error) {
         console.error("Error fetching goals:", error);
@@ -454,6 +459,7 @@ export default function ActivitySix() {
       [type]: text,
     }));
   };
+
   const handleSaveGoal = async () => {
     if (!user?.nationalId) {
       message.warning("กรุณาเข้าสู่ระบบก่อนทำกิจกรรม");
@@ -472,9 +478,17 @@ export default function ActivitySix() {
       const data = {
         nationalId: user.nationalId,
         category: currentStepData.category,
-        shortTermGoal: currentGoals.short,
-        longTermGoal: currentGoals.long,
+        shortTermGoal: {
+          type: "short",
+          text: currentGoals.short.trim(),
+        },
+        longTermGoal: {
+          type: "long",
+          text: currentGoals.long.trim(),
+        },
       };
+
+      console.log("Data being sent:", data);
 
       const response = await axios.post(
         "https://brain-training-server.onrender.com/api/life-design/save",
@@ -482,7 +496,6 @@ export default function ActivitySix() {
       );
 
       if (response.data.success) {
-        // อัพเดต goals state
         setGoals((prev) => {
           const updatedGoals = { ...prev };
           const currentCategory = currentStepData.category;
@@ -491,26 +504,22 @@ export default function ActivitySix() {
             updatedGoals[currentCategory] = { short: [], long: [] };
           }
 
+          // แทนที่ข้อมูลเก่าด้วยข้อมูลใหม่
           updatedGoals[currentCategory] = {
-            short: [
-              ...(updatedGoals[currentCategory].short || []),
-              { text: currentGoals.short },
-            ],
-            long: [
-              ...(updatedGoals[currentCategory].long || []),
-              { text: currentGoals.long },
-            ],
+            short: [{ type: "short", text: currentGoals.short }], // เก็บเฉพาะข้อมูลใหม่
+            long: [{ type: "long", text: currentGoals.long }], // เก็บเฉพาะข้อมูลใหม่
           };
 
-          console.log("Updated goals:", updatedGoals); // เพิ่ม log
           return updatedGoals;
         });
 
         message.success("บันทึกเป้าหมายสำเร็จ");
       }
     } catch (error) {
-      console.error("Error saving goals:", error);
-      message.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+      console.error("Error details:", error.response?.data || error.message);
+      message.error(
+        error.response?.data?.error || "เกิดข้อผิดพลาดในการบันทึกข้อมูล"
+      );
     } finally {
       setLoading(false);
     }
@@ -660,6 +669,7 @@ export default function ActivitySix() {
           style={{
             textAlign: "center",
             borderBottom: `2px solid ${COLORS.primary}`,
+            paddingTop: 16,
             paddingBottom: 16,
             marginBottom: 24,
           }}
@@ -816,7 +826,7 @@ export default function ActivitySix() {
           level={2}
           style={{ textAlign: "center", marginBottom: 32, fontSize: "2rem" }}
         >
-          กิจกรรมที่ 6: ออกแบบชีวิตด้วยความทรงจำ
+          กิจกรรมที่ 6: ตั้งเป้าหมายเพื่อพัฒนาความจำ
         </Title>
 
         <StyledSteps
