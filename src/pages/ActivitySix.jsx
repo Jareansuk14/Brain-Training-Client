@@ -1,4 +1,3 @@
-// ActivitySix.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -36,52 +35,75 @@ const COLORS = {
   shadow: "rgba(17, 12, 46, 0.1)",
 };
 
+// Responsive Breakpoints
+const BREAKPOINTS = {
+  mobile: "480px",
+  tablet: "768px",
+  desktop: "1024px",
+};
+
 // Animations
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 `;
 
-// Styled Components
+// Styled Components with Mobile Responsiveness
 const PageContainer = styled.div`
   min-height: 100vh;
   background: ${COLORS.background};
-  padding: 40px 24px;
+  padding: 20px 15px;
+
+  @media (min-width: ${BREAKPOINTS.tablet}) {
+    padding: 40px 24px;
+  }
 `;
 
 const ContentContainer = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 100%;
   width: 100%;
+  margin: 0 auto;
   animation: ${fadeIn} 0.6s ease-out;
+
+  @media (min-width: ${BREAKPOINTS.tablet}) {
+    max-width: 800px;
+  }
 `;
 
 const StyledCard = styled(Card)`
   background: ${COLORS.light};
-  border-radius: 16px;
+  border-radius: 12px;
   border: none;
   box-shadow: 0 4px 24px ${COLORS.shadow};
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 
   .ant-card-head {
     border-bottom: 1px solid ${COLORS.background};
   }
 
   .ant-card-body {
-    padding: 24px;
+    padding: 16px;
+
+    @media (min-width: ${BREAKPOINTS.tablet}) {
+      padding: 24px;
+    }
   }
 `;
 
-// เพิ่ม styled component ใหม่
 const GoalTypeContainer = styled.div`
   display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  @media (min-width: ${BREAKPOINTS.mobile}) {
+    flex-direction: row;
+    gap: 16px;
+  }
 `;
 
-// ปรับ GoalTypeButton
 const GoalTypeButton = styled(Button)`
-  flex: 1;
+  width: 100%;
   height: 48px;
   border-radius: 8px;
   display: flex;
@@ -90,6 +112,10 @@ const GoalTypeButton = styled(Button)`
   gap: 8px;
   font-weight: 500;
   position: relative;
+
+  @media (min-width: ${BREAKPOINTS.mobile}) {
+    flex: 1;
+  }
 
   &.type-short {
     background: ${(props) => (props.active ? COLORS.primary : "white")};
@@ -116,59 +142,65 @@ const GoalTypeButton = styled(Button)`
   }
 `;
 
-const SlideContainer = styled.div`
-  overflow: hidden;
-  margin-top: 24px;
-`;
+const StyledTextArea = styled(TextArea)`
+  border-radius: 8px;
+  border: 1px solid ${COLORS.secondary};
+  padding: 12px;
+  min-height: 120px;
+  margin: 12px 0;
+  font-size: 14px;
 
-const SlideContent = styled.div`
-  transform: translateX(
-    ${(props) => (props.slide === "short" ? "0" : "-100%")}
-  );
-  transition: transform 0.3s ease-in-out;
-  display: flex;
-  width: 200%;
-`;
+  &:focus {
+    border-color: ${COLORS.primary};
+    box-shadow: 0 0 0 2px ${COLORS.primary}20;
+  }
 
-const SlidePage = styled.div`
-  flex: 0 0 50%;
-  padding-right: 16px;
+  @media (min-width: ${BREAKPOINTS.tablet}) {
+    margin: 16px 0;
+    font-size: 16px;
+  }
 `;
 
 const ExampleBox = styled.div`
   background: ${COLORS.background};
   border: 1px solid ${COLORS.secondary}20;
   border-radius: 8px;
-  padding: 16px;
-  margin: 16px 0;
+  padding: 12px;
+  margin: 12px 0;
   font-style: italic;
   color: ${COLORS.dark};
-`;
+  font-size: 14px;
 
-const StyledTextArea = styled(TextArea)`
-  border-radius: 8px;
-  border: 1px solid ${COLORS.secondary};
-  padding: 12px;
-  min-height: 120px;
-  margin: 16px 0;
-
-  &:focus {
-    border-color: ${COLORS.primary};
-    box-shadow: 0 0 0 2px ${COLORS.primary}20;
+  @media (min-width: ${BREAKPOINTS.tablet}) {
+    padding: 16px;
+    margin: 16px 0;
+    font-size: 16px;
   }
 `;
 
 const NavigationButtons = styled.div`
   display: flex;
-  justify-content: space-between;
-  margin-top: 24px;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+
+  @media (min-width: ${BREAKPOINTS.mobile}) {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 24px;
+  }
 `;
 
 const ActionButton = styled(Button)`
-  min-width: 120px;
+  width: 100%;
   height: 40px;
   border-radius: 8px;
   font-weight: 500;
+
+  @media (min-width: ${BREAKPOINTS.mobile}) {
+    width: auto;
+    min-width: 120px;
+  }
 
   &.primary {
     background: ${COLORS.primary};
@@ -183,6 +215,16 @@ const ActionButton = styled(Button)`
 `;
 
 const StyledSteps = styled(Steps)`
+  .ant-steps-item {
+    font-size: 10px;
+  }
+
+  @media (min-width: ${BREAKPOINTS.mobile}) {
+    .ant-steps-item {
+      font-size: 12px;
+    }
+  }
+
   .ant-steps-item-process {
     .ant-steps-item-icon {
       background: ${COLORS.primary};
@@ -191,7 +233,7 @@ const StyledSteps = styled(Steps)`
 
     .ant-steps-item-title {
       color: ${COLORS.primary} !important;
-      font-size: 16px !important;
+      font-size: 12px !important;
       font-weight: 500 !important;
 
       &::after {
@@ -212,8 +254,22 @@ const StyledSteps = styled(Steps)`
   }
 
   .ant-steps-item-title {
-    font-size: 16px !important;
+    font-size: 10px !important;
     font-weight: 500 !important;
+
+    @media (min-width: ${BREAKPOINTS.mobile}) {
+      font-size: 12px !important;
+    }
+  }
+`;
+
+const SummaryCard = styled(StyledCard)`
+  .ant-card-body {
+    padding: 16px;
+
+    @media (min-width: ${BREAKPOINTS.tablet}) {
+      padding: 24px;
+    }
   }
 `;
 
@@ -756,7 +812,10 @@ export default function ActivitySix() {
   return (
     <PageContainer>
       <ContentContainer>
-        <Title level={2} style={{ textAlign: "center", marginBottom: 32 }}>
+        <Title
+          level={2}
+          style={{ textAlign: "center", marginBottom: 32, fontSize: "2rem" }}
+        >
           กิจกรรมที่ 6: ออกแบบชีวิตด้วยความทรงจำ
         </Title>
 
