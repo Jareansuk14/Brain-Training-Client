@@ -643,7 +643,7 @@ export default function ActivityOneForm() {
       if (response.data.success) {
         message.success("บันทึกข้อมูลทั้งหมดสำเร็จ");
         setInitialData(response.data.user);
-        navigate("/activity-1/mindmap");
+        window.location.href = "https://app.diagrams.net/?src=about";
       } else {
         throw new Error(
           response.data.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล"
