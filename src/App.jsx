@@ -19,6 +19,7 @@ import ActivityFive from "./pages/ActivityFive";
 import ActivitySix from "./pages/ActivitySix";
 import ActivitySeven from "./pages/ActivitySeven";
 import ActivityEight from "./pages/ActivityEight";
+import ColorSortingGame from "./pages/ColorSortingGame"
 
 const { Header: AntHeader, Content } = Layout;
 
@@ -355,6 +356,17 @@ function App() {
               <ProtectedRoute>
                 <AppLayout>
                   <ActivityEight />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/ColorSortingGame/"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <ColorSortingGame />
                 </AppLayout>
               </ProtectedRoute>
             }
