@@ -675,7 +675,7 @@ export default function ActivityFive() {
     <PageContainer>
       <ContentContainer>
         <Title level={2} style={{ textAlign: "center", marginBottom: 32 }}>
-          กิจกรรมที่ 5: สร้างค่านิยม
+          กิจกรรมที่ 5: เสริมสร้างพลัง สร้างค่านิยม
         </Title>
 
         <StyledSteps

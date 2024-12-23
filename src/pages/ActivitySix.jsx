@@ -928,7 +928,7 @@ export default function ActivitySix() {
           level={2}
           style={{ textAlign: "center", marginBottom: 32, fontSize: "2rem" }}
         >
-          กิจกรรมที่ 6: ตั้งเป้าหมายเพื่อพัฒนาความจำ
+          กิจกรรมที่ 6: ออกแบบชีวิต สร้างเป้าหมายที่สมดุล
         </Title>
 
         <StyledSteps

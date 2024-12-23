@@ -880,7 +880,7 @@ export default function ActivitySeven() {
           level={2}
           style={{ textAlign: "center", marginBottom: 32, fontSize: "2rem" }}
         >
-          กิจกรรมที่ 7: สร้างแนวทางปฏิบัติเพื่อพัฒนาความจำ
+          กิจกรรมที่ 7: สู่ฝัน ความสำเร็จ
         </Title>
 
         <StyledSteps
