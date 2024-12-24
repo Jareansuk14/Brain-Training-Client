@@ -39,12 +39,12 @@ const COLORS = {
 const GAME_COLORS = [
   "#FF6B6B", // แดง
   "#4ECDC4", // ฟ้า
-  "#8fce00", // น้ำเงิน
-  "#ffd966", // เขียว
-  "#e448a3", // เหลือง
+  "#45B7D1", // น้ำเงิน
+  "#96CEB4", // เขียว
+  "#FFEEAD", // เหลือง
   "#D4A5A5", // ชมพู
   "#9370DB", // ม่วง
-  "#ff982d", // เขียวน้ำทะเล
+  "#20B2AA", // เขียวน้ำทะเล
 ];
 
 // Level Colors
@@ -304,72 +304,42 @@ export default function ColorSortingGame() {
     setComparison(null);
   };
 
-  // Celebrate animation function
-  const celebrateAnimation = () => {
-    // Center confetti
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-    });
-
-    // Left confetti
-    confetti({
-      particleCount: 50,
-      angle: 60,
-      spread: 55,
-      origin: { x: 0 },
-    });
-
-    // Right confetti
-    confetti({
-      particleCount: 50,
-      angle: 120,
-      spread: 55,
-      origin: { x: 1 },
-    });
-  };
-
   const handleLevelComplete = async () => {
     clearInterval(timer);
 
+    // บันทึกผลของระดับปัจจุบัน
     const currentScore = {
       level,
       time,
       moves,
     };
+    
+    // อัพเดท gameStats ด้วยผลระดับปัจจุบัน
+    const updatedStats = [...gameStats, currentScore];
+    setGameStats(updatedStats);
 
-    setGameStats((prev) => [...prev, currentScore]);
+    // แสดง celebration animation
     celebrateAnimation();
 
     if (level === "easy") {
-      message.success("ยอดเยี่ยม! ผ่านระดับง่ายแล้ว", 1.5).then(() => {
-        setLevel("medium");
-        startGame("medium");
-      });
+      await message.success("ยอดเยี่ยม! ผ่านระดับง่ายแล้ว", 1.5);
+      setLevel("medium");
+      startGame("medium");
     } else if (level === "medium") {
-      message.success("เก่งมาก! ผ่านระดับกลางแล้ว", 1.5).then(() => {
-        setLevel("hard");
-        startGame("hard");
-      });
+      await message.success("เก่งมาก! ผ่านระดับกลางแล้ว", 1.5);
+      setLevel("hard");
+      startGame("hard");
     } else {
+      // จบเกมระดับยาก
       clearInterval(timer);
       setGameState("completed");
 
       try {
-        const totalTime = gameStats.reduce(
-          (total, stat) => total + stat.time,
-          0
-        );
-        const totalMoves = gameStats.reduce(
-          (total, stat) => total + stat.moves,
-          0
-        );
-
+        // รวมคะแนนทั้งหมดรวมถึงระดับยาก
         const sessionData = {
-          totalTime,
-          totalMoves,
-          games: gameStats,
+          totalTime: updatedStats.reduce((total, stat) => total + stat.time, 0),
+          totalMoves: updatedStats.reduce((total, stat) => total + stat.moves, 0),
+          games: updatedStats // ส่งข้อมูลทุกระดับรวมถึงระดับยาก
         };
 
         const response = await axios.post(
@@ -400,6 +370,175 @@ export default function ColorSortingGame() {
     }
   };
 
+  const renderComparison = () => (
+    <StyledCard>
+      <Title level={4}>เปรียบเทียบผลการเล่น</Title>
+      <Row gutter={[16, 24]}>
+        {/* หัวข้อ */}
+        <Col span={8}></Col>
+        <Col span={8}>
+          <Text strong style={{ color: COLORS.secondary }}>
+            ครั้งที่แล้ว
+          </Text>
+        </Col>
+        <Col span={8}>
+          <Text strong style={{ color: COLORS.primary }}>
+            ครั้งนี้
+          </Text>
+        </Col>
+
+        {/* เวลารวม */}
+        <Col span={8}>
+          <Text strong>เวลารวมทั้งหมด</Text>
+        </Col>
+        <Col span={8}>
+          <Text>{formatTime(previousResults?.totalTime || 0)}</Text>
+        </Col>
+        <Col span={8}>
+          <Text>
+            {formatTime(
+              gameStats.reduce((total, stat) => total + stat.time, 0)
+            )}
+            {comparison && (
+              <Text
+                style={{
+                  marginLeft: "8px",
+                  color: comparison.totalTime.improved ? "#3f8600" : "#cf1322",
+                }}
+              >
+                ({comparison.totalTime.improved ? "↓" : "↑"}{" "}
+                {formatTime(Math.abs(comparison.totalTime.difference))})
+              </Text>
+            )}
+          </Text>
+        </Col>
+
+        {/* จำนวนการเคลื่อนย้าย */}
+        <Col span={8}>
+          <Text strong>จำนวนการเคลื่อนย้ายรวม</Text>
+        </Col>
+        <Col span={8}>
+          <Text>{previousResults?.totalMoves || 0} ครั้ง</Text>
+        </Col>
+        <Col span={8}>
+          <Text>
+            {gameStats.reduce((total, stat) => total + stat.moves, 0)} ครั้ง
+            {comparison && (
+              <Text
+                style={{
+                  marginLeft: "8px",
+                  color: comparison.totalMoves.improved ? "#3f8600" : "#cf1322",
+                }}
+              >
+                ({comparison.totalMoves.improved ? "↓" : "↑"}{" "}
+                {Math.abs(comparison.totalMoves.difference)})
+              </Text>
+            )}
+          </Text>
+        </Col>
+      </Row>
+    </StyledCard>
+  );
+
+  const renderLevelComparison = (level, index) => {
+    const previousLevel = previousResults?.games?.[index];
+    const currentLevel = gameStats[index];
+    const comparisonData = comparison?.games?.[index];
+
+    return (
+      <StyledCard key={index}>
+        <Title
+          level={4}
+          style={{
+            color: LEVEL_COLORS[level],
+            marginBottom: "20px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          <TrophyOutlined />
+          {level === "easy"
+            ? "ระดับง่าย"
+            : level === "medium"
+            ? "ระดับกลาง"
+            : "ระดับยาก"}
+        </Title>
+        <Row gutter={[16, 24]}>
+          <Col span={8}></Col>
+          <Col span={8}>
+            <Text strong style={{ color: COLORS.secondary }}>
+              {previousLevel ? "ครั้งที่แล้ว" : "-"}
+            </Text>
+          </Col>
+          <Col span={8}>
+            <Text strong style={{ color: COLORS.primary }}>
+              ครั้งนี้
+            </Text>
+          </Col>
+
+          {/* เวลาที่ใช้ */}
+          <Col span={8}>
+            <Text strong>เวลาที่ใช้</Text>
+          </Col>
+          <Col span={8}>
+            {previousLevel ? (
+              <Text>{formatTime(previousLevel.time)}</Text>
+            ) : (
+              <Text>-</Text>
+            )}
+          </Col>
+          <Col span={8}>
+            <Text>
+              {formatTime(currentLevel.time)}
+              {previousLevel && comparisonData && (
+                <Text
+                  style={{
+                    marginLeft: "8px",
+                    color: comparisonData.time.improved ? "#3f8600" : "#cf1322",
+                  }}
+                >
+                  ({comparisonData.time.improved ? "↓" : "↑"}{" "}
+                  {formatTime(Math.abs(comparisonData.time.difference))})
+                </Text>
+              )}
+            </Text>
+          </Col>
+
+          {/* จำนวนการเคลื่อนย้าย */}
+          <Col span={8}>
+            <Text strong>จำนวนการเคลื่อนย้าย</Text>
+          </Col>
+          <Col span={8}>
+            {previousLevel ? (
+              <Text>{previousLevel.moves} ครั้ง</Text>
+            ) : (
+              <Text>-</Text>
+            )}
+          </Col>
+          <Col span={8}>
+            <Text>
+              {currentLevel.moves} ครั้ง
+              {previousLevel && comparisonData && (
+                <Text
+                  style={{
+                    marginLeft: "8px",
+                    color: comparisonData.moves.improved
+                      ? "#3f8600"
+                      : "#cf1322",
+                  }}
+                >
+                  ({comparisonData.moves.improved ? "↓" : "↑"}{" "}
+                  {Math.abs(comparisonData.moves.difference)})
+                </Text>
+              )}
+            </Text>
+          </Col>
+        </Row>
+      </StyledCard>
+    );
+  };
+
   const renderSummary = () => (
     <>
       <Title
@@ -413,208 +552,9 @@ export default function ColorSortingGame() {
         🎉 สรุปผลการเล่นเกมจัดเรียงสี 🎉
       </Title>
 
-      {/* Previous Result */}
-      {previousResults && (
-        <StyledCard>
-          <Title level={4}>ผลการเล่นครั้งก่อน</Title>
-          <Row gutter={[16, 16]}>
-            <Col span={12}>
-              <Statistic
-                title="เวลารวมทั้งหมด"
-                value={formatTime(previousResults.totalTime)}
-                prefix={<ClockCircleOutlined />}
-              />
-            </Col>
-            <Col span={12}>
-              <Statistic
-                title="จำนวนการเคลื่อนย้ายรวม"
-                value={previousResults.totalMoves}
-                prefix={<SwapOutlined />}
-                suffix="ครั้ง"
-              />
-            </Col>
-          </Row>
+      {renderComparison()}
 
-          {/* แสดงรายละเอียดแต่ละระดับของครั้งก่อน */}
-          {previousResults.games.map((game, index) => (
-            <div key={index} style={{ marginTop: "16px" }}>
-              <Title level={5} style={{ color: LEVEL_COLORS[game.level] }}>
-                {game.level === "easy"
-                  ? "ระดับง่าย"
-                  : game.level === "medium"
-                  ? "ระดับกลาง"
-                  : "ระดับยาก"}
-              </Title>
-              <Row gutter={[16, 16]}>
-                <Col span={12}>
-                  <Statistic
-                    title="เวลาที่ใช้"
-                    value={formatTime(game.time)}
-                    prefix={<ClockCircleOutlined />}
-                  />
-                </Col>
-                <Col span={12}>
-                  <Statistic
-                    title="จำนวนการเคลื่อนย้าย"
-                    value={game.moves}
-                    prefix={<SwapOutlined />}
-                    suffix="ครั้ง"
-                  />
-                </Col>
-              </Row>
-            </div>
-          ))}
-        </StyledCard>
-      )}
-
-      {/* Current Result */}
-      <StyledCard>
-        <Title level={4}>ผลการเล่นครั้งนี้</Title>
-        <Row gutter={[16, 16]}>
-          <Col span={12}>
-            <Statistic
-              title="เวลารวมทั้งหมด"
-              value={formatTime(
-                gameStats.reduce((total, stat) => total + stat.time, 0)
-              )}
-              prefix={<ClockCircleOutlined />}
-            />
-          </Col>
-          <Col span={12}>
-            <Statistic
-              title="จำนวนการเคลื่อนย้ายรวม"
-              value={gameStats.reduce((total, stat) => total + stat.moves, 0)}
-              prefix={<SwapOutlined />}
-              suffix="ครั้ง"
-            />
-          </Col>
-        </Row>
-
-        {/* แสดงรายละเอียดแต่ละระดับของครั้งนี้ */}
-        {gameStats.map((stat, index) => (
-          <div key={index} style={{ marginTop: "16px" }}>
-            <Title level={5} style={{ color: LEVEL_COLORS[stat.level] }}>
-              {stat.level === "easy"
-                ? "ระดับง่าย"
-                : stat.level === "medium"
-                ? "ระดับกลาง"
-                : "ระดับยาก"}
-            </Title>
-            <Row gutter={[16, 16]}>
-              <Col span={12}>
-                <Statistic
-                  title="เวลาที่ใช้"
-                  value={formatTime(stat.time)}
-                  prefix={<ClockCircleOutlined />}
-                />
-              </Col>
-              <Col span={12}>
-                <Statistic
-                  title="จำนวนการเคลื่อนย้าย"
-                  value={stat.moves}
-                  prefix={<SwapOutlined />}
-                  suffix="ครั้ง"
-                />
-              </Col>
-            </Row>
-          </div>
-        ))}
-      </StyledCard>
-
-      {/* Comparison */}
-      {comparison && (
-        <StyledCard>
-          <Title level={4}>การเปรียบเทียบ</Title>
-          <Row gutter={[16, 16]}>
-            <Col span={12}>
-              <Statistic
-                title="เวลารวม"
-                value={formatTime(Math.abs(comparison.totalTime.difference))}
-                valueStyle={{
-                  color: comparison.totalTime.improved ? "#3f8600" : "#cf1322",
-                }}
-                prefix={
-                  comparison.totalTime.improved ? (
-                    <ArrowDownOutlined />
-                  ) : (
-                    <ArrowUpOutlined />
-                  )
-                }
-                suffix={comparison.totalTime.improved ? "เร็วขึ้น" : "ช้าลง"}
-              />
-            </Col>
-            <Col span={12}>
-              <Statistic
-                title="จำนวนการเคลื่อนย้าย"
-                value={Math.abs(comparison.totalMoves.difference)}
-                valueStyle={{
-                  color: comparison.totalMoves.improved ? "#3f8600" : "#cf1322",
-                }}
-                prefix={
-                  comparison.totalMoves.improved ? (
-                    <ArrowDownOutlined />
-                  ) : (
-                    <ArrowUpOutlined />
-                  )
-                }
-                suffix={`ครั้ง ${
-                  comparison.totalMoves.improved ? "น้อยลง" : "มากขึ้น"
-                }`}
-              />
-            </Col>
-          </Row>
-
-          {comparison.games.map((game, index) => (
-            <div key={index} style={{ marginTop: "16px" }}>
-              <Title level={5} style={{ color: LEVEL_COLORS[game.level] }}>
-                {game.level === "easy"
-                  ? "ระดับง่าย"
-                  : game.level === "medium"
-                  ? "ระดับกลาง"
-                  : "ระดับยาก"}
-              </Title>
-              <Row gutter={[16, 16]}>
-                <Col span={12}>
-                  <Statistic
-                    title="เปรียบเทียบเวลา"
-                    value={formatTime(Math.abs(game.time.difference))}
-                    valueStyle={{
-                      color: game.time.improved ? "#3f8600" : "#cf1322",
-                    }}
-                    prefix={
-                      game.time.improved ? (
-                        <ArrowDownOutlined />
-                      ) : (
-                        <ArrowUpOutlined />
-                      )
-                    }
-                    suffix={game.time.improved ? "เร็วขึ้น" : "ช้าลง"}
-                  />
-                </Col>
-                <Col span={12}>
-                  <Statistic
-                    title="เปรียบเทียบการเคลื่อนย้าย"
-                    value={Math.abs(game.moves.difference)}
-                    valueStyle={{
-                      color: game.moves.improved ? "#3f8600" : "#cf1322",
-                    }}
-                    prefix={
-                      game.moves.improved ? (
-                        <ArrowDownOutlined />
-                      ) : (
-                        <ArrowUpOutlined />
-                      )
-                    }
-                    suffix={`ครั้ง ${
-                      game.moves.improved ? "น้อยลง" : "มากขึ้น"
-                    }`}
-                  />
-                </Col>
-              </Row>
-            </div>
-          ))}
-        </StyledCard>
-      )}
+      {gameStats.map((stat, index) => renderLevelComparison(stat.level, index))}
 
       <Space
         style={{
