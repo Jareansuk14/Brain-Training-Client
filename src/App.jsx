@@ -21,6 +21,7 @@ import ActivitySeven from "./pages/ActivitySeven";
 import ActivityEight from "./pages/ActivityEight";
 import ColorSortingGame from "./pages/ColorSortingGame"
 import AnimalNamingTest from "./pages/AnimalNamingTest"
+import CompleteMemoryTest from "./pages/CompleteMemoryTest"
 
 const { Header: AntHeader, Content } = Layout;
 
@@ -379,6 +380,17 @@ function App() {
               <ProtectedRoute>
                 <AppLayout>
                   <AnimalNamingTest />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/CompleteMemoryTest/"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <CompleteMemoryTest />
                 </AppLayout>
               </ProtectedRoute>
             }

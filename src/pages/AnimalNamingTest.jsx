@@ -27,26 +27,26 @@ const ANIMAL_TEST_DATA = [
       {
         level: "easy",
         answers: {
-          th: ["สุนัข", "หมา"],
-          en: ["dog"],
+          th: ["ช้าง"],
+          en: ["elephant"],
         },
-        image: "/animals/dog.jpg",
+        image: "../animals/elephant.jpg",
       },
       {
         level: "medium",
         answers: {
-          th: ["แมวป่า"],
-          en: ["wildcat"],
+          th: ["ยีราฟ"],
+          en: ["giraffe"],
         },
-        image: "/animals/wildcat.jpg",
+        image: "../animals/giraffe.jpg",
       },
       {
         level: "hard",
         answers: {
-          th: ["แรดขาว"],
-          en: ["white rhinoceros", "rhino"],
+          th: ["ฮิปโปโปเตมัส", "ฮิปโป"],
+          en: ["hippopotamus", "hippo"],
         },
-        image: "/animals/white-rhino.jpg",
+        image: "../animals/hippopotamus.jpg",
       },
     ],
   },
@@ -57,26 +57,26 @@ const ANIMAL_TEST_DATA = [
       {
         level: "easy",
         answers: {
-          th: ["แมว"],
-          en: ["cat"],
+          th: ["เสือ"],
+          en: ["tiger"],
         },
-        image: "/animals/cat.jpg",
+        image: "../animals/tiger.jpg",
       },
       {
         level: "medium",
         answers: {
-          th: ["หมีแพนด้า", "แพนด้า"],
+          th: ["แพนด้า", "หมีแพนด้า"],
           en: ["panda", "giant panda"],
         },
-        image: "/animals/panda.jpg",
+        image: "../animals/panda.jpg",
       },
       {
         level: "hard",
         answers: {
-          th: ["ตัวนิ่ม", "ลิ่น"],
-          en: ["pangolin"],
+          th: ["จระเข้", "อัลลิเกเตอร์"],
+          en: ["alligator"],
         },
-        image: "/animals/pangolin.jpg",
+        image: "../animals/alligator.jpg",
       },
     ],
   },
@@ -87,26 +87,26 @@ const ANIMAL_TEST_DATA = [
       {
         level: "easy",
         answers: {
-          th: ["ไก่"],
-          en: ["chicken"],
+          th: ["หมี"],
+          en: ["bear"],
         },
-        image: "/animals/chicken.jpg",
+        image: "../animals/bear.jpg",
       },
       {
         level: "medium",
         answers: {
-          th: ["นกฮูก"],
-          en: ["owl"],
+          th: ["กระรอก"],
+          en: ["squirrel"],
         },
-        image: "/animals/owl.jpg",
+        image: "../animals/squirrel.jpg",
       },
       {
         level: "hard",
         answers: {
-          th: ["นกกระเรียน"],
-          en: ["crane"],
+          th: ["นกเพนกวิน", "เพนกวิน"],
+          en: ["penguin"],
         },
-        image: "/animals/crane.jpg",
+        image: "../animals/penguin.jpg",
       },
     ],
   },
@@ -117,26 +117,26 @@ const ANIMAL_TEST_DATA = [
       {
         level: "easy",
         answers: {
-          th: ["ช้าง"],
-          en: ["elephant"],
+          th: ["กวาง"],
+          en: ["deer"],
         },
-        image: "/animals/elephant.jpg",
+        image: "../animals/deer.jpg",
       },
       {
         level: "medium",
         answers: {
-          th: ["กวางมูส", "มูส"],
-          en: ["moose"],
+          th: ["ม้าลาย"],
+          en: ["zebra"],
         },
-        image: "/animals/moose.jpg",
+        image: "../animals/zebra.jpg",
       },
       {
         level: "hard",
         answers: {
-          th: ["แทสเมเนียนเดวิล", "ทัสมาเนียนเดวิล"],
-          en: ["tasmanian devil"],
+          th: ["จิงโจ้"],
+          en: ["kangaroo"],
         },
-        image: "/animals/tasmanian-devil.jpg",
+        image: "../animals/kangaroo.jpg",
       },
     ],
   },
@@ -147,32 +147,152 @@ const ANIMAL_TEST_DATA = [
       {
         level: "easy",
         answers: {
-          th: ["ม้า"],
-          en: ["horse"],
+          th: ["หมู"],
+          en: ["pig"],
         },
-        image: "/animals/horse.jpg",
+        image: "../animals/pig.jpg",
       },
       {
         level: "medium",
         answers: {
-          th: ["แพะภูเขา"],
-          en: ["mountain goat"],
+          th: ["หมาป่า"],
+          en: ["wolf"],
         },
-        image: "/animals/mountain-goat.jpg",
+        image: "../animals/wolf.jpg",
       },
       {
         level: "hard",
         answers: {
-          th: ["อัลพาก้า"],
-          en: ["alpaca"],
+          th: ["แรด"],
+          en: ["rhinoceros", "rhino"],
         },
-        image: "/animals/alpaca.jpg",
+        image: "../animals/rhinoceros.jpg",
       },
     ],
   },
   // ชุดที่ 6
   {
     setNumber: 6,
+    questions: [
+      {
+        level: "easy",
+        answers: {
+          th: ["นก"],
+          en: ["bird"],
+        },
+        image: "../animals/bird.jpg",
+      },
+      {
+        level: "medium",
+        answers: {
+          th: ["นกยูง"],
+          en: ["peacock"],
+        },
+        image: "../animals/peacock.jpg",
+      },
+      {
+        level: "hard",
+        answers: {
+          th: ["ออรังอุตัง"],
+          en: ["orangutan"],
+        },
+        image: "../animals/orangutan.jpg",
+      },
+    ],
+  },
+  // ชุดที่ 7
+  {
+    setNumber: 7,
+    questions: [
+      {
+        level: "easy",
+        answers: {
+          th: ["ลิง"],
+          en: ["monkey"],
+        },
+        image: "../animals/monkey.jpg",
+      },
+      {
+        level: "medium",
+        answers: {
+          th: ["กอริลลา"],
+          en: ["gorilla"],
+        },
+        image: "../animals/gorilla.jpg",
+      },
+      {
+        level: "hard",
+        answers: {
+          th: ["สิงโตทะเล"],
+          en: ["sea lion"],
+        },
+        image: "../animals/sea-lion.jpg",
+      },
+    ],
+  },
+  // ชุดที่ 8
+  {
+    setNumber: 8,
+    questions: [
+      {
+        level: "easy",
+        answers: {
+          th: ["หมา", "สุนัข"],
+          en: ["dog"],
+        },
+        image: "../animals/dog.jpg",
+      },
+      {
+        level: "medium",
+        answers: {
+          th: ["เสือดาว"],
+          en: ["leopard"],
+        },
+        image: "../animals/leopard.jpg",
+      },
+      {
+        level: "hard",
+        answers: {
+          th: ["อิกัวน่า", "กิ้งก่ายักษ์", "อิเกวียน่า"],
+          en: ["iguana"],
+        },
+        image: "../animals/iguana.jpg",
+      },
+    ],
+  },
+  // ชุดที่ 9
+  {
+    setNumber: 9,
+    questions: [
+      {
+        level: "easy",
+        answers: {
+          th: ["แกะ"],
+          en: ["sheep"],
+        },
+        image: "../animals/sheep.jpg",
+      },
+      {
+        level: "medium",
+        answers: {
+          th: ["แมวน้ำ"],
+          en: ["seal"],
+        },
+        image: "../animals/seal.jpg",
+      },
+      {
+        level: "hard",
+        answers: {
+          th: ["กวางเรนเดียร์", "เรนเดียร์"],
+          en: ["reindeer"],
+        },
+        image: "../animals/reindeer.jpg",
+      },
+    ],
+  },
+  // ชุดที่ 10
+  {
+    setNumber: 10,
     questions: [
       {
         level: "easy",
@@ -185,138 +305,18 @@ const ANIMAL_TEST_DATA = [
       {
         level: "medium",
         answers: {
-          th: ["จิงโจ้"],
-          en: ["kangaroo"],
+          th: ["ไฮยีนา"],
+          en: ["hyena"],
         },
-        image: "/animals/kangaroo.jpg",
+        image: "/animals/hyena.jpg",
       },
       {
         level: "hard",
         answers: {
-          th: ["อาร์มาดิลโล่"],
-          en: ["armadillo"],
+          th: ["อนาคอนดา", "งูยักษ์"],
+          en: ["anaconda"],
         },
-        image: "/animals/armadillo.jpg",
-      },
-    ],
-  },
-  // ชุดที่ 7
-  {
-    setNumber: 7,
-    questions: [
-      {
-        level: "easy",
-        answers: {
-          th: ["กระต่าย"],
-          en: ["rabbit", "bunny"],
-        },
-        image: "/animals/rabbit.jpg",
-      },
-      {
-        level: "medium",
-        answers: {
-          th: ["หมีขั้วโลก", "หมีขาว"],
-          en: ["polar bear"],
-        },
-        image: "/animals/polar-bear.jpg",
-      },
-      {
-        level: "hard",
-        answers: {
-          th: ["นากทะเล"],
-          en: ["sea otter", "otter"],
-        },
-        image: "/animals/sea-otter.jpg",
-      },
-    ],
-  },
-  // ชุดที่ 8
-  {
-    setNumber: 8,
-    questions: [
-      {
-        level: "easy",
-        answers: {
-          th: ["หมู"],
-          en: ["pig"],
-        },
-        image: "/animals/pig.jpg",
-      },
-      {
-        level: "medium",
-        answers: {
-          th: ["อัลลิเกเตอร์", "จระเข้"],
-          en: ["alligator"],
-        },
-        image: "/animals/alligator.jpg",
-      },
-      {
-        level: "hard",
-        answers: {
-          th: ["แมวน้ำ"],
-          en: ["seal"],
-        },
-        image: "/animals/seal.jpg",
-      },
-    ],
-  },
-  // ชุดที่ 9
-  {
-    setNumber: 9,
-    questions: [
-      {
-        level: "easy",
-        answers: {
-          th: ["สิงโต"],
-          en: ["lion"],
-        },
-        image: "/animals/lion.jpg",
-      },
-      {
-        level: "medium",
-        answers: {
-          th: ["แรคคูน"],
-          en: ["raccoon"],
-        },
-        image: "/animals/raccoon.jpg",
-      },
-      {
-        level: "hard",
-        answers: {
-          th: ["ตุ่นปากเป็ด"],
-          en: ["platypus"],
-        },
-        image: "/animals/platypus.jpg",
-      },
-    ],
-  },
-  // ชุดที่ 10
-  {
-    setNumber: 10,
-    questions: [
-      {
-        level: "easy",
-        answers: {
-          th: ["เสือ"],
-          en: ["tiger"],
-        },
-        image: "/animals/tiger.jpg",
-      },
-      {
-        level: "medium",
-        answers: {
-          th: ["ยีราฟ"],
-          en: ["giraffe"],
-        },
-        image: "/animals/giraffe.jpg",
-      },
-      {
-        level: "hard",
-        answers: {
-          th: ["วอลรัส"],
-          en: ["walrus"],
-        },
-        image: "/animals/walrus.jpg",
+        image: "/animals/anaconda.jpg",
       },
     ],
   },
@@ -706,7 +706,7 @@ export default function AnimalNamingTest() {
     return (
       <>
         <Title level={2} style={{ textAlign: "center", marginBottom: 32 }}>
-          แบบทดสอบการเรียกชื่อสัตว์
+        แบบทดสอบการเรียกชื่อสัตว์ (Animal Naming Test)
         </Title>
 
         <StyledCard>
