@@ -20,6 +20,7 @@ import ActivitySix from "./pages/ActivitySix";
 import ActivitySeven from "./pages/ActivitySeven";
 import ActivityEight from "./pages/ActivityEight";
 import ColorSortingGame from "./pages/ColorSortingGame"
+import AnimalNamingTest from "./pages/AnimalNamingTest"
 
 const { Header: AntHeader, Content } = Layout;
 
@@ -367,6 +368,17 @@ function App() {
               <ProtectedRoute>
                 <AppLayout>
                   <ColorSortingGame />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/AnimalNamingTest/"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <AnimalNamingTest />
                 </AppLayout>
               </ProtectedRoute>
             }
