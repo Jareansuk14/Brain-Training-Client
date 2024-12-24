@@ -22,6 +22,7 @@ import ActivityEight from "./pages/ActivityEight";
 import ColorSortingGame from "./pages/ColorSortingGame"
 import AnimalNamingTest from "./pages/AnimalNamingTest"
 import CompleteMemoryTest from "./pages/CompleteMemoryTest"
+import DigitSpan from "./pages/DigitSpan"
 
 const { Header: AntHeader, Content } = Layout;
 
@@ -391,6 +392,17 @@ function App() {
               <ProtectedRoute>
                 <AppLayout>
                   <CompleteMemoryTest />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/DigitSpan/"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <DigitSpan />
                 </AppLayout>
               </ProtectedRoute>
             }
