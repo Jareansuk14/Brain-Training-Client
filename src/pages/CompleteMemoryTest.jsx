@@ -470,10 +470,6 @@ const StyledCard = styled(Card)`
   margin-bottom: 24px;
   transition: transform 0.3s ease;
 
-  &:hover {
-    transform: translateY(-2px);
-  }
-
   .ant-card-body {
     padding: 32px;
   }
@@ -1105,7 +1101,7 @@ export default function MemoryTest() {
   // Timer for game phase
   useEffect(() => {
     if (stage === "game") {
-      setTimeLeft(300); // 5 minutes
+      setTimeLeft(5); // 5 minutes
       const interval = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
