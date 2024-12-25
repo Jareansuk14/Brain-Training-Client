@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Card, Space, Typography, Button, message, Row, Col } from "antd";
 import {
   ClockCircleOutlined,
@@ -146,23 +146,7 @@ const LevelIndicator = styled.div`
   }
 `;
 
-// แก้ไขฟังก์ชัน generateDigits
-const generateDigits = (level) => {
-  // จำนวนหลักตาม level
-  const digitCount = LEVEL_DIGITS[level];
-  let digits = [];
 
-  // สร้างตัวเลขให้ครบตามจำนวนหลักของแต่ละ level
-  while (digits.length < digitCount) {
-    const digit = Math.floor(Math.random() * 10);
-    // ป้องกันเลขซ้ำติดกัน
-    if (digits.length === 0 || digit !== digits[digits.length - 1]) {
-      digits.push(digit);
-    }
-  }
-
-  return digits;
-};
 
 const formatTime = (seconds) => {
   const mins = Math.floor(seconds / 60);
@@ -222,6 +206,25 @@ export default function DigitSpan() {
   const [comparison, setComparison] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const [nextAction, setNextAction] = useState(null);
+  const currentLevel = useRef(1);
+
+  // แก้ไขฟังก์ชัน generateDigits
+const generateDigits = () => {
+  const digitCount = LEVEL_DIGITS[currentLevel.current];
+  let digits = [];
+  while (digits.length < digitCount) {
+    const digit = Math.floor(Math.random() * 10);
+    if (digits.length === 0 || digit !== digits[digits.length - 1]) {
+      digits.push(digit);
+    }
+  }
+  return digits;
+};
+
+  const updateLevel = (newLevel) => {
+    currentLevel.current = newLevel;
+    setLevel(newLevel);
+  };
 
   // Load previous results
   useEffect(() => {
@@ -277,9 +280,10 @@ export default function DigitSpan() {
 
   // Game functions
   const startGame = () => {
+    const newDigits = generateDigits();
+
     setStage("memorize");
     setElapsedTime(0);
-    const newDigits = generateDigits(level);
     setDigits(newDigits);
     setUserInput([]);
   };
@@ -295,22 +299,22 @@ export default function DigitSpan() {
     if (mode === "forward") {
       isCorrect = digits.every((d, i) => d === userInput[i]);
     } else {
-      isCorrect = digits.reverse().every((d, i) => d === userInput[i]);
+      const reversedDigits = [...digits].reverse();
+      isCorrect = reversedDigits.every((d, i) => d === userInput[i]);
     }
 
     if (isCorrect) {
       celebrateCorrect();
       message.success("ถูกต้อง!");
 
-      // กำหนดการกระทำถัดไปเมื่อตอบถูก
-      if (level === 6) {
+      if (currentLevel.current === 6) {
         if (mode === "forward") {
           setNextAction({
             text: "เริ่มโหมด Backward",
             action: () => {
               setForwardTime(elapsedTime);
               setMode("backward");
-              setLevel(1);
+              updateLevel(1);
               setShowResult(false);
               startGame();
             },
@@ -326,9 +330,9 @@ export default function DigitSpan() {
         }
       } else {
         setNextAction({
-          text: `ไป Level ${level + 1}`,
+          text: `ไป Level ${currentLevel.current + 1}`,
           action: () => {
-            setLevel((prev) => prev + 1);
+            updateLevel(currentLevel.current + 1);
             setShowResult(false);
             startGame();
           },
@@ -336,13 +340,12 @@ export default function DigitSpan() {
       }
     } else {
       message.error("ไม่ถูกต้อง");
-      // กำหนดการกระทำเมื่อตอบผิด
       setNextAction({
         text: "ลองอีกครั้ง",
         action: () => {
           setShowResult(false);
           setUserInput([]);
-          startGame(); // จะสุ่มตัวเลขชุดใหม่ใน level เดิม
+          startGame();
         },
       });
     }
