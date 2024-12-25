@@ -99,13 +99,22 @@ const ContentContainer = styled.div`
 
 const GameContainer = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 24px;
+  flex-direction: row; // รักษา layout แนวนอนเสมอ
+  justify-content: space-between;
+  gap: 16px;
   margin-top: 24px;
-
-  @media (min-width: 1024px) {
-    flex-direction: row;
-    justify-content: space-between;
+  
+  @media (max-width: 480px) {
+    gap: 8px;
+    margin-top: 16px;
+  }
+  
+  @media (min-width: 481px) and (max-width: 768px) {
+    gap: 12px;
+    margin-top: 20px;
+  }
+  
+  @media (min-width: 769px) {
     gap: 32px;
     margin-top: 32px;
   }
@@ -115,9 +124,18 @@ const GameBoard = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-
-  @media (min-width: 768px) {
+  gap: 12px;
+  min-width: 0; // ป้องกัน flex child จากการขยายเกินขนาด parent
+  
+  @media (max-width: 480px) {
+    gap: 8px;
+  }
+  
+  @media (min-width: 481px) and (max-width: 768px) {
+    gap: 10px;
+  }
+  
+  @media (min-width: 769px) {
     gap: 24px;
   }
 `;
@@ -129,27 +147,29 @@ const BoxGrid = styled.div`
       ? "repeat(2, 1fr)"
       : props.level === "medium"
       ? "repeat(3, 1fr)"
-      : "repeat(4, 1fr)"};
+      : "repeat(5, 1fr)"};
   gap: 4px;
   padding: 8px;
   background: white;
-  border-radius: 12px;
+  border-radius: 8px;
   box-shadow: 0 4px 24px ${COLORS.shadow};
-
-  @media (min-width: 480px) {
-    gap: 6px;
-    padding: 12px;
+  
+  @media (max-width: 480px) {
+    padding: 4px;
+    gap: 2px;
+    border-radius: 6px;
   }
-
-  @media (min-width: 768px) {
-    gap: 8px;
+  
+  @media (min-width: 481px) and (max-width: 768px) {
+    padding: 6px;
+    gap: 3px;
+    border-radius: 8px;
+  }
+  
+  @media (min-width: 769px) {
     padding: 16px;
-    grid-template-columns: ${(props) =>
-      props.level === "easy"
-        ? "repeat(2, 1fr)"
-        : props.level === "medium"
-        ? "repeat(3, 1fr)"
-        : "repeat(5, 1fr)"};
+    gap: 8px;
+    border-radius: 12px;
   }
 `;
 
@@ -173,8 +193,8 @@ const ColorBox = styled.div`
     transform: ${(props) =>
       !props.isTarget && (props.isSelected ? "scale(0.95)" : "scale(1.05)")};
   }
-
-  @media (min-width: 768px) {
+  
+  @media (min-width: 769px) {
     border-radius: 8px;
     border-width: 3px;
   }
