@@ -1101,7 +1101,7 @@ export default function MemoryTest() {
   // Timer for game phase
   useEffect(() => {
     if (stage === "game") {
-      setTimeLeft(5); // 5 minutes
+      setTimeLeft(300); // 5 minutes
       const interval = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
