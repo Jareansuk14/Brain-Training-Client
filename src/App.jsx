@@ -365,7 +365,7 @@ function App() {
           />
 
           <Route
-            path="/ColorSortingGame/"
+            path="/activity-9/"
             element={
               <ProtectedRoute>
                 <AppLayout>
@@ -376,7 +376,7 @@ function App() {
           />
 
           <Route
-            path="/AnimalNamingTest/"
+            path="/activity-10/"
             element={
               <ProtectedRoute>
                 <AppLayout>
@@ -387,7 +387,7 @@ function App() {
           />
 
           <Route
-            path="/CompleteMemoryTest/"
+            path="/activity-11/"
             element={
               <ProtectedRoute>
                 <AppLayout>
@@ -398,7 +398,7 @@ function App() {
           />
 
           <Route
-            path="/DigitSpan/"
+            path="/activity-12/"
             element={
               <ProtectedRoute>
                 <AppLayout>
