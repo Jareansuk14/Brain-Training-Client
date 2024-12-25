@@ -322,6 +322,25 @@ const ANIMAL_TEST_DATA = [
   },
 ];
 
+const StyledTitle = styled(Title)`
+  &.ant-typography {
+    text-align: center;
+    font-size: 20px !important;
+    margin-bottom: 20px !important;
+    color: ${props => props.color || 'inherit'};
+    
+    @media (min-width: 480px) {
+      font-size: 22px !important;
+      margin-bottom: 24px !important;
+    }
+    
+    @media (min-width: 768px) {
+      font-size: 24px !important;
+      margin-bottom: 32px !important;
+    }
+  }
+`;
+
 // Styled Components
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -669,9 +688,9 @@ export default function AnimalNamingTest() {
   // แสดงหน้าแนะนำ
   const renderIntro = () => (
     <>
-      <Title level={2} style={{ textAlign: "center", marginBottom: 32 }}>
+      <StyledTitle  level={2} style={{ textAlign: "center", marginBottom: 32 }}>
         แบบทดสอบการเรียกชื่อสัตว์ (Animal Naming Test)
-      </Title>
+      </StyledTitle>
 
       <StyledCard>
         <Text>
@@ -705,9 +724,9 @@ export default function AnimalNamingTest() {
 
     return (
       <>
-        <Title level={2} style={{ textAlign: "center", marginBottom: 32 }}>
+        <StyledTitle  level={2} style={{ textAlign: "center", marginBottom: 32 }}>
         แบบทดสอบการเรียกชื่อสัตว์ (Animal Naming Test)
-        </Title>
+        </StyledTitle>
 
         <StyledCard>
           <div
@@ -794,15 +813,15 @@ export default function AnimalNamingTest() {
 
   const renderSummary = () => (
     <>
-      <Title
+      <StyledTitle  
         level={2}
         style={{ textAlign: "center", marginBottom: 32, color: COLORS.primary }}
       >
         🎉 สรุปผลการทำแบบทดสอบ 🎉
-      </Title>
+      </StyledTitle>
 
       <StyledCard>
-        <Title level={4}>เปรียบเทียบผลการทดสอบ</Title>
+        <StyledTitle  level={4}>เปรียบเทียบผลการทดสอบ</StyledTitle>
         <Row gutter={[16, 24]}>
           <Col span={8}></Col>
           <Col span={8}>

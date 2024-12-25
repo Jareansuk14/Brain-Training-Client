@@ -418,6 +418,25 @@ const COLORS = {
   shadow: "rgba(17, 12, 46, 0.1)",
 };
 
+const StyledTitle = styled(Title)`
+  &.ant-typography {
+    text-align: center;
+    font-size: 20px !important;
+    margin-bottom: 20px !important;
+    color: ${props => props.color || 'inherit'};
+    
+    @media (min-width: 480px) {
+      font-size: 22px !important;
+      margin-bottom: 24px !important;
+    }
+    
+    @media (min-width: 768px) {
+      font-size: 24px !important;
+      margin-bottom: 32px !important;
+    }
+  }
+`;
+
 // Styled Components
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -477,12 +496,10 @@ const StyledCard = styled(Card)`
 
 const Timer = styled.div`
   position: fixed;
-  top: 20px;
+  top: 80px;
   right: 20px;
   background: white;
   padding: 12px 24px;
-  border-radius: 8px;
-  box-shadow: 0 4px 24px ${COLORS.shadow};
   font-size: 18px;
   font-weight: bold;
   z-index: 100;
@@ -846,6 +863,146 @@ const SummaryCard = styled(StyledCard)`
   }
 `;
 
+const RecallTitle = styled(Title)`
+  font-size: 20px !important;
+  margin-bottom: 16px !important;
+  text-align: center;
+  
+  @media (min-width: 768px) {
+    font-size: 24px !important;
+    margin-bottom: 24px !important;
+  }
+`;
+
+const ScoreDisplay = styled.div`
+  font-size: 32px;
+  color: ${COLORS.primary};
+  font-weight: bold;
+  text-align: center;
+  margin: 16px 0;
+  
+  @media (min-width: 768px) {
+    font-size: 48px;
+    margin: 24px 0;
+  }
+
+  .total {
+    color: ${COLORS.dark};
+    opacity: 0.5;
+  }
+`;
+
+const OptionsGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+  
+  @media (min-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+`;
+
+const ResponsiveAnswerButton = styled(AnswerButton)`
+  height: 48px;
+  font-size: 14px;
+  border-radius: 8px;
+  
+  @media (min-width: 768px) {
+    height: 56px;
+    font-size: 16px;
+    border-radius: 12px;
+  }
+`;
+
+const AnswerResultsContainer = styled.div`
+  margin-bottom: 16px;
+  
+  @media (min-width: 768px) {
+    margin-bottom: 24px;
+  }
+`;
+
+const ResponsiveAnswerResult = styled(AnswerResult)`
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  
+  @media (min-width: 768px) {
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+  }
+
+  .number {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    
+    @media (min-width: 768px) {
+      width: 24px;
+      height: 24px;
+      font-size: 14px;
+    }
+  }
+
+  .answer-text {
+    font-size: 14px;
+    
+    @media (min-width: 768px) {
+      font-size: 16px;
+    }
+  }
+`;
+
+const ResponsiveCorrectAnswers = styled(CorrectAnswersSection)`
+  padding: 16px;
+  margin-top: 24px;
+  border-radius: 8px;
+  
+  @media (min-width: 768px) {
+    padding: 24px;
+    margin-top: 32px;
+    border-radius: 12px;
+  }
+
+  .title {
+    font-size: 16px;
+    margin-bottom: 12px;
+    
+    @media (min-width: 768px) {
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+  }
+
+  .answers-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    
+    @media (min-width: 480px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+  }
+
+  .answer-item {
+    padding: 8px;
+    font-size: 14px;
+    
+    @media (min-width: 768px) {
+      padding: 12px 16px;
+      font-size: 16px;
+    }
+  }
+`;
+
 const ShapeDisplay = styled.div`
   width: 200px;
   height: 200px;
@@ -1101,7 +1258,7 @@ export default function MemoryTest() {
   // Timer for game phase
   useEffect(() => {
     if (stage === "game") {
-      setTimeLeft(300); // 5 minutes
+      setTimeLeft(5); // 5 minutes
       const interval = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
@@ -1153,9 +1310,9 @@ export default function MemoryTest() {
         size={24}
         style={{ width: "100%", textAlign: "center" }}
       >
-        <Title level={2} style={{ color: COLORS.primary, marginBottom: 0 }}>
+        <StyledTitle level={2} style={{ color: COLORS.primary, marginBottom: 0 }}>
           แบบทดสอบความจำ MoCA
-        </Title>
+        </StyledTitle>
 
         <Text style={{ fontSize: "16px", color: COLORS.dark }}>
           คุณจะได้เห็นคำ 5 คำ เป็นเวลา 15 วินาที จากนั้นจะมีเกมให้เล่น 5 นาที
@@ -1277,38 +1434,28 @@ export default function MemoryTest() {
 
   const renderRecall = () => (
     <SummaryCard>
-      <Space direction="vertical" size={24} style={{ width: "100%" }}>
-        <div className="summary-header">
-          <Title level={2} style={{ color: COLORS.primary, marginBottom: 0 }}>
+      <Space direction="vertical" size={16} style={{ width: "100%" }}>
+        <div style={{ textAlign: "center" }}>
+          <RecallTitle level={2} style={{ color: COLORS.primary }}>
             จำคำที่เห็นตอนแรกได้ไหม?
-          </Title>
+          </RecallTitle>
           {showAnswers && (
-            <div className="total-score">
-              {
-                selectedOptions.filter((answer) => memoryWords.includes(answer))
-                  .length
-              }
+            <ScoreDisplay>
+              {selectedOptions.filter((answer) => memoryWords.includes(answer)).length}
               <span className="total">/5</span>
-            </div>
+            </ScoreDisplay>
           )}
         </div>
-
+  
         {!showAnswers ? (
           <>
-            <div style={{ marginBottom: "16px", textAlign: "center" }}>
+            <div style={{ textAlign: "center", marginBottom: "12px" }}>
               <Text>เลือกคำที่คุณจำได้ ({selectedOptions.length}/5)</Text>
             </div>
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
-                gap: "12px",
-                marginBottom: "24px",
-              }}
-            >
+  
+            <OptionsGrid>
               {availableOptions.map((option) => (
-                <AnswerButton
+                <ResponsiveAnswerButton
                   key={option}
                   onClick={() => {
                     if (selectedOptions.includes(option)) {
@@ -1330,10 +1477,10 @@ export default function MemoryTest() {
                   }}
                 >
                   {option}
-                </AnswerButton>
+                </ResponsiveAnswerButton>
               ))}
-            </div>
-
+            </OptionsGrid>
+  
             <ActionButton
               className="primary"
               size="large"
@@ -1356,19 +1503,19 @@ export default function MemoryTest() {
           </>
         ) : (
           <>
-            <div style={{ marginBottom: "24px" }}>
+            <AnswerResultsContainer>
               {selectedOptions.map((answer, index) => {
                 const isCorrect = memoryWords.includes(answer);
                 return (
-                  <AnswerResult key={index} isCorrect={isCorrect}>
+                  <ResponsiveAnswerResult key={index} isCorrect={isCorrect}>
                     <span className="number">{index + 1}</span>
                     <span className="answer-text">{answer}</span>
-                  </AnswerResult>
+                  </ResponsiveAnswerResult>
                 );
               })}
-            </div>
-
-            <CorrectAnswersSection>
+            </AnswerResultsContainer>
+  
+            <ResponsiveCorrectAnswers>
               <div className="title">คำทั้งหมดที่ต้องจำ</div>
               <div className="answers-grid">
                 {memoryWords.map((word, index) => {
@@ -1385,8 +1532,8 @@ export default function MemoryTest() {
                   );
                 })}
               </div>
-            </CorrectAnswersSection>
-
+            </ResponsiveCorrectAnswers>
+  
             <Space direction="vertical" size={12} style={{ width: "100%" }}>
               <ActionButton
                 className="primary"

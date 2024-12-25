@@ -84,7 +84,11 @@ const celebrateAnimation = () => {
 const PageContainer = styled.div`
   min-height: 100vh;
   background: ${COLORS.background};
-  padding: 40px 24px;
+  padding: 20px 12px;
+
+  @media (min-width: 768px) {
+    padding: 40px 24px;
+  }
 `;
 
 const ContentContainer = styled.div`
@@ -95,16 +99,27 @@ const ContentContainer = styled.div`
 
 const GameContainer = styled.div`
   display: flex;
-  justify-content: space-between;
-  gap: 32px;
-  margin-top: 32px;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 24px;
+
+  @media (min-width: 1024px) {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 32px;
+    margin-top: 32px;
+  }
 `;
 
 const GameBoard = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
+
+  @media (min-width: 768px) {
+    gap: 24px;
+  }
 `;
 
 const BoxGrid = styled.div`
@@ -114,21 +129,37 @@ const BoxGrid = styled.div`
       ? "repeat(2, 1fr)"
       : props.level === "medium"
       ? "repeat(3, 1fr)"
-      : "repeat(5, 1fr)"};
-  gap: 8px;
-  padding: 16px;
+      : "repeat(4, 1fr)"};
+  gap: 4px;
+  padding: 8px;
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 24px ${COLORS.shadow};
+
+  @media (min-width: 480px) {
+    gap: 6px;
+    padding: 12px;
+  }
+
+  @media (min-width: 768px) {
+    gap: 8px;
+    padding: 16px;
+    grid-template-columns: ${(props) =>
+      props.level === "easy"
+        ? "repeat(2, 1fr)"
+        : props.level === "medium"
+        ? "repeat(3, 1fr)"
+        : "repeat(5, 1fr)"};
+  }
 `;
 
 const ColorBox = styled.div`
   aspect-ratio: 1;
   background-color: ${(props) => props.color};
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: ${(props) => (props.isTarget ? "default" : "pointer")};
   transition: all 0.2s ease;
-  border: 3px solid transparent;
+  border: 2px solid transparent;
 
   ${(props) =>
     props.isSelected &&
@@ -142,24 +173,38 @@ const ColorBox = styled.div`
     transform: ${(props) =>
       !props.isTarget && (props.isSelected ? "scale(0.95)" : "scale(1.05)")};
   }
+
+  @media (min-width: 768px) {
+    border-radius: 8px;
+    border-width: 3px;
+  }
 `;
 
 const StyledCard = styled(Card)`
   background: white;
-  border-radius: 12px;
+  border-radius: 8px;
   border: none;
   box-shadow: 0 4px 24px ${COLORS.shadow};
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 
   .ant-card-body {
-    padding: 24px;
+    padding: 16px;
+  }
+
+  @media (min-width: 768px) {
+    border-radius: 12px;
+    margin-bottom: 16px;
+
+    .ant-card-body {
+      padding: 24px;
+    }
   }
 `;
 
 const ActionButton = styled(Button)`
-  min-width: 120px;
-  height: 44px;
-  border-radius: 8px;
+  min-width: 100px;
+  height: 40px;
+  border-radius: 6px;
   font-weight: 500;
 
   &.primary {
@@ -171,6 +216,22 @@ const ActionButton = styled(Button)`
       background: ${COLORS.secondary};
       border-color: ${COLORS.secondary};
     }
+  }
+
+  @media (min-width: 768px) {
+    min-width: 120px;
+    height: 44px;
+    border-radius: 8px;
+  }
+`;
+
+const StyledTitle = styled(Title)`
+  font-size: 20px !important;
+  margin-bottom: 20px !important;
+
+  @media (min-width: 768px) {
+    font-size: 24px !important;
+    margin-bottom: 32px !important;
   }
 `;
 
@@ -313,7 +374,7 @@ export default function ColorSortingGame() {
       time,
       moves,
     };
-    
+
     // อัพเดท gameStats ด้วยผลระดับปัจจุบัน
     const updatedStats = [...gameStats, currentScore];
     setGameStats(updatedStats);
@@ -338,8 +399,11 @@ export default function ColorSortingGame() {
         // รวมคะแนนทั้งหมดรวมถึงระดับยาก
         const sessionData = {
           totalTime: updatedStats.reduce((total, stat) => total + stat.time, 0),
-          totalMoves: updatedStats.reduce((total, stat) => total + stat.moves, 0),
-          games: updatedStats // ส่งข้อมูลทุกระดับรวมถึงระดับยาก
+          totalMoves: updatedStats.reduce(
+            (total, stat) => total + stat.moves,
+            0
+          ),
+          games: updatedStats, // ส่งข้อมูลทุกระดับรวมถึงระดับยาก
         };
 
         const response = await axios.post(
@@ -541,7 +605,7 @@ export default function ColorSortingGame() {
 
   const renderSummary = () => (
     <>
-      <Title
+      <StyledTitle
         level={2}
         style={{
           textAlign: "center",
@@ -550,7 +614,7 @@ export default function ColorSortingGame() {
         }}
       >
         🎉 สรุปผลการเล่นเกมจัดเรียงสี 🎉
-      </Title>
+      </StyledTitle>
 
       {renderComparison()}
 
@@ -573,31 +637,37 @@ export default function ColorSortingGame() {
 
   const renderGame = () => (
     <>
-      <Title level={2} style={{ textAlign: "center", marginBottom: 32 }}>
+      <StyledTitle level={2} style={{ textAlign: "center" }}>
         เกมจัดเรียงสี -{" "}
         {level === "easy"
           ? "ระดับง่าย"
           : level === "medium"
           ? "ระดับกลาง"
           : "ระดับยาก"}
-      </Title>
+      </StyledTitle>
 
       <StyledCard>
-        <Space size="large">
-          <Space>
-            <ClockCircleOutlined />
-            <Text strong>เวลา: {formatTime(time)}</Text>
-          </Space>
-          <Space>
-            <SwapOutlined />
-            <Text strong>จำนวนครั้งที่เคลื่อนย้าย: {moves}</Text>
-          </Space>
+        <Row gutter={[16, 16]} align="middle">
+          <Col xs={24} sm={12} md={8}>
+            <Space>
+              <ClockCircleOutlined />
+              <Text strong>เวลา: {formatTime(time)}</Text>
+            </Space>
+          </Col>
+          <Col xs={24} sm={12} md={8}>
+            <Space>
+              <SwapOutlined />
+              <Text strong>จำนวนครั้งที่เคลื่อนย้าย: {moves}</Text>
+            </Space>
+          </Col>
           {gameState === "waiting" && (
-            <ActionButton className="primary" onClick={() => startGame()}>
-              เริ่มเกม
-            </ActionButton>
+            <Col xs={24} md={8} style={{ textAlign: "right" }}>
+              <ActionButton className="primary" onClick={() => startGame()}>
+                เริ่มเกม
+              </ActionButton>
+            </Col>
           )}
-        </Space>
+        </Row>
       </StyledCard>
 
       <GameContainer>
