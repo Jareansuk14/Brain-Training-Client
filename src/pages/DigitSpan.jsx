@@ -146,8 +146,6 @@ const LevelIndicator = styled.div`
   }
 `;
 
-
-
 const formatTime = (seconds) => {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
@@ -207,19 +205,20 @@ export default function DigitSpan() {
   const [showResult, setShowResult] = useState(false);
   const [nextAction, setNextAction] = useState(null);
   const currentLevel = useRef(1);
+  const [isCorrect, setIsCorrect] = useState(false);
 
   // แก้ไขฟังก์ชัน generateDigits
-const generateDigits = () => {
-  const digitCount = LEVEL_DIGITS[currentLevel.current];
-  let digits = [];
-  while (digits.length < digitCount) {
-    const digit = Math.floor(Math.random() * 10);
-    if (digits.length === 0 || digit !== digits[digits.length - 1]) {
-      digits.push(digit);
+  const generateDigits = () => {
+    const digitCount = LEVEL_DIGITS[currentLevel.current];
+    let digits = [];
+    while (digits.length < digitCount) {
+      const digit = Math.floor(Math.random() * 10);
+      if (digits.length === 0 || digit !== digits[digits.length - 1]) {
+        digits.push(digit);
+      }
     }
-  }
-  return digits;
-};
+    return digits;
+  };
 
   const updateLevel = (newLevel) => {
     currentLevel.current = newLevel;
@@ -281,29 +280,27 @@ const generateDigits = () => {
   // Game functions
   const startGame = () => {
     const newDigits = generateDigits();
-
     setStage("memorize");
     setElapsedTime(0);
     setDigits(newDigits);
     setUserInput([]);
+    setIsCorrect(false); // รีเซ็ต isCorrect เมื่อเริ่มเกมใหม่
   };
 
   const handleInput = (digit) => {
-    if (userInput.length < LEVEL_DIGITS[level]) {
+    if (userInput.length < LEVEL_DIGITS[currentLevel.current]) {
       setUserInput([...userInput, digit]);
     }
   };
 
   const handleSubmit = () => {
-    let isCorrect;
-    if (mode === "forward") {
-      isCorrect = digits.every((d, i) => d === userInput[i]);
-    } else {
-      const reversedDigits = [...digits].reverse();
-      isCorrect = reversedDigits.every((d, i) => d === userInput[i]);
-    }
+    const reversedDigits = [...digits].reverse();
+    const correctDigits = mode === "forward" ? digits : reversedDigits;
 
-    if (isCorrect) {
+    const correct = userInput.every((d, i) => parseInt(d) === correctDigits[i]);
+    setIsCorrect(correct);
+
+    if (correct) {
       celebrateCorrect();
       message.success("ถูกต้อง!");
 
@@ -340,6 +337,8 @@ const generateDigits = () => {
       }
     } else {
       message.error("ไม่ถูกต้อง");
+      const correctAnswer =
+        mode === "forward" ? digits.join("") : reversedDigits.join("");
       setNextAction({
         text: "ลองอีกครั้ง",
         action: () => {
@@ -435,7 +434,7 @@ const generateDigits = () => {
         <span className="mode">
           {mode === "forward" ? "Forward" : "Backward"}
         </span>
-        <span className="level">Level {level}</span>
+        <span className="level">Level {currentLevel.current}</span>
       </LevelIndicator>
 
       <Timer>
@@ -454,7 +453,7 @@ const generateDigits = () => {
           <span className="mode">
             {mode === "forward" ? "Forward" : "Backward"}
           </span>
-          <span className="level">Level {level}</span>
+          <span className="level">Level {currentLevel.current}</span>
         </LevelIndicator>
 
         <Text
@@ -473,7 +472,9 @@ const generateDigits = () => {
               <NumberButton
                 key={digit}
                 onClick={() => handleInput(digit)}
-                disabled={userInput.length === LEVEL_DIGITS[level]}
+                disabled={
+                  userInput.length === LEVEL_DIGITS[currentLevel.current]
+                }
               >
                 {digit}
               </NumberButton>
@@ -486,14 +487,14 @@ const generateDigits = () => {
             </NumberButton>
             <NumberButton
               onClick={() => handleInput(0)}
-              disabled={userInput.length === LEVEL_DIGITS[level]}
+              disabled={userInput.length === LEVEL_DIGITS[currentLevel.current]}
             >
               0
             </NumberButton>
             <NumberButton
               type="primary"
               onClick={handleSubmit}
-              disabled={userInput.length !== LEVEL_DIGITS[level]}
+              disabled={userInput.length !== LEVEL_DIGITS[currentLevel.current]}
             >
               ส่ง
             </NumberButton>
@@ -503,13 +504,11 @@ const generateDigits = () => {
             <Title
               level={3}
               style={{
-                color: userInput.every((d, i) => d === digits[i])
-                  ? COLORS.success
-                  : COLORS.error,
+                color: isCorrect ? COLORS.success : COLORS.error,
                 marginBottom: "24px",
               }}
             >
-              {userInput.every((d, i) => d === digits[i])
+              {isCorrect
                 ? "🎉 ยอดเยี่ยม! คำตอบถูกต้อง"
                 : "😢 เสียใจด้วย คำตอบไม่ถูกต้อง"}
             </Title>
@@ -523,15 +522,13 @@ const generateDigits = () => {
             >
               ตัวเลขที่ถูกต้อง:{" "}
               <span style={{ fontWeight: "bold", letterSpacing: "2px" }}>
-                {digits.join("")}
+                {mode === "forward"
+                  ? digits.join("")
+                  : [...digits].reverse().join("")}
               </span>
             </Text>
             <Button
-              type={
-                userInput.every((d, i) => d === digits[i])
-                  ? "primary"
-                  : "default"
-              }
+              type={isCorrect ? "primary" : "default"}
               size="large"
               onClick={nextAction.action}
               style={{ minWidth: "150px" }}
