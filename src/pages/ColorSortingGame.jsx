@@ -279,7 +279,7 @@ export default function ColorSortingGame() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://brain-training-server.onrender.com/api/game-results/${user.nationalId}`
+          `https://brain-training-server-production.up.railway.app/api/game-results/${user.nationalId}`
         );
 
         if (response.data.sessions?.length > 0) {
@@ -427,7 +427,7 @@ export default function ColorSortingGame() {
         };
 
         const response = await axios.post(
-          "https://brain-training-server.onrender.com/api/game-results/save-session",
+          "https://brain-training-server-production.up.railway.app/api/game-results/save-session",
           {
             nationalId: user.nationalId,
             sessionData,

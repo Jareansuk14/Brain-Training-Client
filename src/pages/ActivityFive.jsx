@@ -298,7 +298,7 @@ export default function ActivityFive() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://brain-training-server.onrender.com/api/goals/${user.nationalId}`
+          `https://brain-training-server-production.up.railway.app/api/goals/${user.nationalId}`
         );
 
         console.log("Fetched data:", response.data);
@@ -337,7 +337,7 @@ export default function ActivityFive() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://brain-training-server.onrender.com/api/goals/${user.nationalId}`
+          `https://brain-training-server-production.up.railway.app/api/goals/${user.nationalId}`
         );
 
         // ตรวจสอบว่ามีข้อมูลคำตอบครบทุกด้านหรือไม่
@@ -405,7 +405,7 @@ export default function ActivityFive() {
       });
 
       await axios.post(
-        "https://brain-training-server.onrender.com/api/goals/save",
+        "https://brain-training-server-production.up.railway.app/api/goals/save",
         {
           nationalId: user.nationalId,
           category: currentStepData.category,

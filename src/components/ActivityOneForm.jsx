@@ -462,7 +462,7 @@ export default function ActivityOneForm() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://brain-training-server.onrender.com/api/user-info/get/${user.nationalId}`
+          `https://brain-training-server-production.up.railway.app/api/user-info/get/${user.nationalId}`
         );
 
         if (response.data.success && response.data.user) {
@@ -572,7 +572,7 @@ export default function ActivityOneForm() {
 
       // Save to backend
       const response = await axios.post(
-        "https://brain-training-server.onrender.com/api/user-info/save-basic-info",
+        "https://brain-training-server-production.up.railway.app/api/user-info/save-basic-info",
         {
           nationalId: user.nationalId,
           basicInfo,
@@ -632,7 +632,7 @@ export default function ActivityOneForm() {
 
       // Save complete data
       const response = await axios.post(
-        "https://brain-training-server.onrender.com/api/user-info/save-info",
+        "https://brain-training-server-production.up.railway.app/api/user-info/save-info",
         {
           nationalId: user.nationalId,
           basicInfo,

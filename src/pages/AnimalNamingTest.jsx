@@ -524,7 +524,7 @@ export default function AnimalNamingTest() {
 
       try {
         const response = await axios.get(
-          `https://brain-training-server.onrender.com/api/animal-test/${user.nationalId}`
+          `https://brain-training-server-production.up.railway.app/api/animal-test/${user.nationalId}`
         );
 
         if (response.data.sessions?.length > 0) {
@@ -639,7 +639,7 @@ export default function AnimalNamingTest() {
 
     try {
       const response = await axios.post(
-        "https://brain-training-server.onrender.com/api/animal-test/save-session",
+        "https://brain-training-server-production.up.railway.app/api/animal-test/save-session",
         {
           nationalId: user.nationalId,
           sessionData: {

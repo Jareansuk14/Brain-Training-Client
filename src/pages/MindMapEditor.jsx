@@ -447,7 +447,7 @@ export default function MindMapEditor() {
       setLoading(true);
       try {
         const response = await axios.get(
-          `https://brain-training-server.onrender.com/api/mindmap/${user.nationalId}`
+          `https://brain-training-server-production.up.railway.app/api/mindmap/${user.nationalId}`
         );
         if (response.data) {
           setTopics(response.data.topics || []);
@@ -474,7 +474,7 @@ export default function MindMapEditor() {
     setSaving(true);
     try {
       await axios.post(
-        "https://brain-training-server.onrender.com/api/mindmap/save",
+        "https://brain-training-server-production.up.railway.app/api/mindmap/save",
         {
           nationalId: user.nationalId,
           topics,

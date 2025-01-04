@@ -368,7 +368,7 @@ export default function DigitSpan() {
 
       try {
         const response = await axios.get(
-          `https://brain-training-server.onrender.com/api/digit-span/${user.nationalId}`
+          `https://brain-training-server-production.up.railway.app/api/digit-span/${user.nationalId}`
         );
 
         if (response.data.sessions?.length > 0) {
@@ -524,7 +524,7 @@ export default function DigitSpan() {
       const totalTimeSpent = forwardTime + backwardTime;
 
       const response = await axios.post(
-        "https://brain-training-server.onrender.com/api/digit-span/save-session",
+        "https://brain-training-server-production.up.railway.app/api/digit-span/save-session",
         {
           nationalId: user.nationalId,
           sessionData: {

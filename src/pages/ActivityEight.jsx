@@ -423,7 +423,7 @@ export default function ActivityEight() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://brain-training-server.onrender.com/api/activity-eight/${user.nationalId}`
+          `https://brain-training-server-production.up.railway.app//api/activity-eight/${user.nationalId}`
         );
 
         if (response.data?.categories) {
@@ -509,7 +509,7 @@ export default function ActivityEight() {
       };
 
       const response = await axios.post(
-        "https://brain-training-server.onrender.com/api/activity-eight/save",
+        "https://brain-training-server-production.up.railway.app//api/activity-eight/save",
         data
       );
 

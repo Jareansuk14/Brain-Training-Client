@@ -469,7 +469,7 @@ export default function ActivitySix() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://brain-training-server.onrender.com/api/life-design/${user.nationalId}`
+          `https://brain-training-server-production.up.railway.app/api/life-design/${user.nationalId}`
         );
 
         if (response.data?.categories) {
@@ -569,7 +569,7 @@ export default function ActivitySix() {
       console.log("Data being sent:", data);
 
       const response = await axios.post(
-        "https://brain-training-server.onrender.com/api/life-design/save",
+        "https://brain-training-server-production.up.railway.app/api/life-design/save",
         data
       );
 
