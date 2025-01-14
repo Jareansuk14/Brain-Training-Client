@@ -650,7 +650,7 @@ export default function ColorSortingGame() {
         <ActionButton className="primary" onClick={resetGame}>
           เล่นใหม่
         </ActionButton>
-        <ActionButton onClick={() => navigate("/")}>กลับหน้าหลัก</ActionButton>
+        <ActionButton onClick={() => navigate("/activity-10")}>เกมถัดไป</ActionButton>
       </Space>
     </>
   );

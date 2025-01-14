@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, Space, Typography, Button, message, Row, Col } from "antd";
 import {
   ClockCircleOutlined,
@@ -322,6 +323,7 @@ export default function DigitSpan() {
   const [nextAction, setNextAction] = useState(null);
   const [isCorrect, setIsCorrect] = useState(false);
   const currentLevel = useRef(1);
+  const navigate = useNavigate();
   const timerRef = useRef(null);
   const [forwardResults, setForwardResults] = useState(null);
   const [currentModeResults, setCurrentModeResults] = useState({

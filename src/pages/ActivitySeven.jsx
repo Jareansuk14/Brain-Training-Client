@@ -645,7 +645,7 @@ export default function ActivitySeven() {
     try {
       setLoading(true);
       message.success("จบกิจกรรมเรียบร้อย");
-      navigate("/");
+      navigate("/activity-9");
     } catch (error) {
       console.error("Error finishing activity:", error);
       message.error("เกิดข้อผิดพลาดในการจบกิจกรรม");

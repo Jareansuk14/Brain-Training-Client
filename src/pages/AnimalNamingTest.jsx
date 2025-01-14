@@ -897,7 +897,7 @@ export default function AnimalNamingTest() {
         <ActionButton className="primary" onClick={() => setTestState("intro")}>
           ทำแบบทดสอบอีกครั้ง
         </ActionButton>
-        <ActionButton onClick={() => navigate("/")}>กลับหน้าหลัก</ActionButton>
+        <ActionButton onClick={() => navigate("/activity-11")}>เกมถัดไป</ActionButton>
       </Space>
     </>
   );

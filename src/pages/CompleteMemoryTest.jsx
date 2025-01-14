@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   Space,
@@ -1205,6 +1206,7 @@ export default function MemoryTest() {
   const [showResults, setShowResults] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [availableOptions, setAvailableOptions] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (stage === "recall") {
@@ -1546,9 +1548,9 @@ export default function MemoryTest() {
               <Button
                 size="large"
                 style={{ width: "100%" }}
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/activity-12")}
               >
-                กลับหน้าหลัก
+                เกมถัดไป
               </Button>
             </Space>
           </>

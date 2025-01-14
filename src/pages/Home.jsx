@@ -139,35 +139,7 @@ const activities = [
       "กิจกรรมส่วนที่ 6 : ด้านจิตวิญญาณ",
     ],
     duration: 50,
-  },
-  {
-    number: 9,
-    title: "เกมจัดเรียงสี (Color Sorting Game)",
-    subtitles: ["ทดสอบการจัดเรียงสีตามลำดับ"],
-    duration: 15,
-    path: "/ColorSortingGame",
-  },
-  {
-    number: 10,
-    title: "ทดสอบการเรียกชื่อสัตว์ (Animal Naming Test)",
-    subtitles: ["ทดสอบความจำและการเรียกชื่อสัตว์"],
-    duration: 20,
-    path: "/AnimalNamingTest",
-  },
-  {
-    number: 11,
-    title: "แบบทดสอบความจำแบบสมบูรณ์ (Complete Memory Test)",
-    subtitles: ["ประเมินความจำรอบด้าน"],
-    duration: 25,
-    path: "/CompleteMemoryTest",
-  },
-  {
-    number: 12,
-    title: "ทดสอบช่วงตัวเลข (Digit Span)",
-    subtitles: ["ทดสอบความจำระยะสั้นด้วยตัวเลข"],
-    duration: 15,
-    path: "/DigitSpan",
-  },
+  }
 ];
 
 export default function Home() {

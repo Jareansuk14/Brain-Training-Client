@@ -423,7 +423,7 @@ export default function ActivityEight() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://brain-training-server-production.up.railway.app//api/activity-eight/${user.nationalId}`
+          `https://brain-training-server-production.up.railway.app/api/activity-eight/${user.nationalId}`
         );
 
         if (response.data?.categories) {
@@ -560,7 +560,7 @@ export default function ActivityEight() {
     try {
       setLoading(true);
       message.success("จบกิจกรรมเรียบร้อย");
-      navigate("/");
+      navigate("/activity-9");
     } catch (error) {
       console.error("Error finishing activity:", error);
       message.error("เกิดข้อผิดพลาดในการจบกิจกรรม");

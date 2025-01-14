@@ -910,7 +910,7 @@ export default function ActivityThree() {
             ) : (
               <ActionButton
                 className="primary"
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/activity-9")}
                 icon={<CheckOutlined />}
               >
                 จบกิจกรรม
