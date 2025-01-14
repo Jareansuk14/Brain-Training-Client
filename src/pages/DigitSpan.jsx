@@ -5,6 +5,7 @@ import {
   ClockCircleOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
+  HeartFilled,
 } from "@ant-design/icons";
 import styled from "@emotion/styled";
 import { useAuth } from "../context/AuthContext";
@@ -58,6 +59,21 @@ const StyledCard = styled(Card)`
   .ant-card-body {
     padding: 24px;
   }
+`;
+
+const AttemptsContainer = styled.div`
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const HeartIcon = styled(HeartFilled)`
+  color: ${props => props.active ? COLORS.error : '#ddd'};
+  font-size: 24px;
+  transition: all 0.3s ease;
 `;
 
 // Timer styled components
@@ -265,9 +281,7 @@ const LevelIndicator = styled.div`
 const formatTime = (seconds) => {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
-  return `${mins.toString().padStart(2, "0")}:${secs
-    .toString()
-    .padStart(2, "0")}`;
+  return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 };
 
 // Celebration Effects
@@ -305,10 +319,11 @@ const celebrateComplete = () => {
 
 export default function DigitSpan() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // States
-  const [stage, setStage] = useState("intro"); // intro, memorize, input, completed
-  const [mode, setMode] = useState("forward"); // forward, backward
+  const [stage, setStage] = useState("intro");
+  const [mode, setMode] = useState("forward");
   const [level, setLevel] = useState(1);
   const [digits, setDigits] = useState([]);
   const [userInput, setUserInput] = useState([]);
@@ -322,8 +337,9 @@ export default function DigitSpan() {
   const [showResult, setShowResult] = useState(false);
   const [nextAction, setNextAction] = useState(null);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [attempts, setAttempts] = useState(3);
+  const [attemptsHistory, setAttemptsHistory] = useState([]);
   const currentLevel = useRef(1);
-  const navigate = useNavigate();
   const timerRef = useRef(null);
   const [forwardResults, setForwardResults] = useState(null);
   const [currentModeResults, setCurrentModeResults] = useState({
@@ -332,25 +348,7 @@ export default function DigitSpan() {
     levels: [],
   });
 
-  // Function สำหรับเก็บผลลัพธ์แต่ละ level
-  const saveCurrentLevelResult = () => {
-    const levelResult = {
-      level: currentLevel.current,
-      digits: digits,
-      userAnswer: userInput.map(Number),
-      isCorrect: isCorrect,
-      timeSpent:
-        elapsedTime -
-        currentModeResults.levels.reduce((acc, cur) => acc + cur.timeSpent, 0),
-    };
-
-    setCurrentModeResults((prev) => ({
-      ...prev,
-      levels: [...prev.levels, levelResult],
-    }));
-  };
-
-  // Timer Effect - จัดการการนับเวลา
+  // Effect for Timer
   useEffect(() => {
     if (isTimerRunning) {
       timerRef.current = setInterval(() => {
@@ -363,7 +361,7 @@ export default function DigitSpan() {
     return () => clearInterval(timerRef.current);
   }, [isTimerRunning]);
 
-  // Load previous results
+  // Effect for loading previous results
   useEffect(() => {
     const fetchPreviousResults = async () => {
       if (!user?.nationalId) return;
@@ -374,8 +372,7 @@ export default function DigitSpan() {
         );
 
         if (response.data.sessions?.length > 0) {
-          const lastSession =
-            response.data.sessions[response.data.sessions.length - 1];
+          const lastSession = response.data.sessions[response.data.sessions.length - 1];
           setPreviousResults(lastSession);
         }
       } catch (error) {
@@ -387,7 +384,7 @@ export default function DigitSpan() {
     fetchPreviousResults();
   }, [user?.nationalId]);
 
-  // Timer for memorization phase
+  // Effect for memorization phase timer
   useEffect(() => {
     if (stage === "memorize") {
       setTimeLeft(5);
@@ -422,13 +419,31 @@ export default function DigitSpan() {
     setLevel(newLevel);
   };
 
+  const saveCurrentLevelResult = () => {
+    const levelResult = {
+      level: currentLevel.current,
+      digits: digits,
+      userAnswer: userInput.map(Number),
+      isCorrect: isCorrect,
+      attemptsUsed: 3 - attempts,
+      timeSpent:
+        elapsedTime -
+        currentModeResults.levels.reduce((acc, cur) => acc + cur.timeSpent, 0),
+    };
+
+    setCurrentModeResults((prev) => ({
+      ...prev,
+      levels: [...prev.levels, levelResult],
+    }));
+  };
+
   const startGame = () => {
     const newDigits = generateDigits();
     setStage("memorize");
     setDigits(newDigits);
     setUserInput([]);
     setIsCorrect(false);
-    setIsTimerRunning(true); // เริ่มจับเวลาเมื่อเริ่มเกม
+    setIsTimerRunning(true);
   };
 
   const handleInput = (digit) => {
@@ -455,8 +470,7 @@ export default function DigitSpan() {
           const currentForwardTime = elapsedTime;
           setForwardTime(currentForwardTime);
           saveCurrentLevelResult();
-          const completedForwardResults = {
-            ...currentModeResults,
+          const completedForwardResults = {...currentModeResults,
             mode: "forward",
             totalTime: currentForwardTime,
           };
@@ -468,6 +482,7 @@ export default function DigitSpan() {
               updateLevel(1);
               setShowResult(false);
               setElapsedTime(0);
+              setAttempts(3);
               setCurrentModeResults({
                 mode: "backward",
                 totalTime: 0,
@@ -499,28 +514,65 @@ export default function DigitSpan() {
           action: () => {
             updateLevel(currentLevel.current + 1);
             setShowResult(false);
+            setAttempts(3);
             startGame();
           },
         });
       }
     } else {
-      saveCurrentLevelResult();
-      message.error("ไม่ถูกต้อง");
-      setNextAction({
-        text: "ลองอีกครั้ง",
-        action: () => {
-          setShowResult(false);
-          setUserInput([]);
-          startGame();
-        },
-      });
+      const newAttempts = attempts - 1;
+      setAttempts(newAttempts);
+      
+      if (newAttempts === 0) {
+        // No more attempts left
+        saveCurrentLevelResult();
+        message.error("หมดโอกาสแล้ว");
+        setNextAction({
+          text: currentLevel.current === 6 
+            ? (mode === "forward" ? "เริ่มโหมด Backward" : "ดูผลการทดสอบ")
+            : `ไป Level ${currentLevel.current + 1}`,
+          action: () => {
+            if (currentLevel.current === 6) {
+              if (mode === "forward") {
+                const currentForwardTime = elapsedTime;
+                setForwardTime(currentForwardTime);
+                setMode("backward");
+                updateLevel(1);
+                setAttempts(3);
+              } else {
+                const currentBackwardTime = elapsedTime;
+                setBackwardTime(currentBackwardTime);
+                handleTestComplete(forwardResults, {
+                  ...currentModeResults,
+                  mode: "backward",
+                  totalTime: currentBackwardTime,
+                });
+              }
+            } else {
+              updateLevel(currentLevel.current + 1);
+              setAttempts(3);
+            }
+            setShowResult(false);
+            startGame();
+          },
+        });
+      } else {
+        message.error(`ไม่ถูกต้อง เหลือโอกาสอีก ${newAttempts} ครั้ง`);
+        setNextAction({
+          text: "ลองอีกครั้ง",
+          action: () => {
+            setShowResult(false);
+            setUserInput([]);
+            startGame();
+          },
+        });
+      }
     }
     setShowResult(true);
   };
 
   const handleTestComplete = async (forwardResults, backwardResults) => {
     try {
-      // อัพเดทค่า backwardTime ให้ถูกต้องจาก backwardResults
       const forwardTime = forwardResults.totalTime;
       const backwardTime = backwardResults.totalTime;
       const totalTimeSpent = forwardTime + backwardTime;
@@ -531,8 +583,8 @@ export default function DigitSpan() {
           nationalId: user.nationalId,
           sessionData: {
             totalTime: totalTimeSpent,
-            forwardTime: forwardResults.totalTime, // ใช้ค่าจาก results โดยตรง
-            backwardTime: backwardResults.totalTime, // ใช้ค่าจาก results โดยตรง
+            forwardTime: forwardResults.totalTime,
+            backwardTime: backwardResults.totalTime,
             modes: [forwardResults, backwardResults],
           },
         }
@@ -555,11 +607,7 @@ export default function DigitSpan() {
 
   const renderIntro = () => (
     <StyledCard>
-      <Space
-        direction="vertical"
-        size={24}
-        style={{ width: "100%", textAlign: "center" }}
-      >
+      <Space direction="vertical" size={24} style={{ width: "100%", textAlign: "center" }}>
         <Title level={2} style={{ color: COLORS.primary, marginBottom: 0 }}>
           Digit Span Memory Training
         </Title>
@@ -572,7 +620,10 @@ export default function DigitSpan() {
           • มี 6 ระดับ เริ่มจาก 3 หลักไปจนถึง 8 หลัก
           <br />
           • แต่ละระดับจะมีเวลาให้จำ 5 วินาที
-          <br />• มีทั้งโหมด Forward (จำปกติ) และ Backward (จำแบบย้อนกลับ)
+          <br />
+          • มีทั้งโหมด Forward (จำปกติ) และ Backward (จำแบบย้อนกลับ)
+          <br />
+          • แต่ละระดับมีโอกาสตอบผิดได้ 3 ครั้ง
         </Text>
 
         <StartGameButton size="large" onClick={startGame}>
@@ -585,9 +636,7 @@ export default function DigitSpan() {
   const renderMemorize = () => (
     <StyledCard>
       <LevelIndicator>
-        <span className="mode">
-          {mode === "forward" ? "Forward" : "Backward"}
-        </span>
+        <span className="mode">{mode === "forward" ? "Forward" : "Backward"}</span>
         <span className="level">Level {currentLevel.current}</span>
       </LevelIndicator>
 
@@ -606,10 +655,14 @@ export default function DigitSpan() {
   const renderInput = () => (
     <InputCard>
       <div className="card-content">
+        <AttemptsContainer>
+          {[...Array(3)].map((_, index) => (
+            <HeartIcon key={index} active={index < attempts} />
+          ))}
+        </AttemptsContainer>
+
         <LevelIndicator>
-          <span className="mode">
-            {mode === "forward" ? "Forward" : "Backward"}
-          </span>
+          <span className="mode">{mode === "forward" ? "Forward" : "Backward"}</span>
           <span className="level">Level {currentLevel.current}</span>
         </LevelIndicator>
 
@@ -621,12 +674,8 @@ export default function DigitSpan() {
           </TimerValue>
         </TimerContainer>
 
-        <Text
-          style={{ textAlign: "center", display: "block", marginBottom: 24 }}
-        >
-          {mode === "forward"
-            ? "กรอกตัวเลขตามลำดับที่เห็น"
-            : "กรอกตัวเลขย้อนกลับจากที่เห็น"}
+        <Text style={{ textAlign: "center", display: "block", marginBottom: 24 }}>
+          {mode === "forward" ? "กรอกตัวเลขตามลำดับที่เห็น" : "กรอกตัวเลขย้อนกลับจากที่เห็น"}
         </Text>
 
         <DigitDisplay>{userInput.map((d) => d).join("") || " "}</DigitDisplay>
@@ -637,9 +686,7 @@ export default function DigitSpan() {
               <NumberButton
                 key={digit}
                 onClick={() => handleInput(digit)}
-                disabled={
-                  userInput.length === LEVEL_DIGITS[currentLevel.current]
-                }
+                disabled={userInput.length === LEVEL_DIGITS[currentLevel.current]}
               >
                 {digit}
               </NumberButton>
@@ -672,9 +719,11 @@ export default function DigitSpan() {
                 marginBottom: "24px",
               }}
             >
-              {isCorrect
-                ? "🎉 ยอดเยี่ยม! คำตอบถูกต้อง"
-                : "😢 เสียใจด้วย คำตอบไม่ถูกต้อง"}
+              {isCorrect 
+                ? "🎉 ยอดเยี่ยม! คำตอบถูกต้อง" 
+                : (attempts === 0 
+                   ? "😢 หมดโอกาสแล้ว" 
+                   : "😢 เสียใจด้วย คำตอบไม่ถูกต้อง")}
             </Title>
             <Text
               style={{
@@ -686,9 +735,7 @@ export default function DigitSpan() {
             >
               ตัวเลขที่ถูกต้อง:{" "}
               <span style={{ fontWeight: "bold", letterSpacing: "2px" }}>
-                {mode === "forward"
-                  ? digits.join("")
-                  : [...digits].reverse().join("")}
+                {mode === "forward" ? digits.join("") : [...digits].reverse().join("")}
               </span>
             </Text>
             <ResultButton
@@ -720,16 +767,10 @@ export default function DigitSpan() {
                 <Text
                   style={{
                     marginLeft: 8,
-                    color: comparison.forwardTime.improved
-                      ? COLORS.success
-                      : COLORS.error,
+                    color: comparison.forwardTime.improved ? COLORS.success : COLORS.error,
                   }}
                 >
-                  {comparison.forwardTime.improved ? (
-                    <ArrowDownOutlined />
-                  ) : (
-                    <ArrowUpOutlined />
-                  )}
+                  {comparison.forwardTime.improved ? <ArrowDownOutlined /> : <ArrowUpOutlined />}
                   {formatTime(Math.abs(comparison.forwardTime.difference))}
                 </Text>
               )}
@@ -740,16 +781,10 @@ export default function DigitSpan() {
                 <Text
                   style={{
                     marginLeft: 8,
-                    color: comparison.backwardTime.improved
-                      ? COLORS.success
-                      : COLORS.error,
+                    color: comparison.backwardTime.improved ? COLORS.success : COLORS.error,
                   }}
                 >
-                  {comparison.backwardTime.improved ? (
-                    <ArrowDownOutlined />
-                  ) : (
-                    <ArrowUpOutlined />
-                  )}
+                  {comparison.backwardTime.improved ? <ArrowDownOutlined /> : <ArrowUpOutlined />}
                   {formatTime(Math.abs(comparison.backwardTime.difference))}
                 </Text>
               )}
@@ -760,16 +795,10 @@ export default function DigitSpan() {
                 <Text
                   style={{
                     marginLeft: 8,
-                    color: comparison.totalTime.improved
-                      ? COLORS.success
-                      : COLORS.error,
+                    color: comparison.totalTime.improved ? COLORS.success : COLORS.error,
                   }}
                 >
-                  {comparison.totalTime.improved ? (
-                    <ArrowDownOutlined />
-                  ) : (
-                    <ArrowUpOutlined />
-                  )}
+                  {comparison.totalTime.improved ? <ArrowDownOutlined /> : <ArrowUpOutlined />}
                   {formatTime(Math.abs(comparison.totalTime.difference))}
                 </Text>
               )}
@@ -781,20 +810,17 @@ export default function DigitSpan() {
           <Title level={4}>ครั้งก่อน</Title>
           <Space direction="vertical" size={16}>
             <div>
-              Forward:{" "}
-              {previousResults && previousResults.forwardTime
+              Forward: {previousResults && previousResults.forwardTime
                 ? formatTime(previousResults.forwardTime)
                 : "-"}
             </div>
             <div>
-              Backward:{" "}
-              {previousResults && previousResults.backwardTime
+              Backward: {previousResults && previousResults.backwardTime
                 ? formatTime(previousResults.backwardTime)
                 : "-"}
             </div>
             <div>
-              รวม:{" "}
-              {previousResults && previousResults.totalTime
+              รวม: {previousResults && previousResults.totalTime
                 ? formatTime(previousResults.totalTime)
                 : "-"}
             </div>
@@ -803,10 +829,12 @@ export default function DigitSpan() {
       </Row>
 
       <Space style={{ width: "100%", justifyContent: "center", marginTop: 32 }}>
-        <EndGameButton  onClick={() => window.location.reload()}>
+        <EndGameButton onClick={() => window.location.reload()}>
           เริ่มทำแบบทดสอบใหม่
         </EndGameButton>
-        <GohomeButton onClick={() => navigate("/")}>กลับหน้าหลัก</GohomeButton>
+        <GohomeButton onClick={() => navigate("/")}>
+          กลับหน้าหลัก
+        </GohomeButton>
       </Space>
     </StyledCard>
   );
