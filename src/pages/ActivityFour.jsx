@@ -905,7 +905,7 @@ export default function ActivityFour() {
 
               <div style={{ textAlign: "center", marginTop: "24px" }}>
                 <ActionButton className="primary" onClick={() => navigate("/activity-9")}>
-                  กลับหน้าหลัก
+                  จบกิจกรรม
                 </ActionButton>
               </div>
             </Space>

@@ -689,7 +689,7 @@ export default function AnimalNamingTest() {
   const renderIntro = () => (
     <>
       <StyledTitle  level={2} style={{ textAlign: "center", marginBottom: 32 }}>
-        แบบทดสอบการเรียกชื่อสัตว์ (Animal Naming Test)
+        เกมปริศนา ไขชื่อสัตว์โลก
       </StyledTitle>
 
       <StyledCard>
@@ -725,7 +725,7 @@ export default function AnimalNamingTest() {
     return (
       <>
         <StyledTitle  level={2} style={{ textAlign: "center", marginBottom: 32 }}>
-        แบบทดสอบการเรียกชื่อสัตว์ (Animal Naming Test)
+        เกมปริศนา ไขชื่อสัตว์โลก
         </StyledTitle>
 
         <StyledCard>

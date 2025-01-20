@@ -609,7 +609,7 @@ export default function DigitSpan() {
     <StyledCard>
       <Space direction="vertical" size={24} style={{ width: "100%", textAlign: "center" }}>
         <Title level={2} style={{ color: COLORS.primary, marginBottom: 0 }}>
-          Digit Span Memory Training
+          เกมสนุกเลข ปลุกพลังสมอง
         </Title>
 
         <Text style={{ fontSize: "16px", color: COLORS.dark }}>

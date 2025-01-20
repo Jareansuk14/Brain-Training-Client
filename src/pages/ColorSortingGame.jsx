@@ -658,7 +658,7 @@ export default function ColorSortingGame() {
   const renderGame = () => (
     <>
       <StyledTitle level={2} style={{ textAlign: "center" }}>
-        เกมจัดเรียงสี -{" "}
+        เกมจำสี ขยับบล็อก -{" "}
         {level === "easy"
           ? "ระดับง่าย"
           : level === "medium"

@@ -1260,7 +1260,7 @@ export default function MemoryTest() {
   // Timer for game phase
   useEffect(() => {
     if (stage === "game") {
-      setTimeLeft(5); // 5 minutes
+      setTimeLeft(300); // 5 minutes
       const interval = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
@@ -1313,7 +1313,7 @@ export default function MemoryTest() {
         style={{ width: "100%", textAlign: "center" }}
       >
         <StyledTitle level={2} style={{ color: COLORS.primary, marginBottom: 0 }}>
-          แบบทดสอบความจำ MoCA
+          เกมจำคำ ท้าสมอง
         </StyledTitle>
 
         <Text style={{ fontSize: "16px", color: COLORS.dark }}>
