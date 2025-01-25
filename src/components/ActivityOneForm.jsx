@@ -599,63 +599,64 @@ export default function ActivityOneForm() {
     setCurrentStep(currentStep - 1);
   };
 
-  // Final submit
-  const onFinish = async (values) => {
-    setLoading(true);
-    try {
-      // Validate deep questions
-      const deepQuestions = {
-        happiness: values.happiness,
-        longTermGoals: values.longTermGoals,
-        proudestMoment: values.proudestMoment,
-        biggestFear: values.biggestFear,
-        strengthsWeaknesses: values.strengthsWeaknesses,
-        desiredChanges: values.desiredChanges,
-      };
+// Final submit
+const onFinish = async (values) => {
+  setLoading(true);
+  try {
+    // Validate deep questions
+    const deepQuestions = {
+      happiness: values.happiness,
+      longTermGoals: values.longTermGoals,
+      proudestMoment: values.proudestMoment,
+      biggestFear: values.biggestFear,
+      strengthsWeaknesses: values.strengthsWeaknesses,
+      desiredChanges: values.desiredChanges,
+    };
 
-      // Check required fields
-      const missingFields = Object.entries(deepQuestions)
-        .filter(([key, value]) => !value)
-        .map(([key]) => key);
+    // Check required fields
+    const missingFields = Object.entries(deepQuestions)
+      .filter(([key, value]) => !value)
+      .map(([key]) => key);
 
-      if (missingFields.length > 0) {
-        setLoading(false);
-        return;
-      }
-
-      const { basicInfo } = formData;
-      if (!basicInfo || Object.keys(basicInfo).length === 0) {
-        message.error("ไม่พบข้อมูลพื้นฐาน กรุณากรอกข้อมูลพื้นฐานก่อน");
-        setLoading(false);
-        return;
-      }
-
-      // Save complete data
-      const response = await axios.post(
-        "https://brain-training-server-production.up.railway.app/api/user-info/save-info",
-        {
-          nationalId: user.nationalId,
-          basicInfo,
-          deepQuestions,
-        }
-      );
-
-      if (response.data.success) {
-        message.success("บันทึกข้อมูลทั้งหมดสำเร็จ");
-        setInitialData(response.data.user);
-        window.location.href = "https://app.diagrams.net/?src=about";
-      } else {
-        throw new Error(
-          response.data.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล"
-        );
-      }
-    } catch (error) {
-      console.error("Save error:", error);
-      message.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง");
-    } finally {
+    if (missingFields.length > 0) {
       setLoading(false);
+      return;
     }
-  };
+
+    const { basicInfo } = formData;
+    if (!basicInfo || Object.keys(basicInfo).length === 0) {
+      message.error("ไม่พบข้อมูลพื้นฐาน กรุณากรอกข้อมูลพื้นฐานก่อน");
+      setLoading(false);
+      return;
+    }
+
+    // Save complete data
+    const response = await axios.post(
+      "https://brain-training-server-production.up.railway.app/api/user-info/save-info",
+      {
+        nationalId: user.nationalId,
+        basicInfo,
+        deepQuestions,
+      }
+    );
+
+    if (response.data.success) {
+      message.success("บันทึกข้อมูลทั้งหมดสำเร็จ");
+      setInitialData(response.data.user);
+      // Changed redirect URL
+      navigate('/activity-1/mindmap');
+    } else {
+      throw new Error(
+        response.data.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล"
+      );
+    }
+  } catch (error) {
+    console.error("Save error:", error);
+    message.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง");
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Form steps configuration
   const steps = [

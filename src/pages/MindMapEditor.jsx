@@ -14,6 +14,7 @@ import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -246,7 +247,7 @@ const ActionButton = styled(Button)({
   },
   
   '&.primary': {
-    background: COLORS.primary,
+    background: '#fff',
     borderColor: COLORS.primary,
     color: 'white',
     '&:hover': {
@@ -436,6 +437,7 @@ const Node = ({ node, level, onUpdate, onDelete, onAddChild, onToggle }) => {
 // Main Component
 const MindMapEditor = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [mindMap, setMindMap] = useState({
     root: {
       _id: 'root',
@@ -444,7 +446,6 @@ const MindMapEditor = () => {
       isExpanded: true
     }
   });
-  const [loading, setLoading] = useState(false);
 
   // Fetch mind map data
   useEffect(() => {
@@ -455,7 +456,6 @@ const MindMapEditor = () => {
 
   const fetchMindMap = async () => {
     try {
-      setLoading(true);
       const response = await axios.get(`${API_BASE_URL}/${user.nationalId}`);
       console.log('Fetched mind map:', response.data);
       if (response.data && response.data.root) {
@@ -464,15 +464,12 @@ const MindMapEditor = () => {
     } catch (error) {
       console.error('Error fetching mind map:', error);
       message.error('เกิดข้อผิดพลาดในการโหลดข้อมูล');
-    } finally {
-      setLoading(false);
     }
   };
 
   // Add new node
   const addChild = async (parentId) => {
     try {
-      setLoading(true);
       console.log('Adding child to parent:', parentId);
       
       const response = await axios.post(`${API_BASE_URL}/add-node`, {
@@ -519,15 +516,12 @@ const MindMapEditor = () => {
     } catch (error) {
       console.error('Error adding node:', error);
       message.error('เกิดข้อผิดพลาดในการเพิ่มหัวข้อ');
-    } finally {
-      setLoading(false);
     }
   };
 
   // Update node content
   const updateNode = async (nodeId, content) => {
     try {
-      setLoading(true);
       console.log('Updating node:', nodeId, 'with content:', content);
       
       const response = await axios.post(`${API_BASE_URL}/update-node`, {
@@ -570,16 +564,13 @@ const MindMapEditor = () => {
     } catch (error) {
       console.error('Error updating node:', error);
       message.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-      throw error; // Re-throw the error to be caught by the Node component
-    } finally {
-      setLoading(false);
+      throw error;
     }
   };
 
   // Delete node
   const deleteNode = async (nodeId) => {
     try {
-      setLoading(true);
       console.log('Deleting node:', nodeId);
       
       const response = await axios.post(`${API_BASE_URL}/delete-node`, {
@@ -619,8 +610,6 @@ const MindMapEditor = () => {
     } catch (error) {
       console.error('Error deleting node:', error);
       message.error('เกิดข้อผิดพลาดในการลบหัวข้อ');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -656,30 +645,6 @@ const MindMapEditor = () => {
       message.error('เกิดข้อผิดพลาดในการเปลี่ยนแปลงการแสดงผล');
     }
   };
-
-  if (loading) {
-    return (
-      <PageContainer>
-        <ContentContainer>
-          <StyledCard>
-            <Spin>
-              <div style={{ 
-                textAlign: 'center', 
-                padding: '100px 50px',
-                minHeight: '400px',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: '100%'
-              }}>
-                <LoadingOutlined style={{ fontSize: 24, color: COLORS.primary }} />
-              </div>
-            </Spin>
-          </StyledCard>
-        </ContentContainer>
-      </PageContainer>
-    );
-  }
 
   return (
     <PageContainer>
@@ -757,6 +722,23 @@ const MindMapEditor = () => {
             onToggle={toggleNode}
           />
         </StyledCard>
+        <div className="flex justify-center mt-8 mb-12">
+          <ActionButton
+            onClick={() => navigate('/activity-9')}
+            className="primary"
+            style={{
+              fontSize: '1.1rem',
+              height: '48px',
+              padding: '0 36px',
+              borderRadius: '24px',
+              background: `linear-gradient(135deg, ${COLORS.gradient.start}, ${COLORS.gradient.end})`,
+              color: 'white',
+              border: 'none',
+            }}
+          >
+            ถัดไป
+          </ActionButton>
+        </div>
       </ContentContainer>
     </PageContainer>
   );
