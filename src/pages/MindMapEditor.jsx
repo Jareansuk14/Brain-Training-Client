@@ -467,11 +467,43 @@ const MindMapEditor = () => {
     }
   };
 
-  // Add new node
+  // Add new node with optimistic update
   const addChild = async (parentId) => {
-    try {
-      console.log('Adding child to parent:', parentId);
+    // Create temporary node
+    const tempNode = {
+      _id: Date.now().toString(), // Temporary ID
+      content: 'หัวข้อใหม่',
+      children: [],
+      isExpanded: true
+    };
+
+    // Optimistically update UI
+    setMindMap(prevMap => {
+      const addNodeToTree = (node) => {
+        if (node._id === parentId) {
+          return {
+            ...node,
+            children: [...(node.children || []), tempNode],
+            isExpanded: true
+          };
+        }
+        if (node.children && node.children.length > 0) {
+          return {
+            ...node,
+            children: node.children.map(addNodeToTree)
+          };
+        }
+        return node;
+      };
       
+      return {
+        ...prevMap,
+        root: addNodeToTree(prevMap.root)
+      };
+    });
+
+    try {
+      // Make API call in background
       const response = await axios.post(`${API_BASE_URL}/add-node`, {
         nationalId: user.nationalId,
         parentId,
@@ -481,49 +513,81 @@ const MindMapEditor = () => {
       if (!response.data) {
         throw new Error('Invalid response from server');
       }
-      
-      console.log('New node response:', response.data);
-      
+
+      // Update with real data from server
       setMindMap(prevMap => {
-        const addNodeToTree = (node) => {
-          if (node._id === parentId) {
-            console.log('Found parent node:', node._id);
-            return {
-              ...node,
-              children: [...(node.children || []), response.data],
-              isExpanded: true
-            };
+        const updateNodeToReal = (node) => {
+          if (node._id === tempNode._id) {
+            return response.data;
           }
           if (node.children && node.children.length > 0) {
             return {
               ...node,
-              children: node.children.map(addNodeToTree)
+              children: node.children.map(updateNodeToReal)
             };
           }
           return node;
         };
         
-        const newMap = {
+        return {
           ...prevMap,
-          root: addNodeToTree(prevMap.root)
+          root: updateNodeToReal(prevMap.root)
         };
-        
-        console.log('Updated mind map:', newMap);
-        return newMap;
       });
-      
-      message.success('เพิ่มหัวข้อใหม่เรียบร้อย');
     } catch (error) {
       console.error('Error adding node:', error);
       message.error('เกิดข้อผิดพลาดในการเพิ่มหัวข้อ');
+      // Revert optimistic update on error
+      setMindMap(prevMap => {
+        const removeNode = (node) => {
+          if (node.children && node.children.length > 0) {
+            return {
+              ...node,
+              children: node.children
+                .filter(child => child._id !== tempNode._id)
+                .map(removeNode)
+            };
+          }
+          return node;
+        };
+        return {
+          ...prevMap,
+          root: removeNode(prevMap.root)
+        };
+      });
     }
   };
 
-  // Update node content
+  // Update node content with optimistic update
   const updateNode = async (nodeId, content) => {
-    try {
-      console.log('Updating node:', nodeId, 'with content:', content);
+    // Store original content for rollback
+    let originalContent;
+    
+    // Optimistically update UI
+    setMindMap(prevMap => {
+      const updateNodeInTree = (node) => {
+        if (!node) return node;
+        
+        if (node._id === nodeId) {
+          originalContent = node.content;
+          return { ...node, content };
+        }
+        if (node.children && node.children.length > 0) {
+          return {
+            ...node,
+            children: node.children.map(child => updateNodeInTree(child))
+          };
+        }
+        return node;
+      };
       
+      return {
+        ...prevMap,
+        root: updateNodeInTree(prevMap.root)
+      };
+    });
+
+    try {
       const response = await axios.post(`${API_BASE_URL}/update-node`, {
         nationalId: user.nationalId,
         nodeId,
@@ -533,46 +597,71 @@ const MindMapEditor = () => {
       if (!response.data.success) {
         throw new Error('Failed to update node');
       }
+    } catch (error) {
+      console.error('Error updating node:', error);
+      message.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
       
+      // Revert to original content on error
       setMindMap(prevMap => {
-        const updateNodeInTree = (node) => {
+        const revertNode = (node) => {
           if (!node) return node;
           
           if (node._id === nodeId) {
-            console.log('Found node to update:', node._id);
-            return { ...node, content };
+            return { ...node, content: originalContent };
           }
           if (node.children && node.children.length > 0) {
             return {
               ...node,
-              children: node.children.map(child => updateNodeInTree(child))
+              children: node.children.map(revertNode)
             };
           }
           return node;
         };
         
-        const newMap = {
+        return {
           ...prevMap,
-          root: updateNodeInTree(prevMap.root)
+          root: revertNode(prevMap.root)
         };
-        
-        console.log('Updated mind map:', newMap);
-        return newMap;
       });
-      
-      message.success('บันทึกการเปลี่ยนแปลงเรียบร้อย');
-    } catch (error) {
-      console.error('Error updating node:', error);
-      message.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
       throw error;
     }
   };
 
-  // Delete node
+  // Delete node with optimistic update
   const deleteNode = async (nodeId) => {
-    try {
-      console.log('Deleting node:', nodeId);
+    // Store deleted node and its parent for potential rollback
+    let deletedNode = null;
+    let parentNode = null;
+    
+    // Optimistically update UI
+    setMindMap(prevMap => {
+      const findAndRemoveNode = (node) => {
+        if (!node) return node;
+        
+        if (node.children && node.children.length > 0) {
+          const nodeToDelete = node.children.find(child => child._id === nodeId);
+          if (nodeToDelete) {
+            deletedNode = nodeToDelete;
+            parentNode = node;
+          }
+          
+          return {
+            ...node,
+            children: node.children
+              .filter(child => child._id !== nodeId)
+              .map(child => findAndRemoveNode(child))
+          };
+        }
+        return node;
+      };
       
+      return {
+        ...prevMap,
+        root: findAndRemoveNode(prevMap.root)
+      };
+    });
+
+    try {
       const response = await axios.post(`${API_BASE_URL}/delete-node`, {
         nationalId: user.nationalId,
         nodeId
@@ -581,55 +670,79 @@ const MindMapEditor = () => {
       if (!response.data.success) {
         throw new Error('Failed to delete node');
       }
-      
-      setMindMap(prevMap => {
-        const deleteNodeFromTree = (node) => {
-          if (!node) return node;
-          
-          if (node.children && node.children.length > 0) {
-            return {
-              ...node,
-              children: node.children
-                .filter(child => child._id !== nodeId)
-                .map(child => deleteNodeFromTree(child))
-            };
-          }
-          return node;
-        };
-        
-        const newMap = {
-          ...prevMap,
-          root: deleteNodeFromTree(prevMap.root)
-        };
-        
-        console.log('Updated mind map after deletion:', newMap);
-        return newMap;
-      });
-      
-      message.success('ลบหัวข้อเรียบร้อย');
     } catch (error) {
       console.error('Error deleting node:', error);
       message.error('เกิดข้อผิดพลาดในการลบหัวข้อ');
+      
+      // Restore deleted node on error
+      if (deletedNode && parentNode) {
+        setMindMap(prevMap => {
+          const restoreNode = (node) => {
+            if (node._id === parentNode._id) {
+              return {
+                ...node,
+                children: [...node.children, deletedNode]
+              };
+            }
+            if (node.children && node.children.length > 0) {
+              return {
+                ...node,
+                children: node.children.map(restoreNode)
+              };
+            }
+            return node;
+          };
+          
+          return {
+            ...prevMap,
+            root: restoreNode(prevMap.root)
+          };
+        });
+      }
     }
   };
 
-  // Toggle node expansion
+  // Toggle node expansion with optimistic update
   const toggleNode = async (nodeId) => {
+    // Optimistically update UI first
+    setMindMap(prevMap => {
+      const toggleNodeInTree = (node) => {
+        if (node._id === nodeId) {
+          return { ...node, isExpanded: !node.isExpanded };
+        }
+        if (node.children && node.children.length > 0) {
+          return {
+            ...node,
+            children: node.children.map(toggleNodeInTree)
+          };
+        }
+        return node;
+      };
+      
+      return {
+        ...prevMap,
+        root: toggleNodeInTree(prevMap.root)
+      };
+    });
+
+    // Then make API call in background
     try {
       await axios.post(`${API_BASE_URL}/toggle-node`, {
         nationalId: user.nationalId,
         nodeId
       });
-      
+    } catch (error) {
+      console.error('Error toggling node:', error);
+      // Revert the toggle on error
       setMindMap(prevMap => {
-        const toggleNodeInTree = (node) => {
+        const revertToggle = (node) => {
           if (node._id === nodeId) {
             return { ...node, isExpanded: !node.isExpanded };
           }
           if (node.children && node.children.length > 0) {
             return {
               ...node,
-              children: node.children.map(toggleNodeInTree)
+              children: node.children.map(revertToggle)
             };
           }
           return node;
@@ -637,11 +750,9 @@ const MindMapEditor = () => {
         
         return {
           ...prevMap,
-          root: toggleNodeInTree(prevMap.root)
+          root: revertToggle(prevMap.root)
         };
       });
-    } catch (error) {
-      console.error('Error toggling node:', error);
       message.error('เกิดข้อผิดพลาดในการเปลี่ยนแปลงการแสดงผล');
     }
   };
