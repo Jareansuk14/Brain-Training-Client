@@ -920,7 +920,7 @@ export default function ActivityFour() {
     <PageContainer>
       <ContentContainer>
         <Title level={2} style={{ textAlign: "center", marginBottom: 32 }}>
-          กิจกรรมที่ 4: บันทึกอารมณ์
+        Session 4 : บันทึกอารมณ์
         </Title>
 
         <StyledSteps

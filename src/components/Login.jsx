@@ -211,17 +211,9 @@ export default function Auth() {
   const [registerForm] = Form.useForm();
   const [validating, setValidating] = useState(false);
 
-  // Validate Thai National ID
+  // Validate User Number
   const validateNationalId = (nationalId) => {
-    if (!nationalId || nationalId.length !== 13) return false;
-
-    let sum = 0;
-    for (let i = 0; i < 12; i++) {
-      sum += parseFloat(nationalId.charAt(i)) * (13 - i);
-    }
-    let mod = sum % 11;
-    let check = (11 - mod) % 10;
-    return check === parseFloat(nationalId.charAt(12));
+    return /^\d{6}$/.test(nationalId);
   };
 
   // Check if user exists
@@ -246,7 +238,7 @@ export default function Auth() {
     
     try {
         if (!validateNationalId(values.nationalId)) {
-            setError('หมายเลขประจำตัวไม่ถูกต้อง');
+            setError('หมายเลขผู้ใช้ไม่ถูกต้อง');
             setLoading(false);
             return;
         }
@@ -264,7 +256,7 @@ export default function Auth() {
     } finally {
         setLoading(false);
     }
-};
+  };
 
   // Handle registration
   const handleRegister = async (values) => {
@@ -273,7 +265,7 @@ export default function Auth() {
     
     try {
         if (!validateNationalId(values.nationalId)) {
-            setError('หมายเลขประจำตัวไม่ถูกต้อง');
+            setError('หมายเลขผู้ใช้ไม่ถูกต้อง');
             setLoading(false);
             return;
         }
@@ -292,24 +284,24 @@ export default function Auth() {
     } finally {
         setLoading(false);
     }
-};
+  };
 
   // Handle real-time national ID validation
   const handleNationalIdChange = async (e, form) => {
     const value = e.target.value;
-    if (value.length === 13) {
+    if (value.length === 6) {
         setValidating(true);
         setError('');
         
         try {
             if (!validateNationalId(value)) {
-                setError('หมายเลขประจำตัวไม่ถูกต้อง');
+                setError('หมายเลขผู้ใช้ไม่ถูกต้อง');
                 return;
             }
 
             const response = await axios.get(`https://brain-training-server-production.up.railway.app/api/auth/check/${value}`);
             if (activeTab === 'register' && response.data.exists) {
-                setError('หมายเลขประจำตัวนี้มีในระบบแล้ว');
+                setError('หมายเลขผู้ใช้นี้มีในระบบแล้ว');
             } else if (activeTab === 'login' && !response.data.exists) {
                 setError('ไม่พบข้อมูลผู้ใช้ในระบบ');
             }
@@ -319,7 +311,7 @@ export default function Auth() {
             setValidating(false);
         }
     }
-};
+  };
 
   // Handle tab switching
   const switchTab = (tab) => {
@@ -357,17 +349,17 @@ export default function Auth() {
                 <Form.Item
                   name="nationalId"
                   rules={[
-                    { required: true, message: "กรุณากรอกหมายเลขประจำตัว" },
+                    { required: true, message: "กรุณากรอกหมายเลขผู้ใช้" },
                     {
-                      pattern: /^\d{13}$/,
-                      message: "กรุณากรอกหมายเลขประจำตัว",
+                      pattern: /^\d{6}$/,
+                      message: "กรุณากรอกหมายเลขผู้ใช้",
                     },
                   ]}
                 >
                   <StyledInput
                     prefix={<IdcardOutlined />}
-                    placeholder="หมายเลขประจำตัว"
-                    maxLength={13}
+                    placeholder="หมายเลขผู้ใช้"
+                    maxLength={6}
                     onChange={(e) => handleNationalIdChange(e, loginForm)}
                     disabled={loading}
                   />
@@ -408,17 +400,17 @@ export default function Auth() {
                 <Form.Item
                   name="nationalId"
                   rules={[
-                    { required: true, message: "กรุณากรอกหมายเลขประจำตัว" },
+                    { required: true, message: "กรุณากรอกหมายเลขผู้ใช้" },
                     {
-                      pattern: /^\d{13}$/,
-                      message: "กรุณากรอกหมายเลขประจำตัว",
+                      pattern: /^\d{6}$/,
+                      message: "กรุณากรอกหมายเลขผู้ใช้",
                     },
                   ]}
                 >
                   <StyledInput
                     prefix={<IdcardOutlined />}
-                    placeholder="หมายเลขประจำตัว"
-                    maxLength={13}
+                    placeholder="หมายเลขผู้ใช้"
+                    maxLength={6}
                     onChange={(e) => handleNationalIdChange(e, registerForm)}
                     disabled={loading}
                   />

@@ -523,36 +523,37 @@ export default function ActivityTwo() {
       message.warning("กรุณาเพิ่มความคิดที่ต้องการปล่อยวาง");
       return;
     }
-
     setIsReleasing(true);
-    setTotalReleasedThoughts((prev) => prev + thoughts.length);
-    thoughts.forEach((thought, index) => {
+    const thoughtsToRelease = thoughts.length;
+    const releaseSingleThought = (index) => {
+      if (index >= thoughts.length) {
+        setTimeout(() => {
+          setThoughts([]);
+          setFloatingThoughts([]);
+          setIsReleasing(false);
+          Modal.success({
+            title: "ปล่อยวางความคิดสำเร็จ",
+            content: "คุณได้ปล่อยวางความคิดทั้งหมดแล้ว รู้สึกเบาสบายขึ้นไหม?",
+          });
+        }, 0);
+        return;
+      }
+      setFloatingThoughts((prev) => [
+        ...prev,
+        {
+          ...thoughts[index],
+          color: balloonColors[Math.floor(Math.random() * balloonColors.length)],
+          left: Math.random() * 80 + 10,
+          text: truncateText(thoughts[index].text),
+        },
+      ]);
       setTimeout(() => {
-        setFloatingThoughts((prev) => [
-          ...prev,
-          {
-            ...thought,
-            color:
-              balloonColors[Math.floor(Math.random() * balloonColors.length)],
-            left: Math.random() * 80 + 10,
-            text: truncateText(thought.text),
-          },
-        ]);
+        setFloatingThoughts((prev) => prev.slice(1));
+        releaseSingleThought(index + 1);
+      }, 10000);
+    };
 
-        if (index === thoughts.length - 1) {
-          setTimeout(() => {
-            setThoughts([]);
-            setFloatingThoughts([]);
-            setIsReleasing(false);
-            Modal.success({
-              title: "ปล่อยวางความคิดสำเร็จ",
-              content: "คุณได้ปล่อยวางความคิดทั้งหมดแล้ว รู้สึกเบาสบายขึ้นไหม?",
-            });
-          }, 15000);
-        }
-      }, index * 1000);
-    });
-  };
+    releaseSingleThought(0);}
 
   const enhancedBalloonContainer = (
     <>
@@ -892,7 +893,7 @@ export default function ActivityTwo() {
   return (
     <div style={{ maxWidth: 800, margin: "0 auto", padding: 24 }}>
       <Title level={2} style={{ textAlign: "center", marginBottom: 32 }}>
-        กิจกรรม "ปล่อยความคิด ให้ปลิวไปในอากาศ"
+        Session 2 : "ปล่อยความคิด ให้ปลิวไปในอากาศ"
       </Title>
 
       <StyledSteps

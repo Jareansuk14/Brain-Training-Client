@@ -129,7 +129,7 @@ export default function ActivityCard({ number, title, subtitles, duration }) {
       onClick={handleClick}
       title={
         <Space size="large" style={{ width: '100%', justifyContent: 'space-between' }}>
-          <ActivityNumber>กิจกรรมที่ {number}</ActivityNumber>
+          <ActivityNumber>Session {number}</ActivityNumber>
           <Duration>
             <ClockCircleOutlined />
             <span>{duration} นาที</span>

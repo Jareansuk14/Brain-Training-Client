@@ -703,22 +703,22 @@ export default function ActivityOneForm() {
             <Space direction="vertical" size="middle" style={{ width: "100%" }}>
               <Form.Item
                 name="fullName"
-                label="ยศ/ชื่อ-นามสกุล"
-                rules={[{ required: true, message: "กรุณากรอกชื่อ-นามสกุล" }]}
+                label="ชื่อ/นามแฟง ที่บ่งบอกความเป็นตัวตนของคุณ"
+                rules={[{ required: true, message: "กรุณากรอกชื่อ/นามแฟง ที่บ่งบอกความเป็นตัวตนของคุณ" }]}
               >
                 <Input
                   prefix={<UserOutlined />}
-                  placeholder="กรุณากรอกชื่อ-นามสกุล"
+                  placeholder="ชื่อ/นามแฟง ที่บ่งบอกความเป็นตัวตนของคุณ"
                 />
               </Form.Item>
 
               <Space wrap>
                 <Form.Item
                   name="nickname"
-                  label="ชื่อเล่น"
-                  rules={[{ required: true, message: "กรุณากรอกชื่อเล่น" }]}
+                  label="เหตุผลของนามแฟง"
+                  rules={[{ required: true, message: "กรุณากรอกเหตุผลของนามแฟง" }]}
                 >
-                  <Input placeholder="ชื่อเล่น" />
+                  <Input placeholder="เหตุผลของนามแฟง" />
                 </Form.Item>
 
                 <Form.Item
@@ -897,22 +897,22 @@ export default function ActivityOneForm() {
 
               <Form.Item
                 name="strengthsWeaknesses"
-                label="อะไรคือจุดแข็งและจุดอ่อนที่สำคัญของคุณ"
+                label="อะไรคือจุดแข็งของคุณ"
                 rules={[{ required: true, message: "กรุณาตอบคำถามนี้" }]}
               >
                 <TextArea
-                  placeholder="อธิบายถึงจุดแข็งและจุดอ่อนของคุณ"
+                  placeholder="อธิบายถึงจุดแข็งของคุณ"
                   autoSize={{ minRows: 3 }}
                 />
               </Form.Item>
 
               <Form.Item
                 name="desiredChanges"
-                label="อะไรคือสิ่งที่คุณอยากเปลี่ยนแปลงเกี่ยวกับตัวเอง"
+                label="อะไรคือจุดอ่อนของคุณ"
                 rules={[{ required: true, message: "กรุณาตอบคำถามนี้" }]}
               >
                 <TextArea
-                  placeholder="เล่าถึงสิ่งที่คุณอยากเปลี่ยนแปลง"
+                  placeholder="อธิบายถึงจุดอ่อนของคุณ"
                   autoSize={{ minRows: 3 }}
                 />
               </Form.Item>
@@ -926,7 +926,7 @@ export default function ActivityOneForm() {
   return (
     <PageContainer>
       <ContentContainer>
-        <PageTitle level={2}>กิจกรรม "ฉันคือฉัน"</PageTitle>
+        <PageTitle level={2}>Session 1 : "ฉันคือฉัน"</PageTitle>
 
         <StyledSteps
           current={currentStep}

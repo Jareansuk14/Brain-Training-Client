@@ -716,7 +716,7 @@ export default function ActivityThree() {
   return (
     <PageContainer>
       <ContentContainer>
-        <PageTitle level={2}>กิจกรรมที่ 3 : สมาธิดิจิทัล</PageTitle>
+        <PageTitle level={2}>Session 3 : สมาธิดิจิทัล</PageTitle>
 
         <StyledSteps
           current={currentStep}

@@ -750,7 +750,7 @@ export default function ActivityEight() {
           level={2}
           style={{ textAlign: "center", marginBottom: 32, fontSize: "2rem" }}
         >
-          กิจกรรมที่ 8: สร้างพันธสัญญาใจ เพื่อพัฒนาความจำ
+          Session 8 : สร้างพันธสัญญาใจ เพื่อพัฒนาความจำ
         </Title>
 
         <StyledSteps
