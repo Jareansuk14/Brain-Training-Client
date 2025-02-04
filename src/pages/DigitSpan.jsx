@@ -63,15 +63,15 @@ const StyledCard = styled(Card)`
 
 const AttemptsContainer = styled.div`
   position: absolute;
-  top: 24px;
-  left: 24px;
+  top: 50px;
+  left: 0px;
   display: flex;
   align-items: center;
   gap: 8px;
 `;
 
 const HeartIcon = styled(HeartFilled)`
-  color: ${props => props.active ? COLORS.error : '#ddd'};
+  color: ${(props) => (props.active ? COLORS.error : "#ddd")};
   font-size: 24px;
   transition: all 0.3s ease;
 `;
@@ -186,13 +186,13 @@ const ResultButton = styled(Button)`
   font-size: 24px;
   font-weight: bold;
   border-radius: 12px;
-  
+
   &.ant-btn-primarys {
     background-color: ${COLORS.primary};
     border-color: ${COLORS.primary};
     color: white;
   }
-  
+
   &.ant-btn-defaults {
     color: ${COLORS.error};
     border-color: ${COLORS.error};
@@ -240,7 +240,7 @@ const SendButton = styled(Button)`
   font-size: 24px;
   font-weight: bold;
   border-radius: 12px;
-  color: #FFF;
+  color: #fff;
   border-color: ${COLORS.primary};
   background: ${COLORS.primary};
 
@@ -281,7 +281,9 @@ const LevelIndicator = styled.div`
 const formatTime = (seconds) => {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
-  return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  return `${mins.toString().padStart(2, "0")}:${secs
+    .toString()
+    .padStart(2, "0")}`;
 };
 
 // Celebration Effects
@@ -372,7 +374,8 @@ export default function DigitSpan() {
         );
 
         if (response.data.sessions?.length > 0) {
-          const lastSession = response.data.sessions[response.data.sessions.length - 1];
+          const lastSession =
+            response.data.sessions[response.data.sessions.length - 1];
           setPreviousResults(lastSession);
         }
       } catch (error) {
@@ -470,7 +473,8 @@ export default function DigitSpan() {
           const currentForwardTime = elapsedTime;
           setForwardTime(currentForwardTime);
           saveCurrentLevelResult();
-          const completedForwardResults = {...currentModeResults,
+          const completedForwardResults = {
+            ...currentModeResults,
             mode: "forward",
             totalTime: currentForwardTime,
           };
@@ -522,15 +526,18 @@ export default function DigitSpan() {
     } else {
       const newAttempts = attempts - 1;
       setAttempts(newAttempts);
-      
+
       if (newAttempts === 0) {
         // No more attempts left
         saveCurrentLevelResult();
         message.error("หมดโอกาสแล้ว");
         setNextAction({
-          text: currentLevel.current === 6 
-            ? (mode === "forward" ? "เริ่มโหมด Backward" : "ดูผลการทดสอบ")
-            : `ไป Level ${currentLevel.current + 1}`,
+          text:
+            currentLevel.current === 6
+              ? mode === "forward"
+                ? "เริ่มโหมด Backward"
+                : "ดูผลการทดสอบ"
+              : `ไป Level ${currentLevel.current + 1}`,
           action: () => {
             if (currentLevel.current === 6) {
               if (mode === "forward") {
@@ -607,27 +614,100 @@ export default function DigitSpan() {
 
   const renderIntro = () => (
     <StyledCard>
-      <Space direction="vertical" size={24} style={{ width: "100%", textAlign: "center" }}>
+      <Space
+        direction="vertical"
+        size={24}
+        style={{ width: "100%", textAlign: "center" }}
+      >
         <Title level={2} style={{ color: COLORS.primary, marginBottom: 0 }}>
           เกมสนุกเลข ปลุกพลังสมอง
         </Title>
 
         <Text style={{ fontSize: "16px", color: COLORS.dark }}>
-          แบบทดสอบนี้จะช่วยฝึกความจำระยะสั้นของคุณ โดยจะมีตัวเลขแสดงขึ้นมาให้จำ
-          และคุณจะต้องจำตัวเลขเหล่านั้นให้ได้ในเวลาที่กำหนด
-          <br />
-          <br />
-          • มี 6 ระดับ เริ่มจาก 3 หลักไปจนถึง 8 หลัก
-          <br />
-          • แต่ละระดับจะมีเวลาให้จำ 5 วินาที
-          <br />
-          • มีทั้งโหมด Forward (จำปกติ) และ Backward (จำแบบย้อนกลับ)
-          <br />
-          • แต่ละระดับมีโอกาสตอบผิดได้ 3 ครั้ง
+          เกมฝึกความจำสนุกๆ ที่จะช่วยพัฒนาสมองของคุณ!
+          คุณจะได้เห็นตัวเลขปรากฏบนหน้าจอ แล้วต้องจำให้ได้ภายในเวลาที่กำหนด
         </Text>
 
+        <div
+          style={{
+            background: COLORS.background,
+            padding: "24px",
+            borderRadius: "12px",
+            margin: "12px 0",
+          }}
+        >
+          <Text
+            strong
+            style={{
+              fontSize: "18px",
+              color: COLORS.primary,
+              display: "block",
+              marginBottom: "16px",
+            }}
+          >
+            วิธีการเล่น
+          </Text>
+
+          <Space direction="vertical" size={16} style={{ textAlign: "left" }}>
+            <div>
+              <Text strong>1. ระดับความยาก:</Text>
+              <Text> มี 6 ระดับ แต่ละระดับจะเพิ่มจำนวนตัวเลข</Text>
+              <Text
+                style={{
+                  display: "block",
+                  color: COLORS.secondary,
+                  marginTop: "4px",
+                }}
+              >
+                เช่น: ระดับ 1 = 3 หลัก (234), ระดับ 2 = 4 หลัก (5678)
+              </Text>
+            </div>
+
+            <div>
+              <Text strong>2. โหมดการเล่น:</Text>
+              <div style={{ marginLeft: "16px" }}>
+                <Text style={{ display: "block" }}>
+                  • แบบปกติ (Forward): จำตัวเลขจากซ้ายไปขวา
+                </Text>
+                <Text style={{ color: COLORS.secondary }}>
+                  ถ้าเห็น "123" ต้องตอบ "123"
+                </Text>
+                <Text style={{ display: "block" }}>
+                  • แบบย้อนกลับ (Backward): จำตัวเลขจากขวาไปซ้าย
+                </Text>
+                <Text style={{ color: COLORS.secondary }}>
+                  ถ้าเห็น "123" ต้องตอบ "321"
+                </Text>
+              </div>
+            </div>
+
+            <div>
+              <Text strong>3. เวลาและโอกาส:</Text>
+              <Text style={{ display: "block" }}>
+                • มีเวลาดูตัวเลข 5 วินาที
+              </Text>
+              <Text style={{ display: "block" }}>
+                • ตอบผิดได้ 3 ครั้งในแต่ละระดับ
+              </Text>
+              <Text style={{ display: "block", color: COLORS.secondary }}>
+                สังเกตไอคอน ❤️ ด้านบนเพื่อดูจำนวนโอกาสที่เหลือ
+              </Text>
+            </div>
+
+            <div>
+              <Text strong>4. คำแนะนำ:</Text>
+              <Text style={{ display: "block" }}>
+                • พยายามจัดกลุ่มตัวเลขในใจเพื่อจำได้ง่ายขึ้น
+              </Text>
+              <Text style={{ display: "block" }}>
+                • ฝึกท่องตัวเลขในใจระหว่างที่รอ
+              </Text>
+            </div>
+          </Space>
+        </div>
+
         <StartGameButton size="large" onClick={startGame}>
-          เริ่มทำแบบทดสอบ
+          เริ่มเกม
         </StartGameButton>
       </Space>
     </StyledCard>
@@ -636,7 +716,9 @@ export default function DigitSpan() {
   const renderMemorize = () => (
     <StyledCard>
       <LevelIndicator>
-        <span className="mode">{mode === "forward" ? "Forward" : "Backward"}</span>
+        <span className="mode">
+          {mode === "forward" ? "Forward" : "Backward"}
+        </span>
         <span className="level">Level {currentLevel.current}</span>
       </LevelIndicator>
 
@@ -662,7 +744,9 @@ export default function DigitSpan() {
         </AttemptsContainer>
 
         <LevelIndicator>
-          <span className="mode">{mode === "forward" ? "Forward" : "Backward"}</span>
+          <span className="mode">
+            {mode === "forward" ? "Forward" : "Backward"}
+          </span>
           <span className="level">Level {currentLevel.current}</span>
         </LevelIndicator>
 
@@ -674,8 +758,12 @@ export default function DigitSpan() {
           </TimerValue>
         </TimerContainer>
 
-        <Text style={{ textAlign: "center", display: "block", marginBottom: 24 }}>
-          {mode === "forward" ? "กรอกตัวเลขตามลำดับที่เห็น" : "กรอกตัวเลขย้อนกลับจากที่เห็น"}
+        <Text
+          style={{ textAlign: "center", display: "block", marginBottom: 24 }}
+        >
+          {mode === "forward"
+            ? "กรอกตัวเลขตามลำดับที่เห็น"
+            : "กรอกตัวเลขย้อนกลับจากที่เห็น"}
         </Text>
 
         <DigitDisplay>{userInput.map((d) => d).join("") || " "}</DigitDisplay>
@@ -686,7 +774,9 @@ export default function DigitSpan() {
               <NumberButton
                 key={digit}
                 onClick={() => handleInput(digit)}
-                disabled={userInput.length === LEVEL_DIGITS[currentLevel.current]}
+                disabled={
+                  userInput.length === LEVEL_DIGITS[currentLevel.current]
+                }
               >
                 {digit}
               </NumberButton>
@@ -719,11 +809,11 @@ export default function DigitSpan() {
                 marginBottom: "24px",
               }}
             >
-              {isCorrect 
-                ? "🎉 ยอดเยี่ยม! คำตอบถูกต้อง" 
-                : (attempts === 0 
-                   ? "😢 หมดโอกาสแล้ว" 
-                   : "😢 เสียใจด้วย คำตอบไม่ถูกต้อง")}
+              {isCorrect
+                ? "🎉 ยอดเยี่ยม! คำตอบถูกต้อง"
+                : attempts === 0
+                ? "😢 หมดโอกาสแล้ว"
+                : "😢 เสียใจด้วย คำตอบไม่ถูกต้อง"}
             </Title>
             <Text
               style={{
@@ -735,7 +825,9 @@ export default function DigitSpan() {
             >
               ตัวเลขที่ถูกต้อง:{" "}
               <span style={{ fontWeight: "bold", letterSpacing: "2px" }}>
-                {mode === "forward" ? digits.join("") : [...digits].reverse().join("")}
+                {mode === "forward"
+                  ? digits.join("")
+                  : [...digits].reverse().join("")}
               </span>
             </Text>
             <ResultButton
@@ -767,10 +859,16 @@ export default function DigitSpan() {
                 <Text
                   style={{
                     marginLeft: 8,
-                    color: comparison.forwardTime.improved ? COLORS.success : COLORS.error,
+                    color: comparison.forwardTime.improved
+                      ? COLORS.success
+                      : COLORS.error,
                   }}
                 >
-                  {comparison.forwardTime.improved ? <ArrowDownOutlined /> : <ArrowUpOutlined />}
+                  {comparison.forwardTime.improved ? (
+                    <ArrowDownOutlined />
+                  ) : (
+                    <ArrowUpOutlined />
+                  )}
                   {formatTime(Math.abs(comparison.forwardTime.difference))}
                 </Text>
               )}
@@ -781,10 +879,16 @@ export default function DigitSpan() {
                 <Text
                   style={{
                     marginLeft: 8,
-                    color: comparison.backwardTime.improved ? COLORS.success : COLORS.error,
+                    color: comparison.backwardTime.improved
+                      ? COLORS.success
+                      : COLORS.error,
                   }}
                 >
-                  {comparison.backwardTime.improved ? <ArrowDownOutlined /> : <ArrowUpOutlined />}
+                  {comparison.backwardTime.improved ? (
+                    <ArrowDownOutlined />
+                  ) : (
+                    <ArrowUpOutlined />
+                  )}
                   {formatTime(Math.abs(comparison.backwardTime.difference))}
                 </Text>
               )}
@@ -795,10 +899,16 @@ export default function DigitSpan() {
                 <Text
                   style={{
                     marginLeft: 8,
-                    color: comparison.totalTime.improved ? COLORS.success : COLORS.error,
+                    color: comparison.totalTime.improved
+                      ? COLORS.success
+                      : COLORS.error,
                   }}
                 >
-                  {comparison.totalTime.improved ? <ArrowDownOutlined /> : <ArrowUpOutlined />}
+                  {comparison.totalTime.improved ? (
+                    <ArrowDownOutlined />
+                  ) : (
+                    <ArrowUpOutlined />
+                  )}
                   {formatTime(Math.abs(comparison.totalTime.difference))}
                 </Text>
               )}
@@ -810,17 +920,20 @@ export default function DigitSpan() {
           <Title level={4}>ครั้งก่อน</Title>
           <Space direction="vertical" size={16}>
             <div>
-              Forward: {previousResults && previousResults.forwardTime
+              Forward:{" "}
+              {previousResults && previousResults.forwardTime
                 ? formatTime(previousResults.forwardTime)
                 : "-"}
             </div>
             <div>
-              Backward: {previousResults && previousResults.backwardTime
+              Backward:{" "}
+              {previousResults && previousResults.backwardTime
                 ? formatTime(previousResults.backwardTime)
                 : "-"}
             </div>
             <div>
-              รวม: {previousResults && previousResults.totalTime
+              รวม:{" "}
+              {previousResults && previousResults.totalTime
                 ? formatTime(previousResults.totalTime)
                 : "-"}
             </div>
@@ -832,9 +945,7 @@ export default function DigitSpan() {
         <EndGameButton onClick={() => window.location.reload()}>
           เริ่มทำแบบทดสอบใหม่
         </EndGameButton>
-        <GohomeButton onClick={() => navigate("/")}>
-          กลับหน้าหลัก
-        </GohomeButton>
+        <GohomeButton onClick={() => navigate("/")}>กลับหน้าหลัก</GohomeButton>
       </Space>
     </StyledCard>
   );
