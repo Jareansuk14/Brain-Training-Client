@@ -24,6 +24,8 @@ import ColorSortingGame from "./pages/ColorSortingGame"
 import AnimalNamingTest from "./pages/AnimalNamingTest"
 import CompleteMemoryTest from "./pages/CompleteMemoryTest"
 import DigitSpan from "./pages/DigitSpan"
+import TowerOfHanoi from "./pages/TowerOfHanoi"
+
 
 const { Header: AntHeader, Content } = Layout;
 
@@ -415,6 +417,17 @@ function App() {
               <ProtectedRoute>
                 <AppLayout>
                   <DigitSpan />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/activity-13/"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <TowerOfHanoi />
                 </AppLayout>
               </ProtectedRoute>
             }
