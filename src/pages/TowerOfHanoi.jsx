@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Space, Typography, Button, Row, Col, Select, message, Modal } from 'antd';
-import { ClockCircleOutlined, SwapRightOutlined } from '@ant-design/icons';
+import { Card, Space, Typography, Button, Row, Col, Select, message } from 'antd';
+import { ClockCircleOutlined , SwapRightOutlined} from '@ant-design/icons';
 import { RotateCcw } from 'lucide-react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -87,33 +87,21 @@ const OrientationCheck = ({ children }) => {
   return children;
 };
 
-// Draggable Disc Component
-const Disc = ({ size, color, index, canDrag, onDiscMove }) => {
-    const [{ isDragging }, drag] = useDrag(() => ({
-      type: 'disc',
-      item: { size, index },
-      canDrag,
-      collect: monitor => ({
-        isDragging: monitor.isDragging(),
-      }),
-    }), [size, index, canDrag]);
-  
-    // Calculate width based on screen size
+// Disc Component
+const Disc = ({ size, color, index, isTop, isSelected }) => {
     const baseWidth = window.innerWidth <= 1024 ? 30 : 40;
     const widthIncrement = window.innerWidth <= 1024 ? 20 : 25;
     const width = baseWidth + size * widthIncrement;
   
     return (
       <div
-        ref={drag}
         style={{
           width: `${width}px`,
           height: window.innerWidth <= 1024 ? '24px' : '32px',
           backgroundColor: color,
           margin: '2px auto',
           borderRadius: '16px',
-          cursor: canDrag ? 'grab' : 'not-allowed',
-          opacity: isDragging ? 0.5 : 1,
+          cursor: 'pointer',
           boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
           display: 'flex',
           alignItems: 'center',
@@ -123,10 +111,11 @@ const Disc = ({ size, color, index, canDrag, onDiscMove }) => {
           fontWeight: 'bold',
           transition: 'all 0.3s ease',
           border: '2px solid rgba(255,255,255,0.4)',
-          transform: `perspective(1000px) rotateX(5deg)`,
-          transformStyle: 'preserve-3d',
+          transform: isSelected && isTop ? 
+            'translateY(-20px) scale(1.05)' : 
+            'translateY(0) scale(1)',
+          zIndex: isSelected && isTop ? 3 : 2,
           position: 'relative',
-          zIndex: 2,
         }}
       >
         {size}
@@ -177,26 +166,16 @@ const Disc = ({ size, color, index, canDrag, onDiscMove }) => {
     );
   };
   
-  // Tower Component with Drop Target
-  const Tower = ({ index, discs, discColors, canDrop, onDiscMove }) => {
-    const [{ isOver, canDropHere }, drop] = useDrop(() => ({
-      accept: 'disc',
-      canDrop: (item) => canDrop(item, index),
-      drop: (item) => onDiscMove(item, index),
-      collect: monitor => ({
-        isOver: monitor.isOver(),
-        canDropHere: monitor.canDrop(),
-      }),
-    }), [index, canDrop, onDiscMove]);
-  
-    // Responsive dimensions
+  // Tower Component
+  const Tower = ({ index, discs, discColors, selectedTower, onTowerClick }) => {
     const towerWidth = window.innerWidth <= 1024 ? 240 : 300;
     const towerHeight = window.innerWidth <= 1024 ? 300 : 400;
     const rodHeight = window.innerWidth <= 1024 ? 200 : 280;
+    const isSelected = selectedTower === index;
   
     return (
       <div
-        ref={drop}
+        onClick={() => onTowerClick(index)}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -205,15 +184,16 @@ const Disc = ({ size, color, index, canDrag, onDiscMove }) => {
           minHeight: `${towerHeight}px`,
           width: `${towerWidth}px`,
           padding: '20px',
-          backgroundColor: isOver 
-            ? (canDropHere ? 'rgba(124, 58, 237, 0.1)' : 'rgba(239, 68, 68, 0.1)')
-            : 'white',
+          backgroundColor: isSelected ? 'rgba(124, 58, 237, 0.1)' : 'white',
           borderRadius: '16px',
-          boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
+          boxShadow: isSelected ? 
+            '0 0 0 2px rgba(124, 58, 237, 0.5)' : 
+            '0 8px 16px rgba(0, 0, 0, 0.1)',
           transition: 'all 0.3s ease',
           position: 'relative',
           border: '1px solid rgba(0,0,0,0.1)',
           flex: '0 0 auto',
+          cursor: 'pointer',
         }}
       >
         {/* Tower Number */}
@@ -262,8 +242,8 @@ const Disc = ({ size, color, index, canDrag, onDiscMove }) => {
               size={disc}
               color={discColors[disc - 1]}
               index={i}
-              canDrag={i === discs.length - 1}
-              onDiscMove={onDiscMove}
+              isTop={i === discs.length - 1}
+              isSelected={isSelected}
             />
           ))}
         </div>
@@ -292,7 +272,7 @@ const GameInstructions = () => (
         </li>
         <li style={{ marginBottom: '8px' }}>
           <Text>
-            ลากจานที่ต้องการไปวางที่หอคอยปลายทาง (สามารถย้ายได้เฉพาะจานบนสุดเท่านั้น)
+            กดที่หอคอยเพื่อเลือกจานที่ต้องการย้าย แล้วกดที่หอคอยปลายทาง
           </Text>
         </li>
         <li style={{ marginBottom: '8px' }}>
@@ -367,7 +347,7 @@ const GameInstructions = () => (
               backgroundColor: COLORS.primary,
               borderColor: COLORS.primary
             }}
-            onClick={initializeGame}
+            onClick={() => initializeGame()}
           >
             เริ่มเกม
           </Button>
@@ -396,7 +376,7 @@ const GameInstructions = () => (
   );
   
   // Game Container Component
-  const GameContainer = ({ towers, discColors, canDrop, onDiscMove }) => (
+  const GameContainer = ({ children }) => (
     <div style={{
       display: 'flex',
       justifyContent: 'center',
@@ -407,16 +387,7 @@ const GameInstructions = () => (
       overflowX: 'auto',
       minHeight: window.innerWidth <= 1024 ? '340px' : '440px',
     }}>
-      {[0, 1, 2].map(i => (
-        <Tower
-          key={i}
-          index={i}
-          discs={towers[i]}
-          discColors={discColors}
-          canDrop={canDrop}
-          onDiscMove={onDiscMove}
-        />
-      ))}
+      {children}
     </div>
   );
   
@@ -427,7 +398,7 @@ const GameInstructions = () => (
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-   // Main Component
+  // Main Component
 const TowerOfHanoi = () => {
     const [gameState, setGameState] = useState('waiting');
     const [selectedLevel, setSelectedLevel] = useState(1);
@@ -438,17 +409,20 @@ const TowerOfHanoi = () => {
     const [discColors, setDiscColors] = useState([]);
     const [minMoves, setMinMoves] = useState(0);
     const [showInstructions, setShowInstructions] = useState(true);
+    const [selectedTower, setSelectedTower] = useState(null);
   
     // Initialize random colors for discs
     useEffect(() => {
-      const generateRandomColor = () => {
-        const hue = Math.floor(Math.random() * 360);
-        return `hsl(${hue}, 70%, 50%)`;
+      const generateRandomColors = () => {
+        const maxDiscs = 8;
+        const colors = Array(maxDiscs).fill().map(() => {
+          const hue = Math.floor(Math.random() * 360);
+          return `hsl(${hue}, 70%, 50%)`;
+        });
+        setDiscColors(colors);
       };
-  
-      const maxDiscs = 8;
-      const colors = Array(maxDiscs).fill().map(() => generateRandomColor());
-      setDiscColors(colors);
+      
+      generateRandomColors();
     }, []);
   
     // Cleanup timer on unmount
@@ -457,6 +431,50 @@ const TowerOfHanoi = () => {
         if (timer) clearInterval(timer);
       };
     }, [timer]);
+  
+    // Handle tower click
+    const handleTowerClick = (towerIndex) => {
+      if (gameState !== 'playing') return;
+  
+      if (selectedTower === null) {
+        // No tower selected yet
+        if (towers[towerIndex].length === 0) {
+          return;
+        }
+        setSelectedTower(towerIndex);
+      } else {
+        // Attempting to move disc
+        const sourceTower = towers[selectedTower];
+        const targetTower = towers[towerIndex];
+        
+        if (selectedTower === towerIndex) {
+          setSelectedTower(null);
+          return;
+        }
+        
+        const discToMove = sourceTower[sourceTower.length - 1];
+        const topDiscOnTarget = targetTower[targetTower.length - 1];
+  
+        if (targetTower.length === 0 || discToMove < topDiscOnTarget) {
+          // Valid move
+          const newTowers = towers.map(tower => [...tower]);
+          const disc = newTowers[selectedTower].pop();
+          newTowers[towerIndex].push(disc);
+          
+          setTowers(newTowers);
+          setMoves(prev => prev + 1);
+          
+          // Check if game is won
+          if (towerIndex === 2 && newTowers[2].length === LEVELS[selectedLevel]) {
+            handleGameWin();
+          }
+        } else {
+          message.error('ไม่สามารถวางจานใหญ่บนจานเล็กได้');
+        }
+        
+        setSelectedTower(null);
+      }
+    };
   
     // Initialize game board
     const initializeGame = (keepLevel = false) => {
@@ -473,21 +491,17 @@ const TowerOfHanoi = () => {
       setMoves(0);
       setTime(0);
       setGameState('playing');
+      setSelectedTower(null);
       setMinMoves(Math.pow(2, numDiscs) - 1);
   
-      // Clear existing timer
-      if (timer) {
-        clearInterval(timer);
-      }
+      if (timer) clearInterval(timer);
   
-      // Start new timer
       const intervalId = setInterval(() => {
         setTime(prev => prev + 1);
       }, 1000);
       setTimer(intervalId);
   
-      // Show help message
-      message.info('ลากจานที่ต้องการเพื่อย้ายไปยังหอคอยอื่น', 3);
+      message.info('กดที่หอคอยเพื่อเลือกและย้ายจาน', 3);
     };
   
     // Reset game
@@ -500,46 +514,14 @@ const TowerOfHanoi = () => {
       setMoves(0);
       setTime(0);
       setTowers([[], [], []]);
-      // สุ่มสีใหม่เมื่อเริ่มเกมใหม่
+      setSelectedTower(null);
+  
+      // Generate new random colors
       const colors = Array(8).fill().map(() => {
         const hue = Math.floor(Math.random() * 360);
         return `hsl(${hue}, 70%, 50%)`;
       });
       setDiscColors(colors);
-    };
-  
-    // Check if disc can be dropped on tower
-    const canDrop = (item, towerIndex) => {
-      const targetTower = towers[towerIndex];
-      if (targetTower.length === 0) return true;
-      return item.size < targetTower[targetTower.length - 1];
-    };
-  
-    // Handle disc move
-    const handleDiscMove = (item, targetTowerIndex) => {
-      const sourceTower = towers.findIndex(tower => 
-        tower.length > 0 && tower[tower.length - 1] === item.size
-      );
-      
-      if (sourceTower === targetTowerIndex) return;
-  
-      // Check if move is valid
-      if (!canDrop(item, targetTowerIndex)) {
-        message.error('ไม่สามารถวางจานใหญ่บนจานเล็กได้');
-        return;
-      }
-  
-      const newTowers = towers.map(tower => [...tower]);
-      const disc = newTowers[sourceTower].pop();
-      newTowers[targetTowerIndex].push(disc);
-      
-      setTowers(newTowers);
-      setMoves(prev => prev + 1);
-      
-      // Check if game is won
-      if (targetTowerIndex === 2 && newTowers[2].length === LEVELS[selectedLevel]) {
-        handleGameWin();
-      }
     };
   
     // Handle game win
@@ -600,58 +582,62 @@ const TowerOfHanoi = () => {
   
     return (
       <OrientationCheck>
-        <DndProvider backend={HTML5Backend}>
+        <div style={{ 
+          minHeight: '100vh',
+          minWidth: '100vw',
+          padding: '24px 0',
+          background: COLORS.background,
+          overflowX: 'hidden'
+        }}>
           <div style={{ 
-            minHeight: '100vh',
-            minWidth: '100vw',
-            padding: '24px 0',
-            background: COLORS.background,
-            overflowX: 'hidden'
+            maxWidth: '1400px', 
+            margin: '0 auto',
+            paddingBottom: '80px'
           }}>
-            <div style={{ 
-              maxWidth: '1400px', 
-              margin: '0 auto',
-              paddingBottom: '80px' // Space for fixed controls
-            }}>
-              <Title 
-                level={2} 
-                style={{ 
-                  textAlign: 'center',
-                  marginBottom: '24px',
-                  color: COLORS.primary,
-                  padding: '0 20px'
-                }}
-              >
-                Tower of Hanoi - ระดับ {selectedLevel}
-              </Title>
+            <Title 
+              level={2} 
+              style={{ 
+                textAlign: 'center',
+                marginBottom: '24px',
+                color: COLORS.primary,
+                padding: '0 20px'
+              }}
+            >
+              Tower of Hanoi - ระดับ {selectedLevel}
+            </Title>
   
-              {showInstructions && <GameInstructions />}
+            {showInstructions && <GameInstructions />}
   
-              <GameStats 
-                time={time}
-                moves={moves}
-                minMoves={minMoves}
-                selectedLevel={selectedLevel}
-                gameState={gameState}
-              />
+            <GameStats 
+              time={time}
+              moves={moves}
+              minMoves={minMoves}
+              selectedLevel={selectedLevel}
+              gameState={gameState}
+            />
   
-              <GameContainer 
-                towers={towers}
-                discColors={discColors}
-                canDrop={canDrop}
-                onDiscMove={handleDiscMove}
-              />
+            <GameContainer>
+              {[0, 1, 2].map(i => (
+                <Tower
+                  key={i}
+                  index={i}
+                  discs={towers[i]}
+                  discColors={discColors}
+                  selectedTower={selectedTower}
+                  onTowerClick={handleTowerClick}
+                />
+              ))}
+            </GameContainer>
   
-              <GameControls 
-                gameState={gameState}
-                selectedLevel={selectedLevel}
-                setSelectedLevel={setSelectedLevel}
-                initializeGame={initializeGame}
-                resetGame={resetGame}
-              />
-            </div>
+            <GameControls 
+              gameState={gameState}
+              selectedLevel={selectedLevel}
+              setSelectedLevel={setSelectedLevel}
+              initializeGame={initializeGame}
+              resetGame={resetGame}
+            />
           </div>
-        </DndProvider>
+        </div>
       </OrientationCheck>
     );
   };
