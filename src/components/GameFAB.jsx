@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Tooltip } from 'antd';
 import { Gamepad2, Play } from 'lucide-react';
@@ -37,6 +37,8 @@ const FloatingButton = styled(Button)`
   z-index: 1000;
   border: none;
   transition: all 0.3s ease;
+  right: 24px;
+  bottom: 24px;
 
   &:hover {
     transform: scale(1.1);
@@ -80,49 +82,11 @@ const FloatingButton = styled(Button)`
     left: 0;
     transition: all 0.3s ease;
   }
-
-  .icon-enter {
-    opacity: 0;
-    transform: scale(0.5) rotate(-180deg);
-  }
-
-  .icon-enter-active {
-    opacity: 1;
-    transform: scale(1) rotate(0);
-  }
-
-  .icon-exit {
-    opacity: 1;
-    transform: scale(1) rotate(0);
-  }
-
-  .icon-exit-active {
-    opacity: 0;
-    transform: scale(0.5) rotate(180deg);
-  }
 `;
 
 const GameFAB = () => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const [buttonPosition, setButtonPosition] = useState({ right: 24, bottom: 24 });
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const position = window.pageYOffset;
-      setScrollPosition(position);
-      
-      const newBottom = Math.max(24, Math.min(24 + position * 0.1, 100));
-      setButtonPosition(prev => ({
-        ...prev,
-        bottom: newBottom
-      }));
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <Tooltip 
@@ -145,8 +109,6 @@ const GameFAB = () => {
           width: '64px',
           height: '64px',
           background: '#7c3aed',
-          right: buttonPosition.right,
-          bottom: buttonPosition.bottom,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

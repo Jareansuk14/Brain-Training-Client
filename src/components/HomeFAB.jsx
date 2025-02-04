@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Tooltip } from 'antd';
 import { Home, ArrowLeft } from 'lucide-react';
@@ -37,6 +37,8 @@ const FloatingButton = styled(Button)`
   z-index: 1000;
   border: none;
   transition: all 0.3s ease;
+  right: 24px;
+  bottom: 24px;
 
   &:hover {
     transform: scale(1.1);
@@ -85,24 +87,6 @@ const FloatingButton = styled(Button)`
 const HomeFAB = () => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const [buttonPosition, setButtonPosition] = useState({ right: 24, bottom: 96 });
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const position = window.pageYOffset;
-      setScrollPosition(position);
-      
-      const newBottom = Math.max(24, Math.min(24 + position * 0.1, 100));
-      setButtonPosition(prev => ({
-        ...prev,
-        bottom: newBottom
-      }));
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <Tooltip 
@@ -125,8 +109,6 @@ const HomeFAB = () => {
           width: '64px',
           height: '64px',
           background: '#7c3aed',
-          right: buttonPosition.right,
-          bottom: buttonPosition.bottom,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
