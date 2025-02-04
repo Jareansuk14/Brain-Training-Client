@@ -327,13 +327,13 @@ const StyledTitle = styled(Title)`
     text-align: center;
     font-size: 20px !important;
     margin-bottom: 20px !important;
-    color: ${props => props.color || 'inherit'};
-    
+    color: ${(props) => props.color || "inherit"};
+
     @media (min-width: 480px) {
       font-size: 22px !important;
       margin-bottom: 24px !important;
     }
-    
+
     @media (min-width: 768px) {
       font-size: 24px !important;
       margin-bottom: 32px !important;
@@ -688,12 +688,14 @@ export default function AnimalNamingTest() {
   // แสดงหน้าแนะนำ
   const renderIntro = () => (
     <>
-      <StyledTitle  level={2} style={{ textAlign: "center", marginBottom: 32 }}>
-        เกมปริศนา ไขชื่อสัตว์โลก
-      </StyledTitle>
-
       <StyledCard>
         <Text>
+          <StyledTitle
+            level={3}
+            style={{ color: COLORS.primary ,textAlign: "center", marginBottom: 32 }}
+          >
+            เกมปริศนา ไขชื่อสัตว์โลก
+          </StyledTitle>
           แบบทดสอบนี้จะแสดงภาพให้คุณดู แล้วให้คุณพิมพ์ชื่อสัตว์ที่เห็น
           สามารถตอบได้ทั้งภาษาไทยและภาษาอังกฤษ
         </Text>
@@ -724,8 +726,11 @@ export default function AnimalNamingTest() {
 
     return (
       <>
-        <StyledTitle  level={2} style={{ textAlign: "center", marginBottom: 32 }}>
-        เกมปริศนา ไขชื่อสัตว์โลก
+        <StyledTitle
+          level={2}
+          style={{ textAlign: "center", marginBottom: 32 }}
+        >
+          เกมปริศนา ไขชื่อสัตว์โลก
         </StyledTitle>
 
         <StyledCard>
@@ -813,7 +818,7 @@ export default function AnimalNamingTest() {
 
   const renderSummary = () => (
     <>
-      <StyledTitle  
+      <StyledTitle
         level={2}
         style={{ textAlign: "center", marginBottom: 32, color: COLORS.primary }}
       >
@@ -821,7 +826,7 @@ export default function AnimalNamingTest() {
       </StyledTitle>
 
       <StyledCard>
-        <StyledTitle  level={4}>เปรียบเทียบผลการทดสอบ</StyledTitle>
+        <StyledTitle level={4}>เปรียบเทียบผลการทดสอบ</StyledTitle>
         <Row gutter={[16, 24]}>
           <Col span={8}></Col>
           <Col span={8}>
@@ -897,7 +902,9 @@ export default function AnimalNamingTest() {
         <ActionButton className="primary" onClick={() => setTestState("intro")}>
           ทำแบบทดสอบอีกครั้ง
         </ActionButton>
-        <ActionButton onClick={() => navigate("/activity-11")}>เกมถัดไป</ActionButton>
+        <ActionButton onClick={() => navigate("/activity-11")}>
+          เกมถัดไป
+        </ActionButton>
       </Space>
     </>
   );
