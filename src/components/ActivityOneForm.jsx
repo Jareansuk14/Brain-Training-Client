@@ -426,6 +426,48 @@ const FormGroup = styled.div`
   }
 `;
 
+const SummaryStyles = styled.div`
+  .summary-grid {
+    display: grid;
+    gap: 24px;
+    margin-top: 16px;
+  }
+
+  .summary-item {
+    background: ${COLORS.background};
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+  }
+
+  .summary-label {
+    color: ${COLORS.primary}; // สีม่วง
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: 500; // ตัวหนาขึ้น
+  }
+
+  .summary-value {
+    color: ${COLORS.text};
+    font-size: 16px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    padding-left: 8px; // เยื้องซ้าย
+    border-left: 2px solid ${COLORS.border}; // เส้นแบ่งด้านซ้าย
+  }
+
+  @media (min-width: 768px) {
+    .summary-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+`;
+
 // Blood type options
 const bloodTypes = [
   "A",
@@ -467,10 +509,7 @@ export default function ActivityOneForm() {
 
         if (response.data.success && response.data.user) {
           const userData = response.data.user;
-          if (
-            userData.basicInfo &&
-            Object.keys(userData.basicInfo).length > 0
-          ) {
+          if (userData.basicInfo && Object.keys(userData.basicInfo).length > 0) {
             setInitialData(userData);
             setFormData({
               basicInfo: userData.basicInfo,
@@ -523,75 +562,72 @@ export default function ActivityOneForm() {
   const next = async () => {
     try {
       const values = await form.validateFields();
+      
+      if (currentStep === 0) {
+        // Format basicInfo data
+        const basicInfo = {
+          fullName: values.fullName,
+          nickname: values.nickname,
+          bloodType: values.bloodType,
+          age: Number(values.age),
+          birthDate: values.birthDate?.toDate(),
+          favoriteColor: values.favoriteColor,
+          favoriteFoods: values.favoriteFoods
+            ?.split(",")
+            .map((item) => item.trim())
+            .filter(Boolean),
+          dislikedFoods: values.dislikedFoods
+            ?.split(",")
+            .map((item) => item.trim())
+            .filter(Boolean),
+          hobbies: values.hobbies
+            ?.split(",")
+            .map((item) => item.trim())
+            .filter(Boolean),
+          motto: values.motto,
+          personalTraits: values.personalTraits
+            ?.split(",")
+            .map((item) => item.trim())
+            .filter(Boolean),
+        };
 
-      // Format basicInfo data
-      const basicInfo = {
-        fullName: values.fullName,
-        nickname: values.nickname,
-        bloodType: values.bloodType,
-        age: Number(values.age),
-        birthDate: values.birthDate?.toDate(),
-        favoriteColor: values.favoriteColor,
-        favoriteFoods: values.favoriteFoods
-          ?.split(",")
-          .map((item) => item.trim())
-          .filter(Boolean),
-        dislikedFoods: values.dislikedFoods
-          ?.split(",")
-          .map((item) => item.trim())
-          .filter(Boolean),
-        hobbies: values.hobbies
-          ?.split(",")
-          .map((item) => item.trim())
-          .filter(Boolean),
-        motto: values.motto,
-        personalTraits: values.personalTraits
-          ?.split(",")
-          .map((item) => item.trim())
-          .filter(Boolean),
-      };
+        // Validate required fields
+        const missingFields = Object.entries(basicInfo)
+          .filter(([key, value]) => !value || (Array.isArray(value) && value.length === 0))
+          .map(([key]) => key);
 
-      // Validate required fields
-      const missingFields = Object.entries(basicInfo)
-        .filter(
-          ([key, value]) =>
-            !value || (Array.isArray(value) && value.length === 0)
-        )
-        .map(([key]) => key);
-
-      if (missingFields.length > 0) {
-        message.error(`กรุณากรอกข้อมูลให้ครบถ้วน: ${missingFields.join(", ")}`);
-        return;
-      }
-
-      // Save basicInfo to state
-      setFormData((prev) => ({
-        ...prev,
-        basicInfo,
-      }));
-
-      // Save to backend
-      const response = await axios.post(
-        "https://brain-training-server-production.up.railway.app/api/user-info/save-basic-info",
-        {
-          nationalId: user.nationalId,
-          basicInfo,
+        if (missingFields.length > 0) {
+          message.error(`กรุณากรอกข้อมูลให้ครบถ้วน: ${missingFields.join(", ")}`);
+          return;
         }
-      );
 
-      if (response.data.success) {
-        message.success("บันทึกข้อมูลพื้นฐานสำเร็จ");
-        setCurrentStep(currentStep + 1);
-      } else {
-        throw new Error(
-          response.data.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล"
+        // Save basicInfo to state
+        setFormData((prev) => ({
+          ...prev,
+          basicInfo,
+        }));
+
+        // Save to backend
+        const response = await axios.post(
+          "https://brain-training-server-production.up.railway.app/api/user-info/save-basic-info",
+          {
+            nationalId: user.nationalId,
+            basicInfo,
+          }
         );
+
+        if (response.data.success) {
+          message.success("บันทึกข้อมูลพื้นฐานสำเร็จ");
+          setCurrentStep(currentStep + 1);
+        } else {
+          throw new Error(response.data.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+        }
+      } else {
+        setCurrentStep(currentStep + 1);
       }
     } catch (error) {
       console.error("Error:", error);
-      message.error(
-        error.response?.data?.message || "กรุณากรอกข้อมูลให้ครบถ้วน"
-      );
+      message.error(error.response?.data?.message || "กรุณากรอกข้อมูลให้ครบถ้วน");
     }
   };
 
@@ -599,64 +635,150 @@ export default function ActivityOneForm() {
     setCurrentStep(currentStep - 1);
   };
 
-// Final submit
-const onFinish = async (values) => {
-  setLoading(true);
-  try {
-    // Validate deep questions
-    const deepQuestions = {
-      happiness: values.happiness,
-      longTermGoals: values.longTermGoals,
-      proudestMoment: values.proudestMoment,
-      biggestFear: values.biggestFear,
-      strengthsWeaknesses: values.strengthsWeaknesses,
-      desiredChanges: values.desiredChanges,
-    };
+  // Final submit
+  const onFinish = async (values) => {
+    setLoading(true);
+    try {
+      // Validate deep questions
+      const deepQuestions = {
+        happiness: values.happiness,
+        longTermGoals: values.longTermGoals,
+        proudestMoment: values.proudestMoment,
+        biggestFear: values.biggestFear,
+        strengthsWeaknesses: values.strengthsWeaknesses,
+        desiredChanges: values.desiredChanges,
+      };
 
-    // Check required fields
-    const missingFields = Object.entries(deepQuestions)
-      .filter(([key, value]) => !value)
-      .map(([key]) => key);
-
-    if (missingFields.length > 0) {
-      setLoading(false);
-      return;
-    }
-
-    const { basicInfo } = formData;
-    if (!basicInfo || Object.keys(basicInfo).length === 0) {
-      message.error("ไม่พบข้อมูลพื้นฐาน กรุณากรอกข้อมูลพื้นฐานก่อน");
-      setLoading(false);
-      return;
-    }
-
-    // Save complete data
-    const response = await axios.post(
-      "https://brain-training-server-production.up.railway.app/api/user-info/save-info",
-      {
-        nationalId: user.nationalId,
-        basicInfo,
-        deepQuestions,
+      const { basicInfo } = formData;
+      if (!basicInfo || Object.keys(basicInfo).length === 0) {
+        message.error("ไม่พบข้อมูลพื้นฐาน กรุณากรอกข้อมูลพื้นฐานก่อน");
+        setLoading(false);
+        return;
       }
-    );
 
-    if (response.data.success) {
-      message.success("บันทึกข้อมูลทั้งหมดสำเร็จ");
-      setInitialData(response.data.user);
-      // Changed redirect URL
-      navigate('/activity-1/mindmap');
-    } else {
-      throw new Error(
-        response.data.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล"
+      // Save complete data
+      const response = await axios.post(
+        "https://brain-training-server-production.up.railway.app/api/user-info/save-info",
+        {
+          nationalId: user.nationalId,
+          basicInfo,
+          deepQuestions,
+        }
       );
+
+      if (response.data.success) {
+        message.success("บันทึกข้อมูลทั้งหมดสำเร็จ");
+        setInitialData(response.data.user);
+        setFormData(prev => ({
+          ...prev,
+          deepQuestions
+        }));
+        setCurrentStep(currentStep + 1);
+      } else {
+        throw new Error(response.data.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+      }
+    } catch (error) {
+      console.error("Save error:", error);
+      message.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง");
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Save error:", error);
-    message.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
+
+  const SummarySection = () => {
+    const { basicInfo, deepQuestions } = formData;
+    
+    return (
+      <FormSection>
+        <SummaryStyles>
+        <StyledAlert>
+          <InfoCircleOutlined className="alert-icon" />
+          <div className="alert-content">
+            <div className="alert-title">สรุปข้อมูลของคุณ</div>
+            <div className="alert-description">
+              นี่คือข้อมูลทั้งหมดที่คุณได้กรอก กรุณาตรวจสอบความถูกต้อง
+            </div>
+          </div>
+        </StyledAlert>
+
+        <FormGroup>
+          <div className="group-title">ข้อมูลทั่วไป</div>
+          <div className="summary-grid">
+            <SummaryItem label="ชื่อ/นามแฟง" value={basicInfo?.fullName} />
+            <SummaryItem label="เหตุผลของนามแฟง" value={basicInfo?.nickname} />
+            <SummaryItem label="กรุ๊ปเลือด" value={basicInfo?.bloodType} />
+            <SummaryItem label="อายุ" value={`${basicInfo?.age} ปี`} />
+            <SummaryItem 
+              label="วันเกิด" 
+              value={dayjs(basicInfo?.birthDate).format('DD/MM/YYYY')} 
+            />
+          </div>
+        </FormGroup>
+
+        <FormGroup>
+          <div className="group-title">ความชอบและบุคลิกภาพ</div>
+          <div className="summary-grid">
+            <SummaryItem label="สีที่ชอบ" value={basicInfo?.favoriteColor} />
+            <SummaryItem 
+              label="อาหารที่ชอบ" 
+              value={basicInfo?.favoriteFoods?.join(", ")} 
+            />
+            <SummaryItem 
+              label="อาหารที่ไม่ชอบ" 
+              value={basicInfo?.dislikedFoods?.join(", ")} 
+            />
+            <SummaryItem 
+              label="งานอดิเรก" 
+              value={basicInfo?.hobbies?.join(", ")} 
+            />
+            <SummaryItem label="คติประจำใจ" value={basicInfo?.motto} />
+            <SummaryItem 
+              label="นิสัยส่วนตัว" 
+              value={basicInfo?.personalTraits?.join(", ")} 
+            />
+          </div>
+        </FormGroup>
+
+        <FormGroup>
+          <div className="group-title">การพัฒนาตนเอง</div>
+          <div className="summary-grid">
+            <SummaryItem 
+              label="สิ่งที่ทำให้มีความสุขที่สุด" 
+              value={deepQuestions?.happiness} 
+            />
+            <SummaryItem 
+              label="ความฝันหรือเป้าหมายระยะยาว" 
+              value={deepQuestions?.longTermGoals} 
+            />
+            <SummaryItem 
+              label="ความภูมิใจที่สุดในชีวิต" 
+              value={deepQuestions?.proudestMoment} 
+            />
+            <SummaryItem 
+              label="ความกลัวหรือความกังวล" 
+              value={deepQuestions?.biggestFear} 
+            />
+            <SummaryItem 
+              label="จุดแข็ง" 
+              value={deepQuestions?.strengthsWeaknesses} 
+            />
+            <SummaryItem 
+              label="จุดอ่อน" 
+              value={deepQuestions?.desiredChanges} 
+            />
+          </div>
+        </FormGroup>
+      </SummaryStyles>
+      </FormSection>
+    );
+  };
+
+  const SummaryItem = ({ label, value }) => (
+    <div className="summary-item">
+      <div className="summary-label">{label}</div>
+      <div className="summary-value">{value}</div>
+    </div>
+  );
 
   // Form steps configuration
   const steps = [
@@ -681,9 +803,7 @@ const onFinish = async (values) => {
               </div>
               <div className="instruction-item">
                 <CheckCircleOutlined />
-                <span>
-                  ไม่มีคำตอบที่ถูกหรือผิด เป้าหมายคือการทำความเข้าใจตนเอง
-                </span>
+                <span>ไม่มีคำตอบที่ถูกหรือผิด เป้าหมายคือการทำความเข้าใจตนเอง</span>
               </div>
             </div>
           </InstructionCard>
@@ -693,8 +813,7 @@ const onFinish = async (values) => {
             <div className="alert-content">
               <div className="alert-title">ข้อมูลส่วนบุคคล</div>
               <div className="alert-description">
-                กรุณากรอกข้อมูลพื้นฐานของคุณ
-                ข้อมูลเหล่านี้จะช่วยให้เราเข้าใจตัวตนของคุณมากขึ้น
+                กรุณากรอกข้อมูลพื้นฐานของคุณ ข้อมูลเหล่านี้จะช่วยให้เราเข้าใจตัวตนของคุณมากขึ้น
               </div>
             </div>
           </StyledAlert>
@@ -707,10 +826,7 @@ const onFinish = async (values) => {
                 label="ชื่อ/นามแฟง ที่บ่งบอกความเป็นตัวตนของคุณ"
                 rules={[{ required: true, message: "กรุณากรอกชื่อ/นามแฟง ที่บ่งบอกความเป็นตัวตนของคุณ" }]}
               >
-                <Input
-                  prefix={<UserOutlined />}
-                  placeholder="ชื่อ/นามแฟง ที่บ่งบอกความเป็นตัวตนของคุณ"
-                />
+                <Input prefix={<UserOutlined />} placeholder="ชื่อ/นามแฟง ที่บ่งบอกความเป็นตัวตนของคุณ" />
               </Form.Item>
 
               <Space wrap>
@@ -718,211 +834,211 @@ const onFinish = async (values) => {
                   name="nickname"
                   label="เหตุผลของนามแฟง"
                   rules={[{ required: true, message: "กรุณากรอกเหตุผลของนามแฟง" }]}
-                >
-                  <Input placeholder="เหตุผลของนามแฟง" />
-                </Form.Item>
-
-                <Form.Item
-                  name="bloodType"
-                  label="กรุ๊ปเลือด"
-                  rules={[{ required: true, message: "กรุณาเลือกกรุ๊ปเลือด" }]}
-                >
-                  <Select style={{ width: 120 }} placeholder="กรุ๊ปเลือด">
-                    {bloodTypes.map((type) => (
-                      <Select.Option key={type} value={type}>
-                        {type}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-
-                <Form.Item
-                  name="age"
-                  label="อายุ (ปี)"
-                  rules={[{ required: true, message: "กรุณากรอกอายุ" }]}
-                >
-                  <Input
-                    type="number"
-                    style={{ width: 100 }}
-                    placeholder="อายุ"
-                  />
-                </Form.Item>
-              </Space>
+              >
+                <Input placeholder="เหตุผลของนามแฟง" />
+              </Form.Item>
 
               <Form.Item
-                name="birthDate"
-                label="วันเกิด"
-                rules={[{ required: true, message: "กรุณาเลือกวันเกิด" }]}
+                name="bloodType"
+                label="กรุ๊ปเลือด"
+                rules={[{ required: true, message: "กรุณาเลือกกรุ๊ปเลือด" }]}
               >
-                <DatePicker
-                  locale={locale}
-                  format="DD/MM/YYYY"
-                  style={{ width: "100%" }}
-                  placeholder="เลือกวันเกิด"
-                />
+                <Select style={{ width: 120 }} placeholder="กรุ๊ปเลือด">
+                  {bloodTypes.map((type) => (
+                    <Select.Option key={type} value={type}>
+                      {type}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+
+              <Form.Item
+                name="age"
+                label="อายุ (ปี)"
+                rules={[{ required: true, message: "กรุณากรอกอายุ" }]}
+              >
+                <Input type="number" style={{ width: 100 }} placeholder="อายุ" />
               </Form.Item>
             </Space>
-          </FormGroup>
 
-          <FormGroup>
-            <div className="group-title">ข้อมูลความชอบและบุคลิกภาพ</div>
-            <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-              <Form.Item
-                name="favoriteColor"
-                label="สีที่ชอบ"
-                rules={[{ required: true, message: "กรุณาระบุสีที่ชอบ" }]}
-              >
-                <TextArea placeholder="สีที่คุณชอบ" autoSize={{ minRows: 2 }} />
-              </Form.Item>
+            <Form.Item
+              name="birthDate"
+              label="วันเกิด"
+              rules={[{ required: true, message: "กรุณาเลือกวันเกิด" }]}
+            >
+              <DatePicker
+                locale={locale}
+                format="DD/MM/YYYY"
+                style={{ width: "100%" }}
+                placeholder="เลือกวันเกิด"
+              />
+            </Form.Item>
+          </Space>
+        </FormGroup>
 
-              <Form.Item
-                name="favoriteFoods"
-                label="อาหารที่ชอบ"
-                rules={[{ required: true, message: "กรุณาระบุอาหารที่ชอบ" }]}
-              >
-                <TextArea
-                  placeholder="กรอกอาหารที่ชอบ (คั่นด้วยเครื่องหมายจุลภาค ,)"
-                  autoSize={{ minRows: 2 }}
-                />
-              </Form.Item>
+        <FormGroup>
+          <div className="group-title">ข้อมูลความชอบและบุคลิกภาพ</div>
+          <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+            <Form.Item
+              name="favoriteColor"
+              label="สีที่ชอบ"
+              rules={[{ required: true, message: "กรุณาระบุสีที่ชอบ" }]}
+            >
+              <TextArea placeholder="สีที่คุณชอบ" autoSize={{ minRows: 2 }} />
+            </Form.Item>
 
-              <Form.Item
-                name="dislikedFoods"
-                label="อาหารที่ไม่ชอบ"
-                rules={[{ required: true, message: "กรุณาระบุอาหารที่ไม่ชอบ" }]}
-              >
-                <TextArea
-                  placeholder="กรอกอาหารที่ไม่ชอบ (คั่นด้วยเครื่องหมายจุลภาค ,)"
-                  autoSize={{ minRows: 2 }}
-                />
-              </Form.Item>
+            <Form.Item
+              name="favoriteFoods"
+              label="อาหารที่ชอบ"
+              rules={[{ required: true, message: "กรุณาระบุอาหารที่ชอบ" }]}
+            >
+              <TextArea
+                placeholder="กรอกอาหารที่ชอบ (คั่นด้วยเครื่องหมายจุลภาค ,)"
+                autoSize={{ minRows: 2 }}
+              />
+            </Form.Item>
 
-              <Form.Item
-                name="hobbies"
-                label="งานอดิเรก"
-                rules={[{ required: true, message: "กรุณาระบุงานอดิเรก" }]}
-              >
-                <TextArea
-                  placeholder="กรอกงานอดิเรกของคุณ (คั่นด้วยเครื่องหมายจุลภาค ,)"
-                  autoSize={{ minRows: 2 }}
-                />
-              </Form.Item>
+            <Form.Item
+              name="dislikedFoods"
+              label="อาหารที่ไม่ชอบ"
+              rules={[{ required: true, message: "กรุณาระบุอาหารที่ไม่ชอบ" }]}
+            >
+              <TextArea
+                placeholder="กรอกอาหารที่ไม่ชอบ (คั่นด้วยเครื่องหมายจุลภาค ,)"
+                autoSize={{ minRows: 2 }}
+              />
+            </Form.Item>
 
-              <Form.Item
-                name="motto"
-                label="คติประจำใจ"
-                rules={[{ required: true, message: "กรุณาระบุคติประจำใจ" }]}
-              >
-                <TextArea
-                  placeholder="คติประจำใจของคุณ"
-                  autoSize={{ minRows: 2 }}
-                />
-              </Form.Item>
+            <Form.Item
+              name="hobbies"
+              label="งานอดิเรก"
+              rules={[{ required: true, message: "กรุณาระบุงานอดิเรก" }]}
+            >
+              <TextArea
+                placeholder="กรอกงานอดิเรกของคุณ (คั่นด้วยเครื่องหมายจุลภาค ,)"
+                autoSize={{ minRows: 2 }}
+              />
+            </Form.Item>
 
-              <Form.Item
-                name="personalTraits"
-                label="นิสัยส่วนตัว"
-                rules={[{ required: true, message: "กรุณาระบุนิสัยส่วนตัว" }]}
-              >
-                <TextArea
-                  placeholder="กรอกนิสัยส่วนตัวของคุณ (คั่นด้วยเครื่องหมายจุลภาค ,)"
-                  autoSize={{ minRows: 2 }}
-                />
-              </Form.Item>
-            </Space>
-          </FormGroup>
-        </FormSection>
-      ),
-    },
-    {
-      title: "คำถามเชิงลึก",
-      icon: <BookOutlined style={{ color: COLORS.primary }} />,
-      content: (
-        <FormSection>
-          <StyledAlert>
-            <InfoCircleOutlined className="alert-icon" />
-            <div className="alert-content">
-              <div className="alert-title">คำถามเพื่อการพัฒนาตนเอง</div>
-              <div className="alert-description">
-                กรุณาตอบคำถามต่อไปนี้อย่างจริงใจ
-                เพื่อช่วยให้คุณเข้าใจตนเองมากขึ้น
-              </div>
+            <Form.Item
+              name="motto"
+              label="คติประจำใจ"
+              rules={[{ required: true, message: "กรุณาระบุคติประจำใจ" }]}
+            >
+              <TextArea
+                placeholder="คติประจำใจของคุณ"
+                autoSize={{ minRows: 2 }}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="personalTraits"
+              label="นิสัยส่วนตัว"
+              rules={[{ required: true, message: "กรุณาระบุนิสัยส่วนตัว" }]}
+            >
+              <TextArea
+                placeholder="กรอกนิสัยส่วนตัวของคุณ (คั่นด้วยเครื่องหมายจุลภาค ,)"
+                autoSize={{ minRows: 2 }}
+              />
+            </Form.Item>
+          </Space>
+        </FormGroup>
+      </FormSection>
+    ),
+  },
+  {
+    title: "คำถามเชิงลึก",
+    icon: <BookOutlined style={{ color: COLORS.primary }} />,
+    content: (
+      <FormSection>
+        <StyledAlert>
+          <InfoCircleOutlined className="alert-icon" />
+          <div className="alert-content">
+            <div className="alert-title">คำถามเพื่อการพัฒนาตนเอง</div>
+            <div className="alert-description">
+              กรุณาตอบคำถามต่อไปนี้อย่างจริงใจ เพื่อช่วยให้คุณเข้าใจตนเองมากขึ้น
             </div>
-          </StyledAlert>
+          </div>
+        </StyledAlert>
 
-          <FormGroup>
-            <Space direction="vertical" size="large" style={{ width: "100%" }}>
-              <Form.Item
-                name="happiness"
-                label="อะไรคือสิ่งที่ทำให้คุณมีความสุขที่สุด"
-                rules={[{ required: true, message: "กรุณาตอบคำถามนี้" }]}
-              >
-                <TextArea
-                  placeholder="บอกเล่าถึงสิ่งที่ทำให้คุณมีความสุขที่สุด"
-                  autoSize={{ minRows: 3 }}
-                />
-              </Form.Item>
+        <FormGroup>
+          <Space direction="vertical" size="large" style={{ width: "100%" }}>
+            <Form.Item
+              name="happiness"
+              label="อะไรคือสิ่งที่ทำให้คุณมีความสุขที่สุด"
+              rules={[{ required: true, message: "กรุณาตอบคำถามนี้" }]}
+            >
+              <TextArea
+                placeholder="บอกเล่าถึงสิ่งที่ทำให้คุณมีความสุขที่สุด"
+                autoSize={{ minRows: 3 }}
+              />
+            </Form.Item>
 
-              <Form.Item
-                name="longTermGoals"
-                label="อะไรคือความฝันหรือเป้าหมายระยะยาวของคุณ"
-                rules={[{ required: true, message: "กรุณาตอบคำถามนี้" }]}
-              >
-                <TextArea
-                  placeholder="เล่าถึงความฝันหรือเป้าหมายระยะยาวของคุณ"
-                  autoSize={{ minRows: 3 }}
-                />
-              </Form.Item>
+            <Form.Item
+              name="longTermGoals"
+              label="อะไรคือความฝันหรือเป้าหมายระยะยาวของคุณ"
+              rules={[{ required: true, message: "กรุณาตอบคำถามนี้" }]}
+            >
+              <TextArea
+                placeholder="เล่าถึงความฝันหรือเป้าหมายระยะยาวของคุณ"
+                autoSize={{ minRows: 3 }}
+              />
+            </Form.Item>
 
-              <Form.Item
-                name="proudestMoment"
-                label="คุณรู้สึกภูมิใจกับอะไรมากที่สุดในชีวิต"
-                rules={[{ required: true, message: "กรุณาตอบคำถามนี้" }]}
-              >
-                <TextArea
-                  placeholder="เล่าถึงความภาคภูมิใจของคุณ"
-                  autoSize={{ minRows: 3 }}
-                />
-              </Form.Item>
+            <Form.Item
+              name="proudestMoment"
+              label="คุณรู้สึกภูมิใจกับอะไรมากที่สุดในชีวิต"
+              rules={[{ required: true, message: "กรุณาตอบคำถามนี้" }]}
+            >
+              <TextArea
+                placeholder="เล่าถึงความภาคภูมิใจของคุณ"
+                autoSize={{ minRows: 3 }}
+              />
+            </Form.Item>
 
-              <Form.Item
-                name="biggestFear"
-                label="อะไรคือความกลัวหรือความกังวลที่ใหญ่ที่สุดของคุณ"
-                rules={[{ required: true, message: "กรุณาตอบคำถามนี้" }]}
-              >
-                <TextArea
-                  placeholder="เล่าถึงความกลัวหรือความกังวลของคุณ"
-                  autoSize={{ minRows: 3 }}
-                />
-              </Form.Item>
+            <Form.Item
+              name="biggestFear"
+              label="อะไรคือความกลัวหรือความกังวลที่ใหญ่ที่สุดของคุณ"
+              rules={[{ required: true, message: "กรุณาตอบคำถามนี้" }]}
+            >
+              <TextArea
+                placeholder="เล่าถึงความกลัวหรือความกังวลของคุณ"
+                autoSize={{ minRows: 3 }}
+              />
+            </Form.Item>
 
-              <Form.Item
-                name="strengthsWeaknesses"
-                label="อะไรคือจุดแข็งของคุณ"
-                rules={[{ required: true, message: "กรุณาตอบคำถามนี้" }]}
-              >
-                <TextArea
-                  placeholder="อธิบายถึงจุดแข็งของคุณ"
-                  autoSize={{ minRows: 3 }}
-                />
-              </Form.Item>
+            <Form.Item
+              name="strengthsWeaknesses"
+              label="อะไรคือจุดแข็งของคุณ"
+              rules={[{ required: true, message: "กรุณาตอบคำถามนี้" }]}
+            >
+              <TextArea
+                placeholder="อธิบายถึงจุดแข็งของคุณ"
+                autoSize={{ minRows: 3 }}
+              />
+            </Form.Item>
 
-              <Form.Item
-                name="desiredChanges"
-                label="อะไรคือจุดอ่อนของคุณ"
-                rules={[{ required: true, message: "กรุณาตอบคำถามนี้" }]}
-              >
-                <TextArea
-                  placeholder="อธิบายถึงจุดอ่อนของคุณ"
-                  autoSize={{ minRows: 3 }}
-                />
-              </Form.Item>
-            </Space>
-          </FormGroup>
-        </FormSection>
-      ),
-    },
-  ];
+            <Form.Item
+              name="desiredChanges"
+              label="อะไรคือจุดอ่อนของคุณ"
+              rules={[{ required: true, message: "กรุณาตอบคำถามนี้" }]}
+            >
+              <TextArea
+                placeholder="อธิบายถึงจุดอ่อนของคุณ"
+                autoSize={{ minRows: 3 }}
+              />
+            </Form.Item>
+          </Space>
+        </FormGroup>
+      </FormSection>
+    ),
+  },
+  {
+    title: "สรุปข้อมูล",
+    icon: <CheckCircleOutlined style={{ color: COLORS.primary }} />,
+    content: <SummarySection />,
+  },
+];
 
   return (
     <PageContainer>
@@ -934,7 +1050,6 @@ const onFinish = async (values) => {
           items={steps.map((item) => ({
             title: item.title,
             icon: item.icon,
-            description: item.description,
           }))}
         />
 
@@ -946,20 +1061,20 @@ const onFinish = async (values) => {
         >
           {steps[currentStep].content}
 
-          <Space
-            style={{ width: "100%", justifyContent: "center", marginTop: 32 }}
-          >
+          <Space style={{ width: "100%", justifyContent: "center", marginTop: 32 }}>
             {currentStep > 0 && (
               <ActionButton variant="ghost" onClick={prev}>
                 ย้อนกลับ
               </ActionButton>
             )}
-            {currentStep < steps.length - 1 && (
-              <ActionButton variant="primary" onClick={next}>
+            {currentStep === steps.length - 1 ? (
+              <ActionButton
+                variant="primary"
+                onClick={() => navigate('/activity-1/mindmap')}
+              >
                 ถัดไป
               </ActionButton>
-            )}
-            {currentStep === steps.length - 1 && (
+            ) : currentStep === 1 ? (
               <ActionButton
                 variant="primary"
                 onClick={form.submit}
@@ -967,6 +1082,10 @@ const onFinish = async (values) => {
               >
                 {loading ? <LoadingOutlined /> : <SaveOutlined />}
                 บันทึกข้อมูล
+              </ActionButton>
+            ) : (
+              <ActionButton variant="primary" onClick={next}>
+                ถัดไป
               </ActionButton>
             )}
           </Space>
