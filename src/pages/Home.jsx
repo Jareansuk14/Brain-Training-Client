@@ -4,6 +4,7 @@ import styled from "@emotion/styled";
 import Header from "../components/Header";
 import Instructions from "../components/Instructions";
 import ActivityCard from "../components/ActivityCard";
+import GameFAB from '../components/GameFAB';
 
 const { Content } = Layout;
 
@@ -158,6 +159,7 @@ export default function Home() {
           </Col>
         </Row>
       </StyledContent>
+      <GameFAB />
     </StyledLayout>
   );
 }

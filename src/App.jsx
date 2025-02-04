@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import styled from "@emotion/styled";
 import Login from "./components/Login";
 import Home from "./pages/Home";
+import Game from "./pages/Game";
 import MindMapEditor from "./pages/MindMapEditor";
 import ActivityOneForm from "./components/ActivityOneForm";
 import ActivityTwo from "./pages/ActivityTwo";
@@ -260,6 +261,17 @@ function App() {
               <ProtectedRoute>
                 <AppLayout>
                   <Home />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/game"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Game />
                 </AppLayout>
               </ProtectedRoute>
             }
