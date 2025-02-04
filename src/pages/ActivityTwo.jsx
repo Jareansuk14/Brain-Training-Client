@@ -525,6 +525,9 @@ export default function ActivityTwo() {
     }
     setIsReleasing(true);
     const thoughtsToRelease = thoughts.length;
+    // เพิ่มจำนวนความคิดที่ปล่อยไปในครั้งนี้
+    setTotalReleasedThoughts(prev => prev + thoughtsToRelease);
+    
     const releaseSingleThought = (index) => {
       if (index >= thoughts.length) {
         setTimeout(() => {
