@@ -509,7 +509,7 @@ export default function ActivityEight() {
       };
 
       const response = await axios.post(
-        "https://brain-training-server-production.up.railway.app//api/activity-eight/save",
+        "https://brain-training-server-production.up.railway.app/api/activity-eight/save",
         data
       );
 
