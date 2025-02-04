@@ -683,7 +683,9 @@ export default function ActivityFour() {
               </div>
 
               <StyledCollapse
-                items={allEntries.map((entry, index) => ({
+                items={[...allEntries]
+                  .reverse()
+                  .map((entry, index) => ({
                   key: index,
                   label: (
                     <div
