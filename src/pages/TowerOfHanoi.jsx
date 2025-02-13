@@ -804,7 +804,7 @@ const TowerOfHanoi = () => {
               padding: "0 20px",
             }}
           >
-            Tower of Hanoi - ระดับ {selectedLevel}
+            เกมกล่องหรรษา - ระดับ {selectedLevel}
           </Title>
 
           {showInstructions && <GameInstructions />}
