@@ -220,7 +220,7 @@ export default function Auth() {
   const checkExistingUser = async (nationalId) => {
     try {
       const response = await axios.get(
-        `https://brain-training-server-production.up.railway.app/api/auth/user-info/${nationalId}`
+        `https://brain-training-server.onrender.com/api/auth/user-info/${nationalId}`
       );
       return response.data;
     } catch (error) {
@@ -243,7 +243,7 @@ export default function Auth() {
             return;
         }
 
-        const response = await axios.post('https://brain-training-server-production.up.railway.app/api/auth/login', values);
+        const response = await axios.post('https://brain-training-server.onrender.com/api/auth/login', values);
         
         if (response.data.success) {
             login(values.nationalId);
@@ -270,7 +270,7 @@ export default function Auth() {
             return;
         }
 
-        const response = await axios.post('https://brain-training-server-production.up.railway.app/api/auth/register', values);
+        const response = await axios.post('https://brain-training-server.onrender.com/api/auth/register', values);
         
         if (response.data.success) {
             message.success('ลงทะเบียนสำเร็จ');
@@ -299,7 +299,7 @@ export default function Auth() {
                 return;
             }
 
-            const response = await axios.get(`https://brain-training-server-production.up.railway.app/api/auth/check/${value}`);
+            const response = await axios.get(`https://brain-training-server.onrender.com/api/auth/check/${value}`);
             if (activeTab === 'register' && response.data.exists) {
                 setError('หมายเลขผู้ใช้นี้มีในระบบแล้ว');
             } else if (activeTab === 'login' && !response.data.exists) {
