@@ -378,7 +378,7 @@ export default function ActivityFour() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://brain-training-server-production.up.railway.app/api/emotion/${user.nationalId}`
+          `https://brain-training-server.onrender.com/api/emotion/${user.nationalId}`
         );
 
         if (response.data.entries?.length > 0) {
@@ -403,7 +403,7 @@ export default function ActivityFour() {
       try {
         const questionPromises = selectedEmotions.map((emotion) =>
           axios.get(
-            `https://brain-training-server-production.up.railway.app/api/emotion/questions/${emotion}`
+            `https://brain-training-server.onrender.com/api/emotion/questions/${emotion}`
           )
         );
         const responses = await Promise.all(questionPromises);
@@ -471,7 +471,7 @@ export default function ActivityFour() {
       };
 
       const response = await axios.post(
-        "https://brain-training-server-production.up.railway.app/api/emotion/entry",
+        "https://brain-training-server.onrender.com/api/emotion/entry",
         {
           nationalId: user.nationalId,
           entryData,
@@ -482,7 +482,7 @@ export default function ActivityFour() {
         message.success("บันทึกข้อมูลเรียบร้อย");
         // อัพเดทข้อมูลทั้งหมดในหน้าสรุป
         const updatedData = await axios.get(
-          `https://brain-training-server-production.up.railway.app/api/emotion/${user.nationalId}`
+          `https://brain-training-server.onrender.com/api/emotion/${user.nationalId}`
         );
         setAllEntries(updatedData.data.entries);
         setCurrentStep(4);

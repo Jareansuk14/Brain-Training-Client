@@ -539,7 +539,7 @@ const TowerOfHanoi = () => {
 
       try {
         const response = await axios.get(
-          `https://brain-training-server-production.up.railway.app/api/tower-of-hanoi/${user.nationalId}/level/${selectedLevel}`
+          `https://brain-training-server.onrender.com/api/tower-of-hanoi/${user.nationalId}/level/${selectedLevel}`
         );
 
         if (response.data && !response.data.message) {
@@ -664,7 +664,7 @@ const TowerOfHanoi = () => {
         };
 
         const response = await axios.post(
-          "https://brain-training-server-production.up.railway.app/api/tower-of-hanoi/save-session",
+          "https://brain-training-server.onrender.com/api/tower-of-hanoi/save-session",
           {
             nationalId: user.nationalId,
             sessionData,

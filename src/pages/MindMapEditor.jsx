@@ -47,7 +47,7 @@ const BREAKPOINTS = {
 };
 
 // API Base URL
-const API_BASE_URL = 'https://brain-training-server-production.up.railway.app/api/mindmap';
+const API_BASE_URL = 'https://brain-training-server.onrender.com/api/mindmap';
 
 // Animations
 const fadeIn = keyframes({

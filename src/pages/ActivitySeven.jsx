@@ -458,7 +458,7 @@ export default function ActivitySeven() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://brain-training-server-production.up.railway.app/api/activity-seven/${user.nationalId}`
+          `https://brain-training-server.onrender.com/api/activity-seven/${user.nationalId}`
         );
 
         if (response.data?.categories) {
@@ -554,7 +554,7 @@ export default function ActivitySeven() {
       };
 
       const response = await axios.post(
-        "https://brain-training-server-production.up.railway.app/api/activity-seven/save",
+        "https://brain-training-server.onrender.com/api/activity-seven/save",
         data
       );
 

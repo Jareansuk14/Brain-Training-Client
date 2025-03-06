@@ -498,7 +498,7 @@ export default function ActivityThree() {
     const fetchHistory = async () => {
       try {
         const response = await axios.get(
-          `https://brain-training-server-production.up.railway.app/api/meditation/history/${user.nationalId}`
+          `https://brain-training-server.onrender.com/api/meditation/history/${user.nationalId}`
         );
         setMeditationHistory(response.data);
       } catch (error) {
@@ -594,7 +594,7 @@ export default function ActivityThree() {
     setLoading(true);
     try {
       const response = await axios.post(
-        "https://brain-training-server-production.up.railway.app/api/meditation/save-session",
+        "https://brain-training-server.onrender.com/api/meditation/save-session",
         {
           nationalId: user.nationalId,
           duration: selectedDuration,
