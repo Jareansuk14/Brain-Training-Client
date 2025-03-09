@@ -704,8 +704,8 @@ export default function ActivityOneForm() {
         <FormGroup>
           <div className="group-title">ข้อมูลทั่วไป</div>
           <div className="summary-grid">
-            <SummaryItem label="ชื่อ/นามแฟง" value={basicInfo?.fullName} />
-            <SummaryItem label="เหตุผลของนามแฟง" value={basicInfo?.nickname} />
+            <SummaryItem label="ชื่อ/นามแฝง" value={basicInfo?.fullName} />
+            <SummaryItem label="เหตุผลของนามแฝง" value={basicInfo?.nickname} />
             <SummaryItem label="กรุ๊ปเลือด" value={basicInfo?.bloodType} />
             <SummaryItem label="อายุ" value={`${basicInfo?.age} ปี`} />
             <SummaryItem 
@@ -823,19 +823,19 @@ export default function ActivityOneForm() {
             <Space direction="vertical" size="middle" style={{ width: "100%" }}>
               <Form.Item
                 name="fullName"
-                label="ชื่อ/นามแฟง ที่บ่งบอกความเป็นตัวตนของคุณ"
-                rules={[{ required: true, message: "กรุณากรอกชื่อ/นามแฟง ที่บ่งบอกความเป็นตัวตนของคุณ" }]}
+                label="ชื่อ/นามแฝง ที่บ่งบอกความเป็นตัวตนของคุณ"
+                rules={[{ required: true, message: "กรุณากรอกชื่อ/นามแฝง ที่บ่งบอกความเป็นตัวตนของคุณ" }]}
               >
-                <Input prefix={<UserOutlined />} placeholder="ชื่อ/นามแฟง ที่บ่งบอกความเป็นตัวตนของคุณ" />
+                <Input prefix={<UserOutlined />} placeholder="ชื่อ/นามแฝง ที่บ่งบอกความเป็นตัวตนของคุณ" />
               </Form.Item>
 
               <Space wrap>
                 <Form.Item
                   name="nickname"
-                  label="เหตุผลของนามแฟง"
-                  rules={[{ required: true, message: "กรุณากรอกเหตุผลของนามแฟง" }]}
+                  label="เหตุผลของนามแฝง"
+                  rules={[{ required: true, message: "กรุณากรอกเหตุผลของนามแฝง" }]}
               >
-                <Input placeholder="เหตุผลของนามแฟง" />
+                <Input placeholder="เหตุผลของนามแฝง" />
               </Form.Item>
 
               <Form.Item

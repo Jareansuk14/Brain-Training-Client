@@ -213,7 +213,7 @@ export default function Auth() {
 
   // Validate User Number
   const validateNationalId = (nationalId) => {
-    return /^\d{6}$/.test(nationalId);
+    return /^[A-Za-z0-9]{1,6}$/.test(nationalId);
   };
 
   // Check if user exists
@@ -234,55 +234,61 @@ export default function Auth() {
   // Handle login
   const handleLogin = async (values) => {
     setLoading(true);
-    setError('');
-    
-    try {
-        if (!validateNationalId(values.nationalId)) {
-            setError('หมายเลขผู้ใช้ไม่ถูกต้อง');
-            setLoading(false);
-            return;
-        }
+    setError("");
 
-        const response = await axios.post('https://brain-training-server.onrender.com/api/auth/login', values);
-        
-        if (response.data.success) {
-            login(values.nationalId);
-            message.success('เข้าสู่ระบบสำเร็จ');
-            navigate('/');
-        }
-    } catch (error) {
-        console.error('Login error:', error);
-        setError(error.response?.data?.error || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ');
-    } finally {
+    try {
+      if (!validateNationalId(values.nationalId)) {
+        setError("หมายเลขผู้ใช้ไม่ถูกต้อง");
         setLoading(false);
+        return;
+      }
+
+      const response = await axios.post(
+        "https://brain-training-server.onrender.com/api/auth/login",
+        values
+      );
+
+      if (response.data.success) {
+        login(values.nationalId);
+        message.success("เข้าสู่ระบบสำเร็จ");
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setError(error.response?.data?.error || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ");
+    } finally {
+      setLoading(false);
     }
   };
 
   // Handle registration
   const handleRegister = async (values) => {
     setLoading(true);
-    setError('');
-    
-    try {
-        if (!validateNationalId(values.nationalId)) {
-            setError('หมายเลขผู้ใช้ไม่ถูกต้อง');
-            setLoading(false);
-            return;
-        }
+    setError("");
 
-        const response = await axios.post('https://brain-training-server.onrender.com/api/auth/register', values);
-        
-        if (response.data.success) {
-            message.success('ลงทะเบียนสำเร็จ');
-            setActiveTab('login');
-            registerForm.resetFields();
-            message.info('กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ');
-        }
-    } catch (error) {
-        console.error('Register error:', error);
-        setError(error.response?.data?.error || 'เกิดข้อผิดพลาดในการลงทะเบียน');
-    } finally {
+    try {
+      if (!validateNationalId(values.nationalId)) {
+        setError("หมายเลขผู้ใช้ไม่ถูกต้อง");
         setLoading(false);
+        return;
+      }
+
+      const response = await axios.post(
+        "https://brain-training-server.onrender.com/api/auth/register",
+        values
+      );
+
+      if (response.data.success) {
+        message.success("ลงทะเบียนสำเร็จ");
+        setActiveTab("login");
+        registerForm.resetFields();
+        message.info("กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ");
+      }
+    } catch (error) {
+      console.error("Register error:", error);
+      setError(error.response?.data?.error || "เกิดข้อผิดพลาดในการลงทะเบียน");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -290,26 +296,28 @@ export default function Auth() {
   const handleNationalIdChange = async (e, form) => {
     const value = e.target.value;
     if (value.length === 6) {
-        setValidating(true);
-        setError('');
-        
-        try {
-            if (!validateNationalId(value)) {
-                setError('หมายเลขผู้ใช้ไม่ถูกต้อง');
-                return;
-            }
+      setValidating(true);
+      setError("");
 
-            const response = await axios.get(`https://brain-training-server.onrender.com/api/auth/check/${value}`);
-            if (activeTab === 'register' && response.data.exists) {
-                setError('หมายเลขผู้ใช้นี้มีในระบบแล้ว');
-            } else if (activeTab === 'login' && !response.data.exists) {
-                setError('ไม่พบข้อมูลผู้ใช้ในระบบ');
-            }
-        } catch (error) {
-            console.error('Validation error:', error);
-        } finally {
-            setValidating(false);
+      try {
+        if (!validateNationalId(value)) {
+          setError("หมายเลขผู้ใช้ไม่ถูกต้อง");
+          return;
         }
+
+        const response = await axios.get(
+          `https://brain-training-server.onrender.com/api/auth/check/${value}`
+        );
+        if (activeTab === "register" && response.data.exists) {
+          setError("หมายเลขผู้ใช้นี้มีในระบบแล้ว");
+        } else if (activeTab === "login" && !response.data.exists) {
+          setError("ไม่พบข้อมูลผู้ใช้ในระบบ");
+        }
+      } catch (error) {
+        console.error("Validation error:", error);
+      } finally {
+        setValidating(false);
+      }
     }
   };
 
@@ -351,8 +359,9 @@ export default function Auth() {
                   rules={[
                     { required: true, message: "กรุณากรอกหมายเลขผู้ใช้" },
                     {
-                      pattern: /^\d{6}$/,
-                      message: "กรุณากรอกหมายเลขผู้ใช้",
+                      pattern: /^[A-Za-z0-9]{1,6}$/,
+                      message:
+                        "กรุณากรอกตัวอักษรภาษาอังกฤษหรือตัวเลขไม่เกิน 6 ตัว",
                     },
                   ]}
                 >
@@ -402,8 +411,9 @@ export default function Auth() {
                   rules={[
                     { required: true, message: "กรุณากรอกหมายเลขผู้ใช้" },
                     {
-                      pattern: /^\d{6}$/,
-                      message: "กรุณากรอกหมายเลขผู้ใช้",
+                      pattern: /^[A-Za-z0-9]{1,6}$/,
+                      message:
+                        "กรุณากรอกตัวอักษรภาษาอังกฤษหรือตัวเลขไม่เกิน 6 ตัว",
                     },
                   ]}
                 >
