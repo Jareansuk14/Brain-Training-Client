@@ -213,7 +213,7 @@ export default function Auth() {
 
   // Validate User Number
   const validateNationalId = (nationalId) => {
-    return /^[A-Za-z0-9]{1,6}$/.test(nationalId);
+    return /^[A-Za-z0-9]{6}$/.test(nationalId);
   };
 
   // Check if user exists
@@ -359,9 +359,9 @@ export default function Auth() {
                   rules={[
                     { required: true, message: "กรุณากรอกหมายเลขผู้ใช้" },
                     {
-                      pattern: /^[A-Za-z0-9]{1,6}$/,
+                      pattern: /^[A-Za-z0-9]{6}$/,
                       message:
-                        "กรุณากรอกตัวอักษรภาษาอังกฤษหรือตัวเลขไม่เกิน 6 ตัว",
+                        "กรุณากรอกตัวอักษรภาษาอังกฤษหรือตัวเลขให้ครบ 6 ตัว",
                     },
                   ]}
                 >
@@ -411,9 +411,9 @@ export default function Auth() {
                   rules={[
                     { required: true, message: "กรุณากรอกหมายเลขผู้ใช้" },
                     {
-                      pattern: /^[A-Za-z0-9]{1,6}$/,
+                      pattern: /^[A-Za-z0-9]{6}$/,
                       message:
-                        "กรุณากรอกตัวอักษรภาษาอังกฤษหรือตัวเลขไม่เกิน 6 ตัว",
+                        "กรุณากรอกตัวอักษรภาษาอังกฤษหรือตัวเลขให้ครบ 6 ตัว",
                     },
                   ]}
                 >
