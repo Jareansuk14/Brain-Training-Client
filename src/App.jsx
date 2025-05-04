@@ -1,5 +1,5 @@
 // src/App.jsx
-import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from "react-router-dom";
 import { Layout, Menu, Button } from "antd";
 import {
   LogoutOutlined,
@@ -199,13 +199,32 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// Header Component with User Info
+// Header Component with User Info and Conditional Navigation
 const Header = () => {
   const { user, logout } = useAuth();
+  const location = useLocation(); // Import useLocation from react-router-dom
+  
+  // Define the game-related paths that should redirect to /game
+  const gameRelatedPaths = [
+    '/game', 
+    '/activity-9', 
+    '/activity-10', 
+    '/activity-11', 
+    '/activity-12', 
+    '/activity-13'
+  ];
+  
+  // Check if current path is in the game-related paths
+  const isGameRelated = gameRelatedPaths.some(path => 
+    location.pathname.startsWith(path)
+  );
+  
+  // Determine the logo link destination
+  const logoLinkDestination = isGameRelated ? "/game" : "/";
 
   return (
     <StyledHeader>
-      <Link to="/">
+      <Link to={logoLinkDestination}>
         <LogoContainer>
           <div className="logo-icon">
             <ExperimentOutlined />

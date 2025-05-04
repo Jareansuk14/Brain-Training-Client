@@ -835,7 +835,7 @@ const MindMapEditor = () => {
         </StyledCard>
         <div className="flex justify-center mt-8 mb-12">
           <ActionButton
-            onClick={() => navigate('/activity-9')}
+            onClick={() => navigate('/game')}
             className="primary"
             style={{
               fontSize: '1.1rem',
