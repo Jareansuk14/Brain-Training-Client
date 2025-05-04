@@ -959,7 +959,7 @@ export default function ActivityTwo() {
                     alignItems: "center",
                     gap: "8px",
                   }}
-                  onClick={() => navigate("/activity-9")}
+                  onClick={() => navigate("/game")}
                   icon={<CheckOutlined />}
                 >
                   จบกิจกรรม

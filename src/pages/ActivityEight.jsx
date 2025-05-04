@@ -560,7 +560,7 @@ export default function ActivityEight() {
     try {
       setLoading(true);
       message.success("จบกิจกรรมเรียบร้อย");
-      navigate("/activity-9");
+      navigate("/game");
     } catch (error) {
       console.error("Error finishing activity:", error);
       message.error("เกิดข้อผิดพลาดในการจบกิจกรรม");

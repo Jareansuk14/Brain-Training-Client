@@ -187,10 +187,23 @@ const StyledSteps = styled(Steps)`
   }
 `;
 
+// Value Creation Explanation Card Component
+const ValueCreationExplanation = styled(Card)`
+  background: linear-gradient(135deg, ${COLORS.background}, #f9f5ff);
+  border-radius: 16px;
+  border: 1px solid ${COLORS.secondary}30;
+  margin-bottom: 32px;
+  box-shadow: 0 6px 24px ${COLORS.shadow};
+  
+  .ant-card-body {
+    padding: 24px;
+  }
+`;
+
 // Steps Configuration
 const STEPS = [
   {
-    title: "ด้านครอบครัว",
+    title: "1. ด้านครอบครัว",
     category: "family",
     questions: [
       {
@@ -204,7 +217,7 @@ const STEPS = [
     ],
   },
   {
-    title: "ด้านการงาน",
+    title: "2. ด้านการงาน",
     category: "work",
     questions: [
       {
@@ -218,7 +231,7 @@ const STEPS = [
     ],
   },
   {
-    title: "ด้านสังคม",
+    title: "3. ด้านสังคม",
     category: "social",
     questions: [
       {
@@ -232,7 +245,7 @@ const STEPS = [
     ],
   },
   {
-    title: "ด้านการพักผ่อน",
+    title: "4. ด้านการพักผ่อน",
     category: "leisure",
     questions: [
       {
@@ -246,7 +259,7 @@ const STEPS = [
     ],
   },
   {
-    title: "ด้านสุขภาพ",
+    title: "5. ด้านสุขภาพ",
     category: "health",
     questions: [
       {
@@ -260,7 +273,7 @@ const STEPS = [
     ],
   },
   {
-    title: "ด้านจิตวิญญาณ",
+    title: "6. ด้านจิตวิญญาณ",
     category: "spiritual",
     questions: [
       {
@@ -483,7 +496,7 @@ export default function ActivityFive() {
     try {
       setLoading(true);
       message.success("จบกิจกรรมเรียบร้อย");
-      navigate("/activity-9");
+      navigate("/game");
     } catch (error) {
       console.error("Error finishing activity:", error);
       message.error("เกิดข้อผิดพลาดในการจบกิจกรรม");
@@ -515,8 +528,6 @@ export default function ActivityFive() {
   };
 
   // แสดงหน้าสรุป
-  // แก้ไขฟังก์ชัน renderSummary():
-
   const renderSummary = () => {
     return (
       <StyledCard
@@ -671,12 +682,32 @@ export default function ActivityFive() {
     );
   };
 
+  // คำอธิบายเกี่ยวกับการสร้างค่านิยม
+  const renderValueExplanation = () => {
+    return (
+      <ValueCreationExplanation>
+        <Title level={4} style={{ color: COLORS.primary, marginBottom: "16px" }}>
+          เกี่ยวกับการสร้างค่านิยม
+        </Title>
+        <Text style={{ fontSize: "16px", lineHeight: "1.6", display: "block", marginBottom: "16px" }}>
+          <strong>"การสร้างค่านิยม"</strong> หมายถึง การที่ระบุว่าอะไรคือสิ่งที่มีคุณค่าและความสำคัญสำหรับท่านมากที่สุด ในด้านต่างๆ พร้อมทั้งให้ความหมายที่ชัดเจน
+        </Text>
+        <Text style={{ fontSize: "16px", lineHeight: "1.6", display: "block" }}>
+          กรุณาตอบคำถามเพื่อสร้างการรับรู้เกี่ยวกับความสำคัญของการเสริมสร้างพลัง สร้างค่านิยม ที่ประกอบไปด้วย 6 ด้าน
+        </Text>
+      </ValueCreationExplanation>
+    );
+  };
+
   return (
     <PageContainer>
       <ContentContainer>
         <Title level={2} style={{ textAlign: "center", marginBottom: 32 }}>
-        Session 5 : เสริมสร้างพลัง สร้างค่านิยม
+          Session 5 : เสริมสร้างพลัง สร้างค่านิยม
         </Title>
+
+        {/* เพิ่มคำอธิบายเกี่ยวกับการสร้างค่านิยม */}
+        {renderValueExplanation()}
 
         <StyledSteps
           current={currentStep}
