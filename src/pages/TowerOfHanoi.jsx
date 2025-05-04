@@ -16,6 +16,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import confetti from "canvas-confetti";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext"; // สมมติว่ามี AuthContext
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 
 const { Title, Text } = Typography;
 
@@ -417,13 +418,14 @@ const GameSummary = ({ time, moves, comparison, previousResults }) => {
   );
 };
 
-// Game Controls Component
+// Updated Game Controls Component with Exit Activity button
 const GameControls = ({
   gameState,
   selectedLevel,
   setSelectedLevel,
   initializeGame,
   resetGame,
+  exitGame,
 }) => (
   <div
     style={{
@@ -477,6 +479,15 @@ const GameControls = ({
         >
           เล่นใหม่
         </Button>
+        <Button 
+          style={{
+            backgroundColor: "#f3f4f6",
+            borderColor: "#d1d5db",
+          }}
+          onClick={exitGame}
+        >
+          จบกิจกรรม
+        </Button>
       </>
     )}
   </div>
@@ -512,6 +523,7 @@ const formatTime = (seconds) => {
 // Main Component
 const TowerOfHanoi = () => {
   const { user } = useAuth();
+  const navigate = useNavigate(); // Initialize useNavigate
   const [gameState, setGameState] = useState("waiting");
   const [selectedLevel, setSelectedLevel] = useState(1);
   const [towers, setTowers] = useState([[], [], []]);
@@ -552,8 +564,8 @@ const TowerOfHanoi = () => {
 
         if (response.data && !response.data.message) {
           setPreviousResults({
-            lastTime: response.data.lastTime, // เพิ่ม lastTime
-            lastMoves: response.data.lastMoves, // เพิ่ม lastMoves
+            lastTime: response.data.lastTime,
+            lastMoves: response.data.lastMoves,
             bestTime: response.data.bestTime,
             bestMoves: response.data.bestMoves,
           });
@@ -620,7 +632,6 @@ const TowerOfHanoi = () => {
 
   // Initialize game board
   const initializeGame = (keepLevel = false) => {
-    // ลบบรรทัดนี้: if (!keepLevel) { setShowInstructions(false); }
     const numDiscs = LEVELS[selectedLevel];
     const initialTowers = [
       Array.from({ length: numDiscs }, (_, i) => numDiscs - i),
@@ -647,6 +658,12 @@ const TowerOfHanoi = () => {
   // Reset game
   const resetGame = () => {
     window.location.reload();
+  };
+  
+  // Exit game function
+  const exitGame = () => {
+    // Navigate to the game selection page
+    navigate("/game");
   };
 
   // Handle game win
@@ -855,6 +872,7 @@ const TowerOfHanoi = () => {
             setSelectedLevel={setSelectedLevel}
             initializeGame={initializeGame}
             resetGame={resetGame}
+            exitGame={exitGame}
           />
         </div>
       </div>

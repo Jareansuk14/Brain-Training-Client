@@ -1170,7 +1170,7 @@ export default function DigitSpan() {
           <EndGameButton onClick={() => window.location.reload()}>
             เริ่มทำแบบทดสอบใหม่
           </EndGameButton>
-          <GohomeButton onClick={() => navigate("/")}>กลับหน้าหลัก</GohomeButton>
+          <GohomeButton onClick={() => navigate("/activity-13")}>เกมถัดไป</GohomeButton>
         </Space>
       </StyledCard>
     );
