@@ -233,6 +233,12 @@ const EmotionsGrid = styled.div`
   padding: 16px;
 `;
 
+const CardTitle = styled.div`
+  white-space: normal;
+  word-break: break-word;
+  max-width: 100%;
+  display: block;
+`;
 const StyledSteps = styled(Steps)`
   display: flex;
   justify-content: center;
@@ -316,36 +322,36 @@ const StyledSteps = styled(Steps)`
 // Steps Configuration
 const STEPS = [
   {
-    title: "สถานการณ์",
+    title: "เหตุการณ์",
     questions: [
       {
         id: "forgetful_events",
-        text: "คุณมีเหตุการณ์อะไรที่ทำให้คุณลืมบ่อยๆ?",
+        text: "ความทรงจำในอดีต เหตุการณ์ใดที่มีความหมายที่สุดในชีวิตของท่าน?",
       },
       {
         id: "event_importance",
-        text: "เหตุการณ์ที่คุณลืมบ่อยๆ มีความสำคัญอย่างไร?",
+        text: "เหตุการณ์ที่เกิดขึ้นนั้น มีใครที่เกี่ยวข้องบ้าง?",
       },
       {
         id: "forgetful_reasons",
-        text: "คุณคิดว่าสาเหตุใด ที่ทำให้คุณลืมกับสถานการณ์นั้นบ่อยๆ?",
+        text: "เหตุการณ์นั้น มีความสำคัญอย่างไรกับท่าน?",
       },
     ],
   },
   {
-    title: "การรับรู้ทางร่างกาย",
+    title: "การรับรู้ทางด้านร่างกาย ขณะท่านมี “ความทรงจำ” ที่ไม่ดี",
     questions: [
       {
         id: "body_symptoms",
-        text: "คุณรู้สึกมีอาการทางร่างกายอย่างไรบ้างตอนที่จำไม่ได้?",
+        text: "ท่านได้สังเกตการเปลี่ยนแปลงทางร่างกายของท่านหรือไม่อย่างไร?",
       },
       {
         id: "breathing_changes",
-        text: "คุณสังเกตุเห็นการเปลียนแปลงในการหายใจของคุณไหม?",
+        text: "ท่านได้สังเกตการเปลี่ยนแปลงทางอารมณ์ของท่านหรือไม่อย่างไร?",
       },
       {
         id: "body_tension",
-        text: "มีความรู้สึกตึงเครียดตรงส่วนไหนของร่างกายบ้าง?",
+        text: "ท่านได้สังเกตการเปลี่ยนแปลงบุคลิกภาพของท่านหรือไม่อย่างไร?",
       },
     ],
   },
@@ -585,7 +591,16 @@ export default function ActivityFour() {
 
       case 2:
         return (
-          <StyledCard title="เลือกอารมณ์ที่คุณรู้สึก">
+          // Change this
+          <StyledCard
+            title={
+              <CardTitle>
+                กรุณาเลือกอารมณ์ที่เกิดขึ้น
+                ขณะที่ท่านมีการเปลี่ยนแปลงเกี่ยวกับความทรงจำ (เลือกได้มากกว่า 1
+                อารมณ์)
+              </CardTitle>
+            }
+          >
             <EmotionsGrid>
               {Object.entries(EMOTIONS).map(([emotion, config]) => (
                 <EmotionButton
@@ -683,9 +698,7 @@ export default function ActivityFour() {
               </div>
 
               <StyledCollapse
-                items={[...allEntries]
-                  .reverse()
-                  .map((entry, index) => ({
+                items={[...allEntries].reverse().map((entry, index) => ({
                   key: index,
                   label: (
                     <div
@@ -721,7 +734,7 @@ export default function ActivityFour() {
                     >
                       {/* สถานการณ์ */}
                       <div className="section" style={{ marginBottom: "24px" }}>
-                        <Title level={5}>สถานการณ์</Title>
+                        <Title level={5}>เหตุการณ์</Title>
                         <div
                           className="qa-pair"
                           style={{ marginBottom: "16px" }}
@@ -734,7 +747,8 @@ export default function ActivityFour() {
                               fontSize: "16px",
                             }}
                           >
-                            คุณมีเหตุการณ์อะไรที่ทำให้คุณลืมบ่อยๆ?
+                            ความทรงจำในอดีต
+                            เหตุการณ์ใดที่มีความหมายที่สุดในชีวิตของท่าน?
                           </Text>
                           <Text style={{ paddingLeft: "16px" }}>
                             {entry.situation.forgetfulEvents}
@@ -752,7 +766,7 @@ export default function ActivityFour() {
                               fontSize: "16px",
                             }}
                           >
-                            เหตุการณ์ที่คุณลืมบ่อยๆ มีความสำคัญอย่างไร?
+                            เหตุการณ์ที่เกิดขึ้นนั้น มีใครที่เกี่ยวข้องบ้าง?
                           </Text>
                           <Text style={{ paddingLeft: "16px" }}>
                             {entry.situation.eventImportance}
@@ -770,8 +784,7 @@ export default function ActivityFour() {
                               fontSize: "16px",
                             }}
                           >
-                            คุณคิดว่าสาเหตุใด
-                            ที่ทำให้คุณลืมกับสถานการณ์นั้นบ่อยๆ?
+                            เหตุการณ์นั้น มีความสำคัญอย่างไรกับท่าน”?
                           </Text>
                           <Text style={{ paddingLeft: "16px" }}>
                             {entry.situation.forgetfulReasons}
@@ -779,9 +792,11 @@ export default function ActivityFour() {
                         </div>
                       </div>
 
-                      {/* การรับรู้ทางร่างกาย */}
+                      {/* การรับรู้ทางด้านร่างกาย ขณะท่านมี “ความทรงจำ” ที่ไม่ดี */}
                       <div className="section" style={{ marginBottom: "24px" }}>
-                        <Title level={5}>การรับรู้ทางร่างกาย</Title>
+                        <Title level={5}>
+                          การรับรู้ทางด้านร่างกาย ขณะท่านมี “ความทรงจำ” ที่ไม่ดี
+                        </Title>
                         <div
                           className="qa-pair"
                           style={{ marginBottom: "16px" }}
@@ -794,7 +809,7 @@ export default function ActivityFour() {
                               fontSize: "16px",
                             }}
                           >
-                            คุณรู้สึกมีอาการทางร่างกายอย่างไรบ้างตอนที่จำไม่ได้?
+                            ท่านได้สังเกตการเปลี่ยนแปลงทางร่างกายของท่านหรือไม่อย่างไร?
                           </Text>
                           <Text style={{ paddingLeft: "16px" }}>
                             {entry.physicalAwareness.bodySymptoms}
@@ -812,7 +827,7 @@ export default function ActivityFour() {
                               fontSize: "16px",
                             }}
                           >
-                            คุณสังเกตุเห็นการเปลียนแปลงในการหายใจของคุณไหม?
+                            ท่านได้สังเกตการเปลี่ยนแปลงทางอารมณ์ของท่านหรือไม่อย่างไร?
                           </Text>
                           <Text style={{ paddingLeft: "16px" }}>
                             {entry.physicalAwareness.breathingChanges}
@@ -830,7 +845,7 @@ export default function ActivityFour() {
                               fontSize: "16px",
                             }}
                           >
-                            มีความรู้สึกตึงเครียดตรงส่วนไหนของร่างกายบ้าง?
+                            ท่านได้สังเกตการเปลี่ยนแปลงบุคลิกภาพของท่านหรือไม่อย่างไร?
                           </Text>
                           <Text style={{ paddingLeft: "16px" }}>
                             {entry.physicalAwareness.bodyTension}
@@ -906,7 +921,10 @@ export default function ActivityFour() {
               />
 
               <div style={{ textAlign: "center", marginTop: "24px" }}>
-                <ActionButton className="primary" onClick={() => navigate("/activity-9")}>
+                <ActionButton
+                  className="primary"
+                  onClick={() => navigate("/activity-9")}
+                >
                   จบกิจกรรม
                 </ActionButton>
               </div>
@@ -922,7 +940,7 @@ export default function ActivityFour() {
     <PageContainer>
       <ContentContainer>
         <Title level={2} style={{ textAlign: "center", marginBottom: 32 }}>
-        Session 4 : บันทึกอารมณ์
+          Session 4 : บันทึกอารมณ์
         </Title>
 
         <StyledSteps
