@@ -239,6 +239,7 @@ const CardTitle = styled.div`
   max-width: 100%;
   display: block;
 `;
+
 const StyledSteps = styled(Steps)`
   display: flex;
   justify-content: center;
