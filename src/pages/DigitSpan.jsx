@@ -1,11 +1,21 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, Space, Typography, Button, message, Row, Col } from "antd";
+import {
+  Card,
+  Space,
+  Typography,
+  Button,
+  message,
+  Row,
+  Col,
+  Table,
+} from "antd";
 import {
   ClockCircleOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
   HeartFilled,
+  InfoCircleOutlined,
 } from "@ant-design/icons";
 import styled from "@emotion/styled";
 import { useAuth } from "../context/AuthContext";
@@ -286,6 +296,33 @@ const formatTime = (seconds) => {
     .padStart(2, "0")}`;
 };
 
+// คอมโพเนนต์แสดงคำแนะนำ
+const InstructionBox = ({ mode }) => (
+  <div
+    style={{
+      background: `${COLORS.background}`,
+      padding: "12px 16px",
+      borderRadius: "8px",
+      marginBottom: "16px",
+    }}
+  >
+    <Space direction="vertical" size={4}>
+      <Text strong style={{ color: COLORS.primary, fontSize: "16px" }}>
+        <InfoCircleOutlined style={{ marginRight: 8 }} />
+        วิธีการเล่น
+      </Text>
+      <Text>
+        {mode === "forward"
+          ? "โหมดปกติ (Forward): จดจำตัวเลขจากซ้ายไปขวา เช่น เห็น 123 ต้องจำ 123"
+          : "โหมดย้อนกลับ (Backward): จดจำตัวเลขจากขวาไปซ้าย เช่น เห็น 123 ต้องจำ 321"}
+      </Text>
+      <Text>• คุณมีเวลาจดจำตัวเลข 5 วินาที</Text>
+      <Text>• แต่ละระดับมีโอกาสตอบผิดได้ 3 ครั้ง (สังเกตไอคอน ❤️)</Text>
+      <Text>• ระดับที่สูงขึ้นจะมีจำนวนตัวเลขเพิ่มขึ้น</Text>
+    </Space>
+  </div>
+);
+
 // Celebration Effects
 const celebrateCorrect = () => {
   confetti({
@@ -343,12 +380,20 @@ export default function DigitSpan() {
   const [attemptsHistory, setAttemptsHistory] = useState([]);
   const currentLevel = useRef(1);
   const timerRef = useRef(null);
-  const [forwardResults, setForwardResults] = useState(null);
   const [currentModeResults, setCurrentModeResults] = useState({
     mode: "forward",
     totalTime: 0,
+    successRate: 0,
     levels: [],
   });
+
+  // กำหนดค่าเริ่มต้นให้กับ nextAction
+  useEffect(() => {
+    setNextAction({
+      text: "เริ่มเกม",
+      action: () => startGame()
+    });
+  }, []);
 
   // Effect for Timer
   useEffect(() => {
@@ -422,24 +467,6 @@ export default function DigitSpan() {
     setLevel(newLevel);
   };
 
-  const saveCurrentLevelResult = () => {
-    const levelResult = {
-      level: currentLevel.current,
-      digits: digits,
-      userAnswer: userInput.map(Number),
-      isCorrect: isCorrect,
-      attemptsUsed: 3 - attempts,
-      timeSpent:
-        elapsedTime -
-        currentModeResults.levels.reduce((acc, cur) => acc + cur.timeSpent, 0),
-    };
-
-    setCurrentModeResults((prev) => ({
-      ...prev,
-      levels: [...prev.levels, levelResult],
-    }));
-  };
-
   const startGame = () => {
     const newDigits = generateDigits();
     setStage("memorize");
@@ -447,6 +474,22 @@ export default function DigitSpan() {
     setUserInput([]);
     setIsCorrect(false);
     setIsTimerRunning(true);
+
+    // ตั้งค่าโหมดปัจจุบัน
+    setCurrentModeResults((prev) => ({
+      ...prev,
+      mode: mode,
+    }));
+    
+    // กำหนดค่าเริ่มต้นให้กับ nextAction เมื่อเริ่มเกม
+    setNextAction({
+      text: "ลองอีกครั้ง",
+      action: () => {
+        setShowResult(false);
+        setUserInput([]);
+        startGame();
+      }
+    });
   };
 
   const handleInput = (digit) => {
@@ -460,59 +503,66 @@ export default function DigitSpan() {
 
     const reversedDigits = [...digits].reverse();
     const correctDigits = mode === "forward" ? digits : reversedDigits;
-    const correct = userInput.every((d, i) => parseInt(d) === correctDigits[i]);
+    const correct = userInput.every(
+      (d, i) => parseInt(d) === correctDigits[i]
+    );
 
+    // บันทึกผลของระดับปัจจุบัน (ใช้ค่า correct โดยตรง)
+    const levelResult = {
+      level: currentLevel.current,
+      digits: digits,
+      userAnswer: userInput.map(Number),
+      isCorrect: correct, // ใช้ correct โดยตรง
+      attemptsUsed: 3 - attempts,
+      timeSpent:
+        elapsedTime -
+        currentModeResults.levels.reduce(
+          (acc, cur) => acc + (cur.timeSpent || 0),
+          0
+        ),
+    };
+
+    // อัปเดต levels และคำนวณอัตราการตอบถูก
+    const updatedLevels = [...currentModeResults.levels, levelResult];
+    const correctAnswers = updatedLevels.filter(
+      (level) => level.isCorrect === true
+    ).length;
+    const successRate = (correctAnswers / updatedLevels.length) * 100;
+
+    // อัปเดต state
+    setCurrentModeResults({
+      ...currentModeResults,
+      levels: updatedLevels,
+      successRate: successRate,
+      totalTime: elapsedTime,
+    });
+
+    // อัปเดต isCorrect (หลังจากบันทึกผลแล้ว)
     setIsCorrect(correct);
-
+    
     if (correct) {
       celebrateCorrect();
       message.success("ถูกต้อง!");
 
       if (currentLevel.current === 6) {
-        if (mode === "forward") {
-          const currentForwardTime = elapsedTime;
-          setForwardTime(currentForwardTime);
-          saveCurrentLevelResult();
-          const completedForwardResults = {
-            ...currentModeResults,
-            mode: "forward",
-            totalTime: currentForwardTime,
-          };
-          setForwardResults(completedForwardResults);
-          setNextAction({
-            text: "เริ่มโหมด Backward",
-            action: () => {
-              setMode("backward");
-              updateLevel(1);
-              setShowResult(false);
-              setElapsedTime(0);
-              setAttempts(3);
-              setCurrentModeResults({
-                mode: "backward",
-                totalTime: 0,
-                levels: [],
-              });
-              startGame();
-            },
-          });
-        } else {
-          const currentBackwardTime = elapsedTime;
-          setBackwardTime(currentBackwardTime);
-          saveCurrentLevelResult();
-          const backwardResults = {
-            ...currentModeResults,
-            mode: "backward",
-            totalTime: currentBackwardTime,
-          };
-          setNextAction({
-            text: "ดูผลการทดสอบ",
-            action: () => {
-              handleTestComplete(forwardResults, backwardResults);
-            },
-          });
-        }
+        // ถ้าเป็นเลเวลสุดท้าย ให้จบเกม
+        setNextAction({
+          text: "ดูผลการทดสอบ",
+          action: () => {
+            const currentModeTime = elapsedTime;
+
+            // เก็บผลลัพธ์ตามโหมดที่เล่น
+            if (mode === "forward") {
+              setForwardTime(currentModeTime);
+              handleTestComplete();
+            } else {
+              setBackwardTime(currentModeTime);
+              handleTestComplete();
+            }
+          },
+        });
       } else {
-        saveCurrentLevelResult();
+        // ถ้ายังไม่ถึงเลเวลสุดท้าย ให้ไปเลเวลถัดไป
         setNextAction({
           text: `ไป Level ${currentLevel.current + 1}`,
           action: () => {
@@ -528,42 +578,40 @@ export default function DigitSpan() {
       setAttempts(newAttempts);
 
       if (newAttempts === 0) {
-        // No more attempts left
-        saveCurrentLevelResult();
+        // หมดโอกาสแล้ว
         message.error("หมดโอกาสแล้ว");
-        setNextAction({
-          text:
-            currentLevel.current === 6
-              ? mode === "forward"
-                ? "เริ่มโหมด Backward"
-                : "ดูผลการทดสอบ"
-              : `ไป Level ${currentLevel.current + 1}`,
-          action: () => {
-            if (currentLevel.current === 6) {
+
+        if (currentLevel.current === 6) {
+          // ถ้าเป็นเลเวลสุดท้าย ให้จบเกม
+          setNextAction({
+            text: "ดูผลการทดสอบ",
+            action: () => {
+              const currentModeTime = elapsedTime;
+
+              // เก็บผลลัพธ์ตามโหมดที่เล่น
               if (mode === "forward") {
-                const currentForwardTime = elapsedTime;
-                setForwardTime(currentForwardTime);
-                setMode("backward");
-                updateLevel(1);
-                setAttempts(3);
+                setForwardTime(currentModeTime);
+                handleTestComplete();
               } else {
-                const currentBackwardTime = elapsedTime;
-                setBackwardTime(currentBackwardTime);
-                handleTestComplete(forwardResults, {
-                  ...currentModeResults,
-                  mode: "backward",
-                  totalTime: currentBackwardTime,
-                });
+                setBackwardTime(currentModeTime);
+                handleTestComplete();
               }
-            } else {
+            },
+          });
+        } else {
+          // ถ้ายังไม่ถึงเลเวลสุดท้าย ให้ไปเลเวลถัดไป
+          setNextAction({
+            text: `ไป Level ${currentLevel.current + 1}`,
+            action: () => {
               updateLevel(currentLevel.current + 1);
               setAttempts(3);
-            }
-            setShowResult(false);
-            startGame();
-          },
-        });
+              setShowResult(false);
+              startGame();
+            },
+          });
+        }
       } else {
+        // ยังมีโอกาสลองอีกครั้ง
         message.error(`ไม่ถูกต้อง เหลือโอกาสอีก ${newAttempts} ครั้ง`);
         setNextAction({
           text: "ลองอีกครั้ง",
@@ -578,28 +626,33 @@ export default function DigitSpan() {
     setShowResult(true);
   };
 
-  const handleTestComplete = async (forwardResults, backwardResults) => {
+  const handleTestComplete = async () => {
     try {
-      const forwardTime = forwardResults.totalTime;
-      const backwardTime = backwardResults.totalTime;
-      const totalTimeSpent = forwardTime + backwardTime;
+      // ตรวจสอบว่าเล่นโหมดไหน
+      const isForwardMode = mode === "forward";
+      
+      // สร้าง sessionData
+      const sessionData = {
+        totalTime: elapsedTime,
+        forwardTime: isForwardMode ? elapsedTime : 0,
+        backwardTime: isForwardMode ? 0 : elapsedTime,
+        successRate: currentModeResults.successRate || 0,
+        forwardSuccessRate: isForwardMode ? currentModeResults.successRate : 0,
+        backwardSuccessRate: isForwardMode ? 0 : currentModeResults.successRate,
+        modes: [currentModeResults] 
+      };
 
       const response = await axios.post(
         "https://brain-training-server.onrender.com/api/digit-span/save-session",
         {
           nationalId: user.nationalId,
-          sessionData: {
-            totalTime: totalTimeSpent,
-            forwardTime: forwardResults.totalTime,
-            backwardTime: backwardResults.totalTime,
-            modes: [forwardResults, backwardResults],
-          },
+          sessionData: sessionData,
         }
       );
 
       if (response.data.comparison) {
         setComparison(response.data.comparison);
-        if (response.data.messages.overall) {
+        if (response.data.messages?.overall) {
           message.success(response.data.messages.overall);
         }
       }
@@ -706,6 +759,45 @@ export default function DigitSpan() {
           </Space>
         </div>
 
+        {/* เพิ่มตัวเลือกโหมดการเล่น */}
+        <div style={{ marginTop: 16, marginBottom: 16 }}>
+          <Text strong style={{ fontSize: "18px", color: COLORS.primary }}>
+            เลือกโหมดการเล่น
+          </Text>
+          <Row gutter={16} style={{ marginTop: 16 }}>
+            <Col span={12}>
+              <Card
+                hoverable
+                style={{
+                  borderColor: mode === "forward" ? COLORS.primary : "#f0f0f0",
+                  backgroundColor:
+                    mode === "forward" ? COLORS.background : "white",
+                }}
+                onClick={() => setMode("forward")}
+              >
+                <Title level={5} style={{ color: COLORS.primary, margin: 0 }}>
+                (Forward)
+                </Title>
+              </Card>
+            </Col>
+            <Col span={12}>
+              <Card
+                hoverable
+                style={{
+                  borderColor: mode === "backward" ? COLORS.primary : "#f0f0f0",
+                  backgroundColor:
+                    mode === "backward" ? COLORS.background : "white",
+                }}
+                onClick={() => setMode("backward")}
+              >
+                <Title level={5} style={{ color: COLORS.primary, margin: 0 }}>
+                  (Backward)
+                </Title>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+
         <StartGameButton size="large" onClick={startGame}>
           เริ่มเกม
         </StartGameButton>
@@ -729,6 +821,13 @@ export default function DigitSpan() {
           {formatTime(elapsedTime)}
         </TimerValue>
       </TimerContainer>
+
+      {/* เพิ่มคำแนะนำ */}
+      <InstructionBox mode={mode} />
+
+      <Text style={{ display: "block", textAlign: "center", marginBottom: 16 }}>
+        มีเวลาจำ {timeLeft} วินาที
+      </Text>
 
       <DigitDisplay>{digits.join("")}</DigitDisplay>
     </StyledCard>
@@ -758,8 +857,11 @@ export default function DigitSpan() {
           </TimerValue>
         </TimerContainer>
 
+        {/* เพิ่มคำแนะนำ */}
+        <InstructionBox mode={mode} />
+
         <Text
-          style={{ textAlign: "center", display: "block", marginBottom: 24 }}
+          style={{ textAlign: "center", display: "block", marginBottom: 16 }}
         >
           {mode === "forward"
             ? "กรอกตัวเลขตามลำดับที่เห็น"
@@ -830,13 +932,16 @@ export default function DigitSpan() {
                   : [...digits].reverse().join("")}
               </span>
             </Text>
-            <ResultButton
-              type={isCorrect ? "primarys" : "defaults"}
-              size="large"
-              onClick={nextAction.action}
-            >
-              {nextAction.text}
-            </ResultButton>
+            {/* เพิ่มการตรวจสอบว่า nextAction มีค่าหรือไม่ */}
+            {nextAction && (
+              <ResultButton
+                type={isCorrect ? "primarys" : "defaults"}
+                size="large"
+                onClick={nextAction.action}
+              >
+                {nextAction.text}
+              </ResultButton>
+            )}
           </div>
         )}
       </div>
@@ -849,69 +954,112 @@ export default function DigitSpan() {
         สรุปผลการทดสอบ
       </Title>
 
+      {/* แสดงว่าเล่นโหมดไหน */}
+      <div style={{ textAlign: "center", marginBottom: 16 }}>
+        <Text
+          style={{ fontSize: 18, color: COLORS.primary, fontWeight: "bold" }}
+        >
+          โหมดการเล่น:{" "}
+          {mode === "forward" ? "แบบปกติ (Forward)" : "แบบย้อนกลับ (Backward)"}
+        </Text>
+      </div>
+
       <Row gutter={[24, 24]}>
         <Col span={12}>
           <Title level={4}>ครั้งนี้</Title>
           <Space direction="vertical" size={16}>
+            {/* แสดงเฉพาะโหมดที่เล่น */}
+            {mode === "forward" ? (
+              <div>
+                เวลาที่ใช้: {formatTime(elapsedTime)}
+                {comparison?.forwardTime && (
+                  <Text
+                    style={{
+                      marginLeft: 8,
+                      color: comparison.forwardTime.improved
+                        ? COLORS.success
+                        : COLORS.error,
+                    }}
+                  >
+                    {comparison.forwardTime.improved ? (
+                      <ArrowDownOutlined />
+                    ) : (
+                      <ArrowUpOutlined />
+                    )}
+                    {formatTime(Math.abs(comparison.forwardTime.difference))}
+                  </Text>
+                )}
+              </div>
+            ) : (
+              <div>
+                เวลาที่ใช้: {formatTime(elapsedTime)}
+                {comparison?.backwardTime && (
+                  <Text
+                    style={{
+                      marginLeft: 8,
+                      color: comparison.backwardTime.improved
+                        ? COLORS.success
+                        : COLORS.error,
+                    }}
+                  >
+                    {comparison.backwardTime.improved ? (
+                      <ArrowDownOutlined />
+                    ) : (
+                      <ArrowUpOutlined />
+                    )}
+                    {formatTime(Math.abs(comparison.backwardTime.difference))}
+                  </Text>
+                )}
+              </div>
+            )}
+
+            {/* แสดงอัตราการตอบถูก */}
             <div>
-              Forward: {formatTime(forwardTime)}
-              {comparison?.forwardTime && (
-                <Text
-                  style={{
-                    marginLeft: 8,
-                    color: comparison.forwardTime.improved
-                      ? COLORS.success
-                      : COLORS.error,
-                  }}
-                >
-                  {comparison.forwardTime.improved ? (
-                    <ArrowDownOutlined />
-                  ) : (
-                    <ArrowUpOutlined />
-                  )}
-                  {formatTime(Math.abs(comparison.forwardTime.difference))}
-                </Text>
-              )}
-            </div>
-            <div>
-              Backward: {formatTime(backwardTime)}
-              {comparison?.backwardTime && (
-                <Text
-                  style={{
-                    marginLeft: 8,
-                    color: comparison.backwardTime.improved
-                      ? COLORS.success
-                      : COLORS.error,
-                  }}
-                >
-                  {comparison.backwardTime.improved ? (
-                    <ArrowDownOutlined />
-                  ) : (
-                    <ArrowUpOutlined />
-                  )}
-                  {formatTime(Math.abs(comparison.backwardTime.difference))}
-                </Text>
-              )}
-            </div>
-            <div>
-              รวมเวลาทั้งหมด: {formatTime(forwardTime + backwardTime)}
-              {comparison?.totalTime && (
-                <Text
-                  style={{
-                    marginLeft: 8,
-                    color: comparison.totalTime.improved
-                      ? COLORS.success
-                      : COLORS.error,
-                  }}
-                >
-                  {comparison.totalTime.improved ? (
-                    <ArrowDownOutlined />
-                  ) : (
-                    <ArrowUpOutlined />
-                  )}
-                  {formatTime(Math.abs(comparison.totalTime.difference))}
-                </Text>
-              )}
+              อัตราการตอบถูก:{" "}
+              {
+                // ตรวจสอบค่าให้แน่ใจว่ามีค่าที่ถูกต้อง
+                currentModeResults &&
+                typeof currentModeResults.successRate === "number"
+                  ? currentModeResults.successRate.toFixed(1) + "%"
+                  : "0.0%"
+              }
+              {comparison &&
+                comparison[
+                  mode === "forward"
+                    ? "forwardSuccessRate"
+                    : "backwardSuccessRate"
+                ] && (
+                  <Text
+                    style={{
+                      marginLeft: 8,
+                      color: comparison[
+                        mode === "forward"
+                          ? "forwardSuccessRate"
+                          : "backwardSuccessRate"
+                      ].improved
+                        ? COLORS.success
+                        : COLORS.error,
+                    }}
+                  >
+                    {comparison[
+                      mode === "forward"
+                        ? "forwardSuccessRate"
+                        : "backwardSuccessRate"
+                    ].improved ? (
+                      <ArrowUpOutlined />
+                    ) : (
+                      <ArrowDownOutlined />
+                    )}
+                    {Math.abs(
+                      comparison[
+                        mode === "forward"
+                          ? "forwardSuccessRate"
+                          : "backwardSuccessRate"
+                      ].difference
+                    ).toFixed(1)}
+                    %
+                  </Text>
+                )}
             </div>
           </Space>
         </Col>
@@ -919,45 +1067,122 @@ export default function DigitSpan() {
         <Col span={12}>
           <Title level={4}>ครั้งก่อน</Title>
           <Space direction="vertical" size={16}>
+            {/* แสดงเฉพาะโหมดที่เล่น */}
+            {mode === "forward" ? (
+              <div>
+                เวลาที่ใช้:{" "}
+                {previousResults && previousResults.forwardTime
+                  ? formatTime(previousResults.forwardTime)
+                  : "-"}
+              </div>
+            ) : (
+              <div>
+                เวลาที่ใช้:{" "}
+                {previousResults && previousResults.backwardTime
+                  ? formatTime(previousResults.backwardTime)
+                  : "-"}
+              </div>
+            )}
+
+            {/* แสดงอัตราการตอบถูกของครั้งก่อน */}
             <div>
-              Forward:{" "}
-              {previousResults && previousResults.forwardTime
-                ? formatTime(previousResults.forwardTime)
-                : "-"}
-            </div>
-            <div>
-              Backward:{" "}
-              {previousResults && previousResults.backwardTime
-                ? formatTime(previousResults.backwardTime)
-                : "-"}
-            </div>
-            <div>
-              รวม:{" "}
-              {previousResults && previousResults.totalTime
-                ? formatTime(previousResults.totalTime)
+              อัตราการตอบถูก:{" "}
+              {previousResults &&
+              (mode === "forward"
+                ? previousResults.forwardSuccessRate
+                : previousResults.backwardSuccessRate)
+                ? `${(mode === "forward"
+                    ? previousResults.forwardSuccessRate
+                    : previousResults.backwardSuccessRate
+                  ).toFixed(1)}%`
                 : "-"}
             </div>
           </Space>
         </Col>
       </Row>
 
-      <Space style={{ width: "100%", justifyContent: "center", marginTop: 32 }}>
-        <EndGameButton onClick={() => window.location.reload()}>
-          เริ่มทำแบบทดสอบใหม่
-        </EndGameButton>
-        <GohomeButton onClick={() => navigate("/")}>กลับหน้าหลัก</GohomeButton>
-      </Space>
-    </StyledCard>
-  );
+      {/* คำแนะนำเพิ่มเติม */}
+      <div style={{ marginTop: 24, textAlign: "center" }}>
+        <Text style={{ fontSize: 16, display: "block", marginBottom: 8 }}>
+          <InfoCircleOutlined style={{ marginRight: 8 }} />
+          ลองฝึกฝนบ่อยๆ เพื่อพัฒนาความจำของคุณ
+        </Text>
+        <Text style={{ fontSize: 14, color: COLORS.secondary }}>
+          โปรดทดลองเล่นทั้งโหมด Forward และ Backward เพื่อฝึกสมองทั้งสองด้าน
+        </Text>
+      </div>
 
-  return (
-    <PageContainer>
-      <ContentContainer>
-        {stage === "intro" && renderIntro()}
-        {stage === "memorize" && renderMemorize()}
-        {stage === "input" && renderInput()}
-        {stage === "completed" && renderSummary()}
-      </ContentContainer>
-    </PageContainer>
-  );
-}
+      {/* แสดงประวัติการเล่นของโหมดปัจจุบัน */}
+      {previousResults &&
+        previousResults.sessions &&
+        previousResults.sessions.length > 0 && (
+          <div style={{ marginTop: 24 }}>
+            <Title level={4} style={{ color: COLORS.primary }}>
+              ประวัติการเล่น {mode === "forward" ? "Forward" : "Backward"} Mode
+            </Title>
+
+            <Table
+              dataSource={previousResults.sessions
+                .filter(
+                  (session) =>
+                    (mode === "forward" && session.forwardTime > 0) ||
+                    (mode === "backward" && session.backwardTime > 0)
+                )
+                .map((session, index) => ({
+                  key: index,
+                  date: new Date(session.completedAt).toLocaleDateString(
+                    "th-TH"
+                  ),
+                  time: formatTime(
+                    mode === "forward"
+                      ? session.forwardTime
+                      : session.backwardTime
+                  ),
+                  successRate: `${(mode === "forward"
+                    ? session.forwardSuccessRate || 0
+                    : session.backwardSuccessRate || 0
+                  ).toFixed(1)}%`,
+                }))}
+                columns={[
+                  {
+                    title: "วันที่",
+                    dataIndex: "date",
+                    key: "date",
+                  },
+                  {
+                    title: "เวลาที่ใช้",
+                    dataIndex: "time",
+                    key: "time",
+                  },
+                  {
+                    title: "อัตราการตอบถูก",
+                    dataIndex: "successRate",
+                    key: "successRate",
+                  },
+                ]}
+                pagination={false}
+                size="small"
+              />
+            </div>
+          )}
+  
+        <Space style={{ width: "100%", justifyContent: "center", marginTop: 32 }}>
+          <EndGameButton onClick={() => window.location.reload()}>
+            เริ่มทำแบบทดสอบใหม่
+          </EndGameButton>
+          <GohomeButton onClick={() => navigate("/")}>กลับหน้าหลัก</GohomeButton>
+        </Space>
+      </StyledCard>
+    );
+  
+    return (
+      <PageContainer>
+        <ContentContainer>
+          {stage === "intro" && renderIntro()}
+          {stage === "memorize" && renderMemorize()}
+          {stage === "input" && renderInput()}
+          {stage === "completed" && renderSummary()}
+        </ContentContainer>
+      </PageContainer>
+    );
+  }
