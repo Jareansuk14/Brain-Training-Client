@@ -109,7 +109,7 @@ const Disc = ({ size, color, index, isBottom, isSelected, totalDiscs }) => {
   const widthIncrement = window.innerWidth <= 1024 ? 20 : 25;
   const width = baseWidth + size * widthIncrement;
   const discHeight = window.innerWidth <= 1024 ? 24 : 32;
-  
+
   // Calculate the total stack height to ensure proper animation
   const stackHeight = totalDiscs * (discHeight + 4); // 4px for margin
 
@@ -119,23 +119,24 @@ const Disc = ({ size, color, index, isBottom, isSelected, totalDiscs }) => {
         width: `${width}px`,
         height: `${discHeight}px`,
         backgroundColor: color,
-        margin: '2px auto',
-        borderRadius: '16px',
-        cursor: 'pointer',
-        boxShadow: '0 -4px 8px rgba(0,0,0,0.3)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'rgba(255,255,255,0.9)',
-        fontSize: window.innerWidth <= 1024 ? '12px' : '14px',
-        fontWeight: 'bold',
-        transition: 'all 0.3s ease',
-        border: '2px solid rgba(255,255,255,0.4)',
-        transform: isSelected && isBottom
-          ? `translateY(${stackHeight}px) scale(1.05)` // Animate relative to stack height
-          : 'translateY(0) scale(1)',
+        margin: "2px auto",
+        borderRadius: "16px",
+        cursor: "pointer",
+        boxShadow: "0 -4px 8px rgba(0,0,0,0.3)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "rgba(255,255,255,0.9)",
+        fontSize: window.innerWidth <= 1024 ? "12px" : "14px",
+        fontWeight: "bold",
+        transition: "all 0.3s ease",
+        border: "2px solid rgba(255,255,255,0.4)",
+        transform:
+          isSelected && isBottom
+            ? `translateY(${stackHeight}px) scale(1.05)` // Animate relative to stack height
+            : "translateY(0) scale(1)",
         zIndex: isSelected && isBottom ? 3 : 2,
-        position: 'relative',
+        position: "relative",
       }}
     >
       {size}
@@ -151,41 +152,41 @@ const TowerBase = () => {
   return (
     <div
       style={{
-        position: 'relative',
+        position: "relative",
         width: `${baseWidth}px`,
         height: `${baseHeight}px`,
-        marginTop: '0',
-        padding: '0',
+        marginTop: "0",
+        padding: "0",
       }}
     >
       {/* Main Base - Flipped */}
       <div
         style={{
-          position: 'absolute',
-          top: '0',
+          position: "absolute",
+          top: "0",
           left: `${baseWidth * 0.115}px`,
           width: `${baseWidth * 0.77}px`,
           height: `${baseHeight * 0.75}px`,
           background: WOOD_TEXTURE,
-          borderRadius: '8px',
-          boxShadow: '0 -4px 12px rgba(0,0,0,0.4)',
-          transform: 'perspective(500px) rotateX(-10deg)',
-          transformStyle: 'preserve-3d',
-          border: '2px solid rgba(139, 69, 19, 0.6)',
+          borderRadius: "8px",
+          boxShadow: "0 -4px 12px rgba(0,0,0,0.4)",
+          transform: "perspective(500px) rotateX(-10deg)",
+          transformStyle: "preserve-3d",
+          border: "2px solid rgba(139, 69, 19, 0.6)",
         }}
       />
 
       {/* Base Shadow - Flipped */}
       <div
         style={{
-          position: 'absolute',
+          position: "absolute",
           top: `${baseHeight * 0.75}px`,
           left: `${baseWidth * 0.077}px`,
           width: `${baseWidth * 0.85}px`,
           height: `${baseHeight * 0.5}px`,
-          background: 'rgba(0,0,0,0.2)',
-          filter: 'blur(8px)',
-          borderRadius: '50%',
+          background: "rgba(0,0,0,0.2)",
+          filter: "blur(8px)",
+          borderRadius: "50%",
         }}
       />
     </div>
@@ -203,36 +204,36 @@ const Tower = ({ index, discs, discColors, selectedTower, onTowerClick }) => {
     <div
       onClick={() => onTowerClick(index)}
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-start",
+        alignItems: "center",
         minHeight: `${towerHeight}px`,
         width: `${towerWidth}px`,
-        padding: '20px',
-        backgroundColor: isSelected ? 'rgba(124, 58, 237, 0.1)' : 'white',
-        borderRadius: '16px',
+        padding: "20px",
+        backgroundColor: isSelected ? "rgba(124, 58, 237, 0.1)" : "white",
+        borderRadius: "16px",
         boxShadow: isSelected
-          ? '0 0 0 2px rgba(124, 58, 237, 0.5)'
-          : '0 8px 16px rgba(0, 0, 0, 0.1)',
-        transition: 'all 0.3s ease',
-        position: 'relative',
-        border: '1px solid rgba(0,0,0,0.1)',
-        flex: '0 0 auto',
-        cursor: 'pointer',
+          ? "0 0 0 2px rgba(124, 58, 237, 0.5)"
+          : "0 8px 16px rgba(0, 0, 0, 0.1)",
+        transition: "all 0.3s ease",
+        position: "relative",
+        border: "1px solid rgba(0,0,0,0.1)",
+        flex: "0 0 auto",
+        cursor: "pointer",
       }}
     >
       {/* Tower Number - at bottom */}
       <div
         style={{
-          position: 'absolute',
-          bottom: '12px',
-          fontSize: window.innerWidth <= 1024 ? '14px' : '16px',
+          position: "absolute",
+          bottom: "12px",
+          fontSize: window.innerWidth <= 1024 ? "14px" : "16px",
           color: COLORS.dark,
-          fontWeight: 'bold',
-          padding: '4px 12px',
-          borderRadius: '12px',
-          background: 'rgba(124, 58, 237, 0.1)',
+          fontWeight: "bold",
+          padding: "4px 12px",
+          borderRadius: "12px",
+          background: "rgba(124, 58, 237, 0.1)",
         }}
       >
         Tower {index + 1}
@@ -244,29 +245,29 @@ const Tower = ({ index, discs, discColors, selectedTower, onTowerClick }) => {
       {/* Discs Container - Flipped */}
       <div
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
           minHeight: `${rodHeight}px`,
-          justifyContent: 'flex-start',
-          width: '100%',
+          justifyContent: "flex-start",
+          width: "100%",
           zIndex: 1,
-          marginTop: '16px',
-          position: 'relative',
+          marginTop: "16px",
+          position: "relative",
         }}
       >
         {/* Tower Rod */}
         <div
           style={{
-            position: 'absolute',
-            top: '-16px',
-            width: '16px',
+            position: "absolute",
+            top: "-16px",
+            width: "16px",
             height: `${rodHeight}px`,
             background: WOOD_TEXTURE,
-            borderRadius: '4px 4px 8px 8px',
-            boxShadow: '2px -4px 8px rgba(0,0,0,0.2)',
+            borderRadius: "4px 4px 8px 8px",
+            boxShadow: "2px -4px 8px rgba(0,0,0,0.2)",
             zIndex: 0,
-            border: '1px solid rgba(139, 69, 19, 0.6)',
+            border: "1px solid rgba(139, 69, 19, 0.6)",
           }}
         />
 
@@ -294,6 +295,8 @@ const GameInstructions = () => (
       marginBottom: "24px",
       maxWidth: "800px",
       margin: "0 auto 24px auto",
+      border: `2px solid ${COLORS.primary}`,
+      borderRadius: "12px",
     }}
   >
     <Title level={4} style={{ color: COLORS.primary, marginBottom: "16px" }}>
@@ -379,15 +382,19 @@ const GameStats = ({
 );
 
 const GameSummary = ({ time, moves, comparison, previousResults }) => {
-  const incrementedMoves = comparison?.moves?.previous 
-    ? comparison.moves.previous + 1 
+  const incrementedMoves = comparison?.moves?.previous
+    ? comparison.moves.previous + 1
     : moves;
 
   return (
-    <Card style={{ marginBottom: "10px" }}>  {/* เพิ่ม marginBottom */}
+    <Card style={{ marginBottom: "10px" }}>
+      {" "}
+      {/* เพิ่ม marginBottom */}
       <Row gutter={[24, 24]}>
         {/* ผลครั้งนี้ */}
-        <Col span={12}>  {/* ปรับจาก 8 เป็น 12 */}
+        <Col span={12}>
+          {" "}
+          {/* ปรับจาก 8 เป็น 12 */}
           <Title level={4}>ผลครั้งนี้</Title>
           <Space direction="vertical">
             <div>เวลาที่ใช้: {formatTime(time)}</div>
@@ -396,7 +403,9 @@ const GameSummary = ({ time, moves, comparison, previousResults }) => {
         </Col>
 
         {/* ผลครั้งก่อน */}
-        <Col span={12}>  {/* ปรับจาก 8 เป็น 12 */}
+        <Col span={12}>
+          {" "}
+          {/* ปรับจาก 8 เป็น 12 */}
           <Title level={4}>ผลครั้งก่อน</Title>
           <Space direction="vertical">
             <div>เวลาที่ใช้: {formatTime(comparison?.time?.previous || 0)}</div>
@@ -511,7 +520,6 @@ const TowerOfHanoi = () => {
   const [timer, setTimer] = useState(null);
   const [discColors, setDiscColors] = useState([]);
   const [minMoves, setMinMoves] = useState(0);
-  const [showInstructions, setShowInstructions] = useState(true);
   const [selectedTower, setSelectedTower] = useState(null);
   const [previousResults, setPreviousResults] = useState(null);
   const [comparison, setComparison] = useState(null);
@@ -612,9 +620,7 @@ const TowerOfHanoi = () => {
 
   // Initialize game board
   const initializeGame = (keepLevel = false) => {
-    if (!keepLevel) {
-      setShowInstructions(false);
-    }
+    // ลบบรรทัดนี้: if (!keepLevel) { setShowInstructions(false); }
     const numDiscs = LEVELS[selectedLevel];
     const initialTowers = [
       Array.from({ length: numDiscs }, (_, i) => numDiscs - i),
@@ -807,7 +813,8 @@ const TowerOfHanoi = () => {
             เกมจานหรรษา - ระดับ {selectedLevel}
           </Title>
 
-          {showInstructions && <GameInstructions />}
+          {/* แสดง GameInstructions เสมอ ไม่ว่าสถานะเกมจะเป็นอะไร */}
+          <GameInstructions />
 
           <GameStats
             time={time}
